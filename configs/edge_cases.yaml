@@ -1,0 +1,29 @@
+# configs/edge_cases.yaml —— 阶段0 冻结的 3 个反例几何(SE(2),米/弧度)
+# 门:中心原点,穿门方向 +x,门宽 D
+common_door: {xD: 0.0, yD: 0.0, theta_D: 0.0, D: 0.9, thickness: 0.1, x_exit: 0.0}
+box: {L: 1.2, W: 0.4}
+
+EC1_open_accept:
+  seed: 1001
+  obstacles: []              # 开阔区,无障碍
+  box_pose: [-1.5, 0.0, 0.0] # 门前开阔处
+  from_template: rear_center
+  to_template: left_side
+  expect: accept
+
+EC2_box_blocks_door_reject:
+  seed: 1002
+  obstacles: [[wall_left], [wall_right]]  # 门框两侧墙
+  box_pose: [0.0, 0.0, 1.5708]  # 箱子横在门中(alpha=90°,投影=L=1.2 > D=0.9)
+  from_template: rear_center     # 门前站位
+  to_template: rear_center       # 门后站位(IK 各自可解)
+  expect: reject                 # base 连通分量断开
+  expected_failure: F2_UNREACHABLE
+
+EC3_box_moved_recover_accept:
+  seed: 1003
+  obstacles: [[wall_left], [wall_right]]
+  box_pose: [-1.2, 0.0, 0.0]     # 箱子已推离门口
+  from_template: rear_center
+  to_template: left_side
+  expect: accept                 # 连通性恢复
