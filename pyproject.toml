@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "g1_access_push"
+version = "0.0.1"
+description = "Access-aware bimanual pushing of long objects through narrow passages (Stage 0)"
+requires-python = ">=3.10"
+dependencies = ["numpy", "pyyaml"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

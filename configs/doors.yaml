@@ -1,0 +1,9 @@
+# configs/doors.yaml —— 门几何与净空余量(宽->窄 curriculum,见 10.10)
+doors:
+  wide:   {D: 1.10, thickness: 0.10}
+  medium: {D: 0.90, thickness: 0.10}
+  narrow: {D: 0.75, thickness: 0.15}
+margins:
+  delta_geom: 0.03      # 几何余量
+  commit_yaw_deg: 2.0   # 门 commit yaw 起步(见附录参数表)
+  commit_lateral: 0.02  # 门 commit 横向 (m)

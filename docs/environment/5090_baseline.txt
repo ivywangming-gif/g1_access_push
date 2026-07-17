@@ -1,0 +1,14 @@
+]633;E;echo "date=$(date -Iseconds)";9b64a14e-cb0b-4a93-814d-987783621545]633;Cdate=2026-07-17T17:24:15+08:00
+hostname=5090
+os=Ubuntu 22.04.5 LTS
+kernel=6.8.0-134-generic
+python=Python 3.11.15
+torch=2.7.0+cu128
+gpu=NVIDIA GeForce RTX 5090
+cuda_available=True
+isaaclab_commit=5c2ec81cb17532d32f7922dd7fcaae40d123b71a
+isaaclab_tag=v2.3.1
+agile_commit=ad4ff6ee6b38da207592b3e71dcee4c118049f6d
+agile_tag=v1.2
+project_commit=4dbbdfac707ca5f9fb6efc764e21b06aacf79492
+NVIDIA GeForce RTX 5090, 580.159.03, 32607 MiB

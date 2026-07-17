@@ -1,0 +1,12 @@
+# configs/object_families.yaml —— 长矩形箱子族(最终尺寸由 IK/WBC sweep 决定,见 3.6)
+default_box:
+  L: 1.2      # 长边 (m),占位,待模板审计后确定
+  W: 0.4      # 短边 (m)
+  H: 0.5      # 高 (m)
+  mass: 3.0   # kg,低质量起步(阶段2)
+ranges:
+  L: [0.8, 1.4]
+  W: [0.3, 0.5]
+  mass: [2.0, 6.0]
+  mu_ground: [0.2, 0.6]   # 箱-地摩擦 mu_og
+  mu_hand: [0.4, 0.9]     # 手-箱摩擦 mu_ho

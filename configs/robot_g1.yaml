@@ -1,0 +1,7 @@
+# configs/robot_g1.yaml —— G1 机器人接口参数(Stage 0 占位)
+robot: unitree_g1
+wbc_id: "agile_velocity_g1_history_v1"   # WBCID:随 checkpoint/频率/增益变化而更新
+control_hz: 200
+base_footprint_radius: 0.35   # 保守圆盘,覆盖所有允许 yaw(见式 6.2)
+hand:
+  reach_lateral_ratio: [0.5, 0.7]   # 两掌间距占可达横向范围(见 3.6 研究决策)
