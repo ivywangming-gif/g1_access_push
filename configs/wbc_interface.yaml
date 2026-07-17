@@ -1,0 +1,22 @@
+# configs/wbc_interface.yaml —— 阶段1 冻结的 WBC baseline 接口(式5.1 / 式7.2 WBCID)
+wbc_id: "agile_velocity_g1_history_v1"   # WBCID = checkpoint + 频率 + 观测 + 增益版本
+checkpoint: "agile/data/policy/velocity_g1/unitree_g1_velocity_history.pt"
+task: "Velocity-G1-History-v0"
+control_hz: 50            # policy 决策频率(以 AGILE 实际配置为准,先占位)
+
+# 式(5.1) 接口:u = [vBx, vBy, wB, hB, T_BHL, T_BHR, psi_waist]
+command_interface:
+  base_vx: true
+  base_vy: true
+  base_wz: true
+  base_height: false      # velocity policy 通常不接受高度命令,先关
+  hand_left_pose: false   # velocity-only policy 无上肢末端跟踪 -> 阶段1B 待定
+  hand_right_pose: false
+  waist_yaw: false
+
+# Go/No-Go 门槛(§5.10 / §12.1)
+gonogo:
+  n_trials: 100
+  max_falls: 0
+  base_pos_err_max_m: 0.15     # base 跟踪误差稳定阈值(起始值,标定后再定)
+  base_yaw_err_max_rad: 0.15
