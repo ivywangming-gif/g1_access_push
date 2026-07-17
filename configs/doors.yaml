@@ -1,0 +1,18 @@
+schema_version: 1
+doors:
+  synthetic_wide:
+    use: geometry_unit_tests_only
+    pose_world: {x_m: 0.0, y_m: 0.0, yaw_rad: 0.0}
+    width_m: 1.0
+    thickness_m: 0.2
+  synthetic_impossible_for_stage0_box:
+    use: rejection_unit_tests_only
+    pose_world: {x_m: 0.0, y_m: 0.0, yaw_rad: 0.0}
+    width_m: 0.35
+    thickness_m: 0.2
+  physical_door:
+    use: blocked_until_scene_measurement
+    pose_world: {x_m: null, y_m: null, yaw_rad: null}
+    width_m: null
+    thickness_m: null
+    measurement_margin_m: null

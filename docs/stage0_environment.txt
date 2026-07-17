@@ -1,0 +1,15 @@
+captured_at=2026-07-17T20:53:03+08:00
+user=ivy
+host=5090
+conda_env=agile_env
+python=Python 3.11.15
+isaaclab_tag=v2.3.1
+isaaclab_commit=5c2ec81cb17532d32f7922dd7fcaae40d123b71a
+agile_tag=v1.2
+agile_commit=ad4ff6ee6b38da207592b3e71dcee4c118049f6d
+torch=2.7.0+cu128
+torch_cuda=12.8
+cuda_available=True
+gpu=NVIDIA GeForce RTX 5090
+isaaclab_file=/home/ivy/robotics/third_party/IsaacLab/source/isaaclab/isaaclab/__init__.py
+NVIDIA GeForce RTX 5090, 580.159.03, 32607 MiB

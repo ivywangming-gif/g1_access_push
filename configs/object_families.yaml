@@ -1,0 +1,21 @@
+schema_version: 1
+object_families:
+  synthetic_stage0_box:
+    use: geometry_unit_tests_only
+    shape: rectangular_box
+    length_m: 1.2
+    width_m: 0.4
+    height_m: 0.5
+    mass_kg: null
+    validated_for_g1: false
+  physical_stage2_box:
+    use: blocked_until_dual_arm_and_wbc_audit
+    shape: rectangular_box
+    length_m: null
+    width_m: null
+    height_m: null
+    mass_kg: null
+    com_xyz_m: null
+    box_ground_friction: null
+    hand_box_friction: null
+    validated_for_g1: false

@@ -1,0 +1,32 @@
+schema_version: 1
+robot:
+  name: unitree_g1
+  world_frame: W
+  door_frame: D
+  object_frame: O
+  base_frame: B
+  left_hand_frame: HL
+  right_hand_frame: HR
+  convention:
+    length_unit: m
+    angle_unit: rad
+    x_forward: true
+    z_up: true
+    positive_yaw: counter_clockwise_about_positive_z
+  geometry_audit:
+    validated: false
+    urdf_commit: null
+    conservative_base_radius_m: null
+    robot_rear_radius_m: null
+    note: Fill only after the G1 URDF/collision/dual-arm sweep.
+  simulator_interface_audit:
+    completed: false
+    right_minus_left_normal_offset_produces_positive_yaw: null
+    note: Confirm in Isaac Sim/WBC-AGILE; do not infer from analytic convention.
+  wbc:
+    provider: WBC-AGILE
+    repository_tag: v1.2
+    checkpoint: agile/data/policy/velocity_g1/unitree_g1_velocity_history.pt
+    control_frequency_hz: null
+    observation_schema_version: 1
+    gains_version: null

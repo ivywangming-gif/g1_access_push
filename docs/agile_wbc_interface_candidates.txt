@@ -1,0 +1,300 @@
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:77:        - waist_yaw_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:80:        - waist_roll_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:83:        - waist_pitch_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:98:        - left_wrist_roll_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:99:        - right_wrist_roll_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:100:        - left_wrist_pitch_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:101:        - right_wrist_pitch_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:102:        - left_wrist_yaw_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:103:        - right_wrist_yaw_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:153:        - waist_yaw_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:156:        - waist_roll_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:159:        - waist_pitch_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:174:        - left_wrist_roll_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:175:        - right_wrist_roll_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:176:        - left_wrist_pitch_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:177:        - right_wrist_pitch_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:178:        - left_wrist_yaw_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:179:        - right_wrist_yaw_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:306:      - waist_yaw_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:309:      - waist_roll_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:312:      - waist_pitch_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:327:      - left_wrist_roll_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:328:      - right_wrist_roll_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:329:      - left_wrist_pitch_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:330:      - right_wrist_pitch_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:331:      - left_wrist_yaw_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_recurrent_student.yaml:332:      - right_wrist_yaw_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:97:        - waist_yaw_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:100:        - waist_roll_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:103:        - waist_pitch_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:118:        - left_wrist_roll_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:119:        - right_wrist_roll_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:120:        - left_wrist_pitch_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:121:        - right_wrist_pitch_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:122:        - left_wrist_yaw_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:123:        - right_wrist_yaw_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:173:        - waist_yaw_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:176:        - waist_roll_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:179:        - waist_pitch_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:194:        - left_wrist_roll_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:195:        - right_wrist_roll_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:196:        - left_wrist_pitch_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:197:        - right_wrist_pitch_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:198:        - left_wrist_yaw_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:199:        - right_wrist_yaw_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:334:      - waist_yaw_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:337:      - waist_roll_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:340:      - waist_pitch_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:355:      - left_wrist_roll_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:356:      - right_wrist_roll_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:357:      - left_wrist_pitch_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:358:      - right_wrist_pitch_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:359:      - left_wrist_yaw_joint
+agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.yaml:360:      - right_wrist_yaw_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:27:        element_names: [[left_hip_pitch_joint, right_hip_pitch_joint, waist_yaw_joint, left_hip_roll_joint, right_hip_roll_joint, waist_roll_joint, left_hip_yaw_joint, right_hip_yaw_joint, waist_pitch_joint, left_knee_joint, right_knee_joint, left_shoulder_pitch_joint, right_shoulder_pitch_joint, left_ankle_pitch_joint, right_ankle_pitch_joint, left_shoulder_roll_joint, right_shoulder_roll_joint, left_ankle_roll_joint, right_ankle_roll_joint, left_shoulder_yaw_joint, right_shoulder_yaw_joint, left_elbow_joint, right_elbow_joint, left_wrist_roll_joint, right_wrist_roll_joint, left_wrist_pitch_joint, right_wrist_pitch_joint, left_wrist_yaw_joint, right_wrist_yaw_joint]]
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:33:        element_names: [[left_hip_pitch_joint, right_hip_pitch_joint, waist_yaw_joint, left_hip_roll_joint, right_hip_roll_joint, waist_roll_joint, left_hip_yaw_joint, right_hip_yaw_joint, waist_pitch_joint, left_knee_joint, right_knee_joint, left_shoulder_pitch_joint, right_shoulder_pitch_joint, left_ankle_pitch_joint, right_ankle_pitch_joint, left_shoulder_roll_joint, right_shoulder_roll_joint, left_ankle_roll_joint, right_ankle_roll_joint, left_shoulder_yaw_joint, right_shoulder_yaw_joint, left_elbow_joint, right_elbow_joint, left_wrist_roll_joint, right_wrist_roll_joint, left_wrist_pitch_joint, right_wrist_pitch_joint, left_wrist_yaw_joint, right_wrist_yaw_joint]]
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:75:        element_names: [[left_hip_pitch_joint, right_hip_pitch_joint, left_hip_roll_joint, right_hip_roll_joint, waist_roll_joint, left_hip_yaw_joint, right_hip_yaw_joint, waist_pitch_joint, left_knee_joint, right_knee_joint, left_ankle_pitch_joint, right_ankle_pitch_joint, left_ankle_roll_joint, right_ankle_roll_joint]]
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:81:        element_names: [[left_hip_pitch_joint, right_hip_pitch_joint, left_hip_roll_joint, right_hip_roll_joint, waist_roll_joint, left_hip_yaw_joint, right_hip_yaw_joint, waist_pitch_joint, left_knee_joint, right_knee_joint, left_ankle_pitch_joint, right_ankle_pitch_joint, left_ankle_roll_joint, right_ankle_roll_joint]]
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:87:        element_names: [[left_hip_pitch_joint, right_hip_pitch_joint, left_hip_roll_joint, right_hip_roll_joint, waist_roll_joint, left_hip_yaw_joint, right_hip_yaw_joint, waist_pitch_joint, left_knee_joint, right_knee_joint, left_ankle_pitch_joint, right_ankle_pitch_joint, left_ankle_roll_joint, right_ankle_roll_joint]]
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:170:        - waist_roll_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:173:        - waist_pitch_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:189:        - waist_roll_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:192:        - waist_pitch_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:213:        - waist_roll_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:216:        - waist_pitch_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:236:        - left_wrist_roll_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:237:        - right_wrist_roll_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:238:        - left_wrist_pitch_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:239:        - right_wrist_pitch_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:240:        - left_wrist_yaw_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:241:        - right_wrist_yaw_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_history.yaml:55:      - waist_roll_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_history.yaml:58:      - waist_pitch_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_history.yaml:329:      - waist_yaw_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_history.yaml:332:      - waist_roll_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_history.yaml:335:      - waist_pitch_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_history.yaml:350:      - left_wrist_roll_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_history.yaml:351:      - right_wrist_roll_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_history.yaml:352:      - left_wrist_pitch_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_history.yaml:353:      - right_wrist_pitch_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_history.yaml:354:      - left_wrist_yaw_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_history.yaml:355:      - right_wrist_yaw_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_history.yaml:424:        - waist_roll_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_history.yaml:427:        - waist_pitch_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_history.yaml:470:        - waist_roll_joint
+agile/data/policy/velocity_g1/unitree_g1_velocity_history.yaml:473:        - waist_pitch_joint
+agile/rl_env/tasks/pick_place/pick_place_tracking_env_cfg.py:125:                prim_path="{ENV_REGEX_NS}/Robot/right_hand/right_hand_palm_link",
+agile/rl_env/tasks/pick_place/pick_place_tracking_env_cfg.py:126:                name="right_hand_palm",
+agile/rl_env/tasks/pick_place/pick_place_tracking_env_cfg.py:182:            "waist_roll_joint": (-0.1, 0.1),
+agile/rl_env/tasks/pick_place/pick_place_tracking_env_cfg.py:183:            "waist_pitch_joint": (-0.1, 0.1),
+agile/rl_env/tasks/pick_place/pick_place_tracking_env_cfg.py:184:            "waist_yaw_joint": (-0.2, 0.2),
+agile/rl_env/tasks/pick_place/g1/g1_pick_place_tracking_env_cfg.py:54:            "left_wrist_roll_joint": -0.0926,
+agile/rl_env/tasks/pick_place/g1/g1_pick_place_tracking_env_cfg.py:55:            "left_wrist_pitch_joint": -0.0179,
+agile/rl_env/tasks/pick_place/g1/g1_pick_place_tracking_env_cfg.py:56:            "left_wrist_yaw_joint": -0.0225,
+agile/rl_env/tasks/pick_place/g1/g1_pick_place_tracking_env_cfg.py:57:            "left_hand_thumb_1_joint": 1.0,
+agile/rl_env/tasks/pick_place/g1/g1_pick_place_tracking_env_cfg.py:58:            "left_hand_thumb_2_joint": 0.3,
+agile/rl_env/tasks/pick_place/g1/g1_pick_place_tracking_env_cfg.py:247:        finger_tip_body_list = ["right_hand_index_1_link", "right_hand_middle_1_link", "right_hand_thumb_2_link"]
+agile/rl_env/tasks/pick_place/g1/g1_pick_place_tracking_env_cfg.py:253:                    prim_path="{ENV_REGEX_NS}/Robot/right_hand/" + link_name,
+agile/rl_env/tasks/pick_place/g1/g1_pick_place_tracking_env_cfg.py:259:        for link_name in ["right_hand_index_1_link", "right_hand_middle_1_link", "right_hand_thumb_2_link"]:
+agile/rl_env/tasks/locomotion/t1/velocity_env_cfg.py:114:    base_velocity = mdp.UniformNullVelocityCommandCfg(
+agile/rl_env/tasks/locomotion/t1/velocity_env_cfg.py:171:        velocity_commands = ObsTerm(func=mdp.generated_commands, params={"command_name": "base_velocity"})
+agile/rl_env/tasks/locomotion/t1/velocity_env_cfg.py:195:        velocity_commands = ObsTerm(func=mdp.generated_commands, params={"command_name": "base_velocity"})
+agile/rl_env/tasks/locomotion/t1/velocity_env_cfg.py:222:        params={"command_name": "base_velocity", "std": 0.2},
+agile/rl_env/tasks/locomotion/t1/velocity_env_cfg.py:229:            "command_name": "base_velocity",
+agile/rl_env/tasks/locomotion/t1/velocity_env_cfg.py:590:            "command_name": "base_velocity",
+agile/rl_env/tasks/locomotion/g1/velocity_history_env_cfg.py:40:# Define controlled joints for G1 (legs + waist roll/pitch for locomotion)
+agile/rl_env/tasks/locomotion/g1/velocity_history_env_cfg.py:41:CONTROLLED_JOINT_NAMES = unitree_g1.LEG_JOINT_NAMES + ["waist_roll_joint", "waist_pitch_joint"]
+agile/rl_env/tasks/locomotion/g1/velocity_history_env_cfg.py:129:    base_velocity = mdp.UniformNullVelocityCommandCfg(
+agile/rl_env/tasks/locomotion/g1/velocity_history_env_cfg.py:186:        velocity_commands = ObsTerm(func=mdp.generated_commands, params={"command_name": "base_velocity"})
+agile/rl_env/tasks/locomotion/g1/velocity_history_env_cfg.py:210:        velocity_commands = ObsTerm(func=mdp.generated_commands, params={"command_name": "base_velocity"})
+agile/rl_env/tasks/locomotion/g1/velocity_history_env_cfg.py:237:        params={"command_name": "base_velocity", "std": 0.2},
+agile/rl_env/tasks/locomotion/g1/velocity_history_env_cfg.py:244:            "command_name": "base_velocity",
+agile/rl_env/tasks/locomotion/g1/velocity_history_env_cfg.py:607:            "command_name": "base_velocity",
+agile/rl_env/tasks/tracking/tracking_env_cfg.py:354:                    r"^(?!left_ankle_roll_link$)(?!right_ankle_roll_link$)(?!left_wrist_yaw_link$)(?!right_wrist_yaw_link$).+$"
+agile/rl_env/tasks/tracking/tracking_env_cfg.py:383:                "left_wrist_yaw_link",
+agile/rl_env/tasks/tracking/tracking_env_cfg.py:384:                "right_wrist_yaw_link",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:45:            "left_wrist_yaw_link",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:48:            "right_wrist_yaw_link",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:67:            "waist_yaw_link",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:68:            "waist_roll_link",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:74:            "left_wrist_roll_link",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:75:            "left_wrist_pitch_link",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:76:            "left_wrist_yaw_link",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:81:            "right_wrist_roll_link",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:82:            "right_wrist_pitch_link",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:83:            "right_wrist_yaw_link",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:101:            "waist_yaw_joint",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:102:            "waist_roll_joint",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:103:            "waist_pitch_joint",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:108:            "left_wrist_roll_joint",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:109:            "left_wrist_pitch_joint",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:110:            "left_wrist_yaw_joint",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:115:            "right_wrist_roll_joint",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:116:            "right_wrist_pitch_joint",
+agile/rl_env/tasks/tracking/g1/flat_env_cfg.py:117:            "right_wrist_yaw_joint",
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:49:    velocity_height_commands = ObsTerm(func=mdp.generated_commands, params={"command_name": "base_velocity"})
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:80:    velocity_height_commands = ObsTerm(func=mdp.generated_commands, params={"command_name": "base_velocity"})
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:92:    base_height = ObsTerm(func=mdp.base_height_from_command, params={"command_name": "base_velocity"}, clip=(-10, 10))
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:113:    velocity_height_commands = ObsTerm(func=mdp.generated_commands, params={"command_name": "base_velocity"})
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:250:    base_velocity = mdp.UniformVelocityBaseHeightCommandCfg(
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:285:    # We don't want to randomize the roll and pitch joints of the waist.
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:290:            "waist_roll_joint": (-0.0, 0.0),
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:291:            "waist_pitch_joint": (-0.0, 0.0),
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:292:            "waist_yaw_joint": (-math.radians(15.0), math.radians(15.0)),
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:309:        command_name="base_velocity",
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:323:        command_name="base_velocity",
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:344:        params={"command_name": "base_velocity", "std": 0.2},
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:349:        params={"command_name": "base_velocity", "std": 0.2},
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:354:        params={"command_name": "base_velocity", "std": 0.2},
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:356:    no_undersired_base_velocity_exp = RewTerm(
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:357:        func=mdp.no_undersired_base_velocity_exp_if_null_cmd,
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:365:            "command_name": "base_velocity",
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:374:            "command_name": "base_velocity",
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:432:            "command_name": "base_velocity",
+agile/rl_env/tasks/locomotion_height/g1/velocity_height_env_cfg.py:763:            "command_name": "base_velocity",
+agile/rl_env/tasks/debug/object_debug_env_cfg.py:46:                joint_names=["right_shoulder_.*", "right_elbow_.*", "right_wrist_.*"],
+agile/rl_env/tasks/debug/object_debug_env_cfg.py:49:            self.actions.base_velocity = None
+agile/rl_env/assets/robots/unitree_g1.py:35:    "waist_.*_joint",
+agile/rl_env/assets/robots/unitree_g1.py:49:    "waist_.*_joint",
+agile/rl_env/assets/robots/unitree_g1.py:61:    "waist_.*_joint",
+agile/rl_env/assets/robots/unitree_g1.py:73:    "right_wrist_roll_joint",
+agile/rl_env/assets/robots/unitree_g1.py:74:    "right_wrist_pitch_joint",
+agile/rl_env/assets/robots/unitree_g1.py:75:    "right_wrist_yaw_joint",
+agile/rl_env/assets/robots/unitree_g1.py:76:    "right_hand_.*_joint",
+agile/rl_env/assets/robots/unitree_g1.py:83:    "left_wrist_roll_joint",
+agile/rl_env/assets/robots/unitree_g1.py:84:    "left_wrist_pitch_joint",
+agile/rl_env/assets/robots/unitree_g1.py:85:    "left_wrist_yaw_joint",
+agile/rl_env/assets/robots/unitree_g1.py:86:    "left_hand_.*_joint",
+agile/rl_env/assets/robots/unitree_g1.py:96:        variants={"Physics": "PhysX", "left_hand": "None", "right_hand": "None"},
+agile/rl_env/assets/robots/unitree_g1.py:186:        "waist": DelayedDCMotorCfg(
+agile/rl_env/assets/robots/unitree_g1.py:189:                "waist_yaw_joint": 88.0,
+agile/rl_env/assets/robots/unitree_g1.py:190:                "waist_roll_joint": 50.0,
+agile/rl_env/assets/robots/unitree_g1.py:191:                "waist_pitch_joint": 50.0,
+agile/rl_env/assets/robots/unitree_g1.py:194:                "waist_yaw_joint": 32.0,
+agile/rl_env/assets/robots/unitree_g1.py:195:                "waist_roll_joint": 37.0,
+agile/rl_env/assets/robots/unitree_g1.py:196:                "waist_pitch_joint": 37.0,
+agile/rl_env/assets/robots/unitree_g1.py:199:                "waist_yaw_joint": 300.0,
+agile/rl_env/assets/robots/unitree_g1.py:200:                "waist_roll_joint": 300.0,
+agile/rl_env/assets/robots/unitree_g1.py:201:                "waist_pitch_joint": 300.0,
+agile/rl_env/assets/robots/unitree_g1.py:204:                "waist_yaw_joint": 5.0,
+agile/rl_env/assets/robots/unitree_g1.py:205:                "waist_roll_joint": 5.0,
+agile/rl_env/assets/robots/unitree_g1.py:206:                "waist_pitch_joint": 5.0,
+agile/rl_env/assets/robots/unitree_g1.py:282:        variants={"Physics": "PhysX", "left_hand": "None", "right_hand": "None"},
+agile/rl_env/assets/robots/unitree_g1.py:358:        "waist": ImplicitActuatorCfg(
+agile/rl_env/assets/robots/unitree_g1.py:361:                "waist_yaw_joint": 88.0,
+agile/rl_env/assets/robots/unitree_g1.py:362:                "waist_roll_joint": 50.0,
+agile/rl_env/assets/robots/unitree_g1.py:363:                "waist_pitch_joint": 50.0,
+agile/rl_env/assets/robots/unitree_g1.py:366:                "waist_yaw_joint": 32.0,
+agile/rl_env/assets/robots/unitree_g1.py:367:                "waist_roll_joint": 37.0,
+agile/rl_env/assets/robots/unitree_g1.py:368:                "waist_pitch_joint": 37.0,
+agile/rl_env/assets/robots/unitree_g1.py:371:                "waist_yaw_joint": 300.0,
+agile/rl_env/assets/robots/unitree_g1.py:372:                "waist_roll_joint": 300.0,
+agile/rl_env/assets/robots/unitree_g1.py:373:                "waist_pitch_joint": 300.0,
+agile/rl_env/assets/robots/unitree_g1.py:376:                "waist_yaw_joint": 5.0,
+agile/rl_env/assets/robots/unitree_g1.py:377:                "waist_roll_joint": 5.0,
+agile/rl_env/assets/robots/unitree_g1.py:378:                "waist_pitch_joint": 5.0,
+agile/rl_env/assets/robots/unitree_g1.py:444:        variants={"Physics": "PhysX", "left_hand": "None", "right_hand": "None"},
+agile/rl_env/assets/robots/unitree_g1.py:525:        "waist": DelayedImplicitActuatorCfg(
+agile/rl_env/assets/robots/unitree_g1.py:526:            joint_names_expr=["waist_roll_joint", "waist_pitch_joint"],
+agile/rl_env/assets/robots/unitree_g1.py:535:        "waist_yaw": DelayedImplicitActuatorCfg(
+agile/rl_env/assets/robots/unitree_g1.py:536:            joint_names_expr=["waist_yaw_joint"],
+agile/rl_env/assets/robots/unitree_g1.py:702:        "waist": DelayedImplicitActuatorCfg(
+agile/rl_env/assets/robots/unitree_g1.py:705:                "waist_yaw_joint": 88.0,
+agile/rl_env/assets/robots/unitree_g1.py:706:                "waist_roll_joint": 50.0,
+agile/rl_env/assets/robots/unitree_g1.py:707:                "waist_pitch_joint": 50.0,
+agile/rl_env/assets/robots/unitree_g1.py:710:                "waist_yaw_joint": 32.0,
+agile/rl_env/assets/robots/unitree_g1.py:711:                "waist_roll_joint": 37.0,
+agile/rl_env/assets/robots/unitree_g1.py:712:                "waist_pitch_joint": 37.0,
+agile/rl_env/assets/robots/unitree_g1.py:715:                "waist_yaw_joint": 300.0,
+agile/rl_env/assets/robots/unitree_g1.py:716:                "waist_roll_joint": 300.0,
+agile/rl_env/assets/robots/unitree_g1.py:717:                "waist_pitch_joint": 300.0,
+agile/rl_env/assets/robots/unitree_g1.py:720:                "waist_yaw_joint": 5.0,
+agile/rl_env/assets/robots/unitree_g1.py:721:                "waist_roll_joint": 5.0,
+agile/rl_env/assets/robots/unitree_g1.py:722:                "waist_pitch_joint": 5.0,
+agile/rl_env/assets/robots/unitree_g1.py:734:                "left_wrist_roll_joint",
+agile/rl_env/assets/robots/unitree_g1.py:735:                "left_wrist_pitch_joint",
+agile/rl_env/assets/robots/unitree_g1.py:736:                "left_wrist_yaw_joint",
+agile/rl_env/assets/robots/unitree_g1.py:743:                "left_wrist_roll_joint": 25.0,
+agile/rl_env/assets/robots/unitree_g1.py:744:                "left_wrist_pitch_joint": 5.0,
+agile/rl_env/assets/robots/unitree_g1.py:745:                "left_wrist_yaw_joint": 5.0,
+agile/rl_env/assets/robots/unitree_g1.py:752:                "left_wrist_roll_joint": 37.0,
+agile/rl_env/assets/robots/unitree_g1.py:753:                "left_wrist_pitch_joint": 22.0,
+agile/rl_env/assets/robots/unitree_g1.py:754:                "left_wrist_yaw_joint": 22.0,
+agile/rl_env/assets/robots/unitree_g1.py:761:                "left_wrist_roll_joint": 100.0,
+agile/rl_env/assets/robots/unitree_g1.py:762:                "left_wrist_pitch_joint": 100.0,
+agile/rl_env/assets/robots/unitree_g1.py:763:                "left_wrist_yaw_joint": 100.0,
+agile/rl_env/assets/robots/unitree_g1.py:770:                "left_wrist_roll_joint": 0.2,
+agile/rl_env/assets/robots/unitree_g1.py:771:                "left_wrist_pitch_joint": 0.2,
+agile/rl_env/assets/robots/unitree_g1.py:772:                "left_wrist_yaw_joint": 0.2,
+agile/rl_env/assets/robots/unitree_g1.py:777:                "left_wrist_roll_joint": 0.03,
+agile/rl_env/assets/robots/unitree_g1.py:778:                "left_wrist_pitch_joint": 0.03,
+agile/rl_env/assets/robots/unitree_g1.py:779:                "left_wrist_yaw_joint": 0.03,
+agile/rl_env/assets/robots/unitree_g1.py:790:                "right_wrist_roll_joint",
+agile/rl_env/assets/robots/unitree_g1.py:791:                "right_wrist_pitch_joint",
+agile/rl_env/assets/robots/unitree_g1.py:792:                "right_wrist_yaw_joint",
+agile/rl_env/assets/robots/unitree_g1.py:799:                "right_wrist_roll_joint": 25.0,
+agile/rl_env/assets/robots/unitree_g1.py:800:                "right_wrist_pitch_joint": 5.0,
+agile/rl_env/assets/robots/unitree_g1.py:801:                "right_wrist_yaw_joint": 5.0,
+agile/rl_env/assets/robots/unitree_g1.py:808:                "right_wrist_roll_joint": 37.0,
+agile/rl_env/assets/robots/unitree_g1.py:809:                "right_wrist_pitch_joint": 22.0,
+agile/rl_env/assets/robots/unitree_g1.py:810:                "right_wrist_yaw_joint": 22.0,
+agile/rl_env/assets/robots/unitree_g1.py:817:                "right_wrist_roll_joint": 100.0,
+agile/rl_env/assets/robots/unitree_g1.py:818:                "right_wrist_pitch_joint": 100.0,
+agile/rl_env/assets/robots/unitree_g1.py:819:                "right_wrist_yaw_joint": 100.0,
+agile/rl_env/assets/robots/unitree_g1.py:826:                "right_wrist_roll_joint": 0.2,
+agile/rl_env/assets/robots/unitree_g1.py:827:                "right_wrist_pitch_joint": 0.2,
+agile/rl_env/assets/robots/unitree_g1.py:828:                "right_wrist_yaw_joint": 0.2,
+agile/rl_env/assets/robots/unitree_g1.py:833:                "right_wrist_roll_joint": 0.03,
+agile/rl_env/assets/robots/unitree_g1.py:834:                "right_wrist_pitch_joint": 0.03,
+agile/rl_env/assets/robots/unitree_g1.py:835:                "right_wrist_yaw_joint": 0.03,
+agile/rl_env/mdp/rewards/task_rewards.py:240:    command_name: str = "base_velocity_height",
+agile/rl_env/mdp/rewards/task_rewards.py:309:    command_name: str = "base_velocity_height",
+agile/rl_env/mdp/rewards/aestetic_rewards.py:495:def no_undersired_base_velocity_exp(
+agile/rl_env/mdp/rewards/aestetic_rewards.py:508:def no_undersired_base_velocity_exp_if_null_cmd(
+agile/rl_env/mdp/rewards/aestetic_rewards.py:511:    command_name: str = "base_velocity",
+agile/rl_env/mdp/curriculums/task_curriculum.py:49:        command_name: str = "base_velocity",
+agile/rl_env/mdp/observations/observations_cfg.py:44:    commands = ObsTerm(func=observations_io.velocity_height_command, params={"command_name": "base_velocity"})
+agile/rl_env/mdp/actions/actions_cfg.py:72:    command_name: str = "base_velocity"
+agile/rl_env/mdp/actions/actions_cfg.py:73:    """Name of the command to use for the action term. Defaults to "base_velocity"."""
+agile/rl_env/mdp/actions/actions_cfg.py:142:    """Name of the command term for height commands (e.g., 'base_velocity'). If None, uses fixed target_height."""
+agile/rl_env/mdp/actions/velocity_profiles/linear.py:133:            base_velocity = velocities.expand(-1, self._num_joints)
+agile/rl_env/mdp/actions/velocity_profiles/linear.py:139:            base_velocity = velocities
+agile/rl_env/mdp/actions/velocity_profiles/linear.py:143:            base_velocity = torch.min(base_velocity, self._velocity_limits[env_ids])
+agile/rl_env/mdp/actions/velocity_profiles/linear.py:146:        self._trajectory_velocity[env_ids] = base_velocity * self._trajectory_direction[env_ids]
+agile/rl_env/tests/test_motion_tracking.py:250:    "left_wrist_yaw_link", "right_shoulder_roll_link", "right_elbow_link",
+agile/rl_env/tests/test_motion_tracking.py:251:    "right_wrist_yaw_link",
+agile/rl_env/tests/test_motion_tracking.py:259:    "waist_yaw_link", "waist_roll_link", "torso_link",
+agile/rl_env/tests/test_motion_tracking.py:261:    "left_elbow_link", "left_wrist_roll_link", "left_wrist_pitch_link",
+agile/rl_env/tests/test_motion_tracking.py:262:    "left_wrist_yaw_link", "right_shoulder_pitch_link", "right_shoulder_roll_link",
+agile/rl_env/tests/test_motion_tracking.py:263:    "right_shoulder_yaw_link", "right_elbow_link", "right_wrist_roll_link",
+agile/rl_env/tests/test_motion_tracking.py:264:    "right_wrist_pitch_link", "right_wrist_yaw_link",
+agile/rl_env/tests/test_motion_tracking.py:272:    "waist_yaw_joint", "waist_roll_joint", "waist_pitch_joint",
+agile/rl_env/tests/test_motion_tracking.py:274:    "left_elbow_joint", "left_wrist_roll_joint", "left_wrist_pitch_joint",
+agile/rl_env/tests/test_motion_tracking.py:275:    "left_wrist_yaw_joint", "right_shoulder_pitch_joint", "right_shoulder_roll_joint",
+agile/rl_env/tests/test_motion_tracking.py:276:    "right_shoulder_yaw_joint", "right_elbow_joint", "right_wrist_roll_joint",
+agile/rl_env/tests/test_motion_tracking.py:277:    "right_wrist_pitch_joint", "right_wrist_yaw_joint",
+agile/algorithms/evaluation/random_command_scheduler.py:109:            cfg = self.env.cfg.commands.base_velocity.ranges
+agile/algorithms/evaluation/random_command_scheduler.py:113:                "Ensure the environment has 'cfg.commands.base_velocity.ranges' defined. "
+agile/algorithms/evaluation/random_command_scheduler.py:206:        base_vel_term = cmd_manager.get_term("base_velocity")
+agile/algorithms/evaluation/eval_config.py:212:                        base_velocity:
+agile/algorithms/evaluation/velocity_height_scheduler.py:37:    **Supported Command Type:** base_velocity
+agile/algorithms/evaluation/velocity_height_scheduler.py:107:            cfg = self.env.cfg.commands.base_velocity.ranges
+agile/algorithms/evaluation/velocity_height_scheduler.py:133:                f"Ensure the environment has 'cfg.commands.base_velocity.ranges' defined. "
+agile/algorithms/evaluation/velocity_height_scheduler.py:176:        if "base_velocity" not in commands:
+agile/algorithms/evaluation/velocity_height_scheduler.py:177:            raise ValueError("Commands must contain 'base_velocity' key")
+agile/algorithms/evaluation/velocity_height_scheduler.py:179:        cmd = commands["base_velocity"]
+agile/algorithms/evaluation/velocity_height_scheduler.py:232:                    if step.commands and "base_velocity" in step.commands:
+agile/algorithms/evaluation/velocity_height_scheduler.py:233:                        cmd = step.commands["base_velocity"]
+agile/algorithms/evaluation/velocity_height_scheduler.py:323:            commands: Command dictionary with 'base_velocity' key
+agile/algorithms/evaluation/velocity_height_scheduler.py:325:        cmd = commands["base_velocity"]
+agile/algorithms/evaluation/velocity_height_scheduler.py:362:        base_vel_term = cmd_manager.get_term("base_velocity")
+agile/algorithms/evaluation/evaluator.py:152:                              Each pattern supports wildcards (e.g., ".*_hip_.*", "waist_yaw").
+agile/algorithms/evaluation/evaluator.py:160:            {"upper_body": ["waist_.*", ".*_shoulder_.*", ".*_elbow.*"],
+agile/algorithms/evaluation/configs/default_eval.yaml:19:          base_velocity:
+agile/algorithms/evaluation/configs/default_eval.yaml:30:          base_velocity:
+agile/algorithms/evaluation/configs/default_eval.yaml:37:      name: "yaw_rate_capability"
+agile/algorithms/evaluation/configs/default_eval.yaml:41:          base_velocity:
+agile/algorithms/evaluation/configs/default_eval.yaml:52:          base_velocity:
+agile/algorithms/evaluation/configs/examples/yaw_rate_sweep.yaml:11:      name: "yaw_rate_sweep"
+agile/algorithms/evaluation/configs/examples/yaw_rate_sweep.yaml:15:          base_velocity:

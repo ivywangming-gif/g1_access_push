@@ -1,0 +1,27 @@
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:2:  Velocity-G1-History-v0:
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:132:    Velocity-G1-History-v0/actions_history_out: [Velocity-G1-History-v0/actions_history]
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:133:    Velocity-G1-History-v0/base_ang_vel_history_out: [Velocity-G1-History-v0/base_ang_vel_history]
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:134:    Velocity-G1-History-v0/controlled_joint_pos_history_out: [Velocity-G1-History-v0/controlled_joint_pos_history]
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:135:    Velocity-G1-History-v0/controlled_joint_vel_history_out: [Velocity-G1-History-v0/controlled_joint_vel_history]
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:136:    Velocity-G1-History-v0/last_actions_out: [Velocity-G1-History-v0/last_actions]
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:137:    Velocity-G1-History-v0/projected_gravity_history_out: [Velocity-G1-History-v0/projected_gravity_history]
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:138:    Velocity-G1-History-v0/velocity_commands_history_out: [Velocity-G1-History-v0/velocity_commands_history]
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:140:    Velocity-G1-History-v0: [root_link_quat_w, root_ang_vel_b, velocity_commands, joint_pos, joint_vel]
+agile/data/policy/velocity_g1/unitree_g1_velocity_e2e.yaml:142:    Velocity-G1-History-v0: [action_joint_pos, action_joint_pos_kp_gains, action_joint_pos_kd_gains]
+agile/rl_env/tasks/stand_up/t1/__init__.py:24:gym.register(
+agile/rl_env/tasks/pick_place/g1/__init__.py:24:gym.register(
+agile/rl_env/tasks/pick_place/g1/__init__.py:34:gym.register(
+agile/rl_env/tasks/pick_place/g1/__init__.py:44:gym.register(
+agile/rl_env/tasks/pick_place/g1/__init__.py:54:gym.register(
+agile/rl_env/tasks/locomotion/t1/__init__.py:24:gym.register(
+agile/rl_env/tasks/locomotion/g1/__init__.py:24:gym.register(
+agile/rl_env/tasks/locomotion/g1/__init__.py:25:    id="Velocity-G1-History-v0",
+agile/rl_env/tasks/tracking/g1/__init__.py:25:gym.register(
+agile/rl_env/tasks/locomotion_height/g1/__init__.py:24:gym.register(
+agile/rl_env/tasks/locomotion_height/g1/__init__.py:39:gym.register(
+agile/rl_env/tasks/locomotion_height/g1/__init__.py:49:gym.register(
+agile/rl_env/tasks/debug/__init__.py:20:gym.register(
+agile/rl_env/tasks/debug/__init__.py:21:    id="Debug-G1-v0",
+agile/rl_env/tasks/debug/__init__.py:31:gym.register(
+agile/rl_env/tasks/debug/__init__.py:43:gym.register(
+agile/rl_env/tasks/debug/__init__.py:44:    id="Debug-G1-Object-v0",

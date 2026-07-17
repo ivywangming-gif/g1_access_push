@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+build/
+dist/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Local environments
+.venv/
+venv/
+env/
+
+# Research outputs
+experiment_logs/
+logs/
+outputs/
+runs/
+wandb/
+videos/
+*.mp4
+*.avi
+
+# Data and generated caches
+datasets/
+cache/
+primitive_cache/
+*.npz
+*.npy
+*.pt
+*.pth
+
+# Isaac Sim / Omniverse local artifacts
+_isaac_sim/
+kit/cache/
+.omniverse/
