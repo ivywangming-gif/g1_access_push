@@ -1,0 +1,27 @@
+test_id: "s1_02_dual_arm_hold"
+
+seed: 42
+warmup_steps: 100
+measurement_steps: 3000
+
+command:
+  lin_vel_x: 0.0
+  lin_vel_y: 0.0
+  ang_vel_z: 0.0
+  base_height: 0.72
+
+acceptance:
+  minimum_root_height_m: 0.50
+  maximum_root_height_m: 1.00
+  maximum_base_height_p95_error_m: 0.05
+  maximum_final_xy_drift_m: 0.25
+  maximum_root_orientation_error_deg: 15.0
+
+  maximum_hand_position_rms_m: 0.03
+  maximum_hand_position_p95_m: 0.05
+  maximum_hand_orientation_rms_deg: 5.0
+  maximum_hand_orientation_p95_deg: 8.0
+
+  maximum_arm_joint_target_p95_error_rad: 0.20
+  maximum_torque_ratio: 1.001
+  minimum_joint_limit_margin_rad: 0.0
