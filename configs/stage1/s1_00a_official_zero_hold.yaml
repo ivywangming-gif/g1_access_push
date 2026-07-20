@@ -1,0 +1,21 @@
+evaluation:
+  task_name: "Velocity-Height-G1-v0"
+  num_envs: 1
+  episode_length_s: 60.0
+  num_episodes: 1
+
+  env_overrides:
+    events:
+      disable_all: true
+
+  environments:
+    - env_ids: [0]
+      name: "zero_velocity_hold"
+      schedule:
+        - time: 0.0
+          commands:
+            base_velocity:
+              lin_vel_x: 0.0
+              lin_vel_y: 0.0
+              ang_vel_z: 0.0
+              base_height: 0.72

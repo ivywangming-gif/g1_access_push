@@ -1,0 +1,54 @@
+stage: 1
+baseline_id: agile_g1_velocity_height_teacher_v1
+
+task:
+  id: "Velocity-Height-G1-v0"
+  purpose: "Official AGILE lower-body velocity-height baseline before custom bimanual task"
+
+agile:
+  path: "/root/autodl-tmp/robotics/third_party/WBC-AGILE"
+  tag: "v1.2"
+  commit: "ad4ff6ee6b38da207592b3e71dcee4c118049f6d"
+
+isaac_lab:
+  path: "/root/autodl-tmp/robotics/third_party/IsaacLab"
+  tag: "v2.3.1"
+  commit: "5c2ec81cb17532d32f7922dd7fcaae40d123b71a"
+
+checkpoint:
+  path_relative_to_agile: >-
+    agile/data/policy/velocity_height_g1/unitree_g1_velocity_height_teacher.pt
+  sha256: "e2bcf9704d94c6ca8b9baf0a73c2c7e06ffb6e9bdf856ef012442eb05d6cca54"
+  format: "torchscript"
+
+simulation:
+  device: "cuda:0"
+  controller_frequency_hz: 50
+  physics_frequency_hz: 200
+  headless: true
+
+zero_hold_evaluation:
+  config_path: "configs/stage1/s1_00a_official_zero_hold.yaml"
+  episode_length_s: 60.0
+  num_envs: 1
+  num_episodes: 1
+  nominal_base_height_m: 0.72
+  expected_control_frames: 3000
+
+acceptance:
+  minimum_frames: 2950
+  require_all_numeric_finite: true
+  minimum_root_height_m: 0.50
+  maximum_root_height_m: 1.00
+  maximum_final_xy_drift_m: 0.25
+
+reference_result:
+  run_timestamp: "2026-07-20T16:20:43+08:00"
+  frames: 3000
+  all_numeric_finite: true
+  root_height_min_m: 0.669341
+  root_height_mean_m: 0.718477
+  root_height_max_m: 0.894827
+  final_xy_drift_m: 0.081810
+  maximum_xy_excursion_m: 0.105987
+  result: "pass"
