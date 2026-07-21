@@ -1,0 +1,88 @@
+test_id: "s1_06_recurrent_base_motion_hand_hold"
+
+seed: 42
+warmup_steps: 150
+transient_ignore_steps: 50
+
+segments:
+  - name: "forward"
+    steps: 250
+    command: [0.15, 0.0, 0.0, 0.72]
+    evaluate_axes:
+      x: 0.15
+
+  - name: "settle_1"
+    steps: 100
+    command: [0.0, 0.0, 0.0, 0.72]
+
+  - name: "backward"
+    steps: 250
+    command: [-0.15, 0.0, 0.0, 0.72]
+    evaluate_axes:
+      x: -0.15
+
+  - name: "settle_2"
+    steps: 100
+    command: [0.0, 0.0, 0.0, 0.72]
+
+  - name: "lateral_left"
+    steps: 250
+    command: [0.0, 0.20, 0.0, 0.72]
+    evaluate_axes:
+      y: 0.20
+
+  - name: "settle_3"
+    steps: 100
+    command: [0.0, 0.0, 0.0, 0.72]
+
+  - name: "lateral_right"
+    steps: 250
+    command: [0.0, -0.20, 0.0, 0.72]
+    evaluate_axes:
+      y: -0.20
+
+  - name: "settle_4"
+    steps: 100
+    command: [0.0, 0.0, 0.0, 0.72]
+
+  - name: "arc_left"
+    steps: 300
+    command: [0.15, 0.0, 0.25, 0.72]
+    evaluate_axes:
+      x: 0.15
+      wz: 0.25
+    require_yaw_displacement: true
+
+  - name: "settle_5"
+    steps: 120
+    command: [0.0, 0.0, 0.0, 0.72]
+
+  - name: "arc_right"
+    steps: 300
+    command: [0.15, 0.0, -0.25, 0.72]
+    evaluate_axes:
+      x: 0.15
+      wz: -0.25
+    require_yaw_displacement: true
+
+  - name: "final_settle"
+    steps: 150
+    command: [0.0, 0.0, 0.0, 0.72]
+
+acceptance:
+  minimum_velocity_response_ratio: 0.40
+  maximum_linear_velocity_p95_error_m_s: 0.12
+  maximum_yaw_rate_p95_error_rad_s: 0.20
+  minimum_arc_yaw_displacement_rad: 0.80
+
+  maximum_hand_position_p95_m: 0.03
+  maximum_hand_position_max_m: 0.06
+
+  maximum_hand_orientation_p95_deg: 5.0
+  maximum_hand_orientation_max_deg: 8.0
+
+  maximum_root_tilt_deg: 15.0
+  minimum_root_height_m: 0.50
+  maximum_root_height_m: 1.00
+
+  maximum_arm_torque_ratio: 1.001
