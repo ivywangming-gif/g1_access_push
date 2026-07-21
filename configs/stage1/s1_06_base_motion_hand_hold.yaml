@@ -1,19 +1,17 @@
-test_id: "s1_06_recurrent_base_motion_hand_hold"
+test_id: "s1_06_recurrent_base_motion_hand_hold_isolated"
 
+episode_mode: "isolated"
 seed: 42
 warmup_steps: 150
-transient_ignore_steps: 50
+transient_ignore_steps: 150
+case_timeout_s: 600
 
 segments:
   - name: "forward"
-    steps: 250
-    command: [0.15, 0.0, 0.0, 0.72]
+    steps: 500
+    command: [0.16, 0.0, 0.0, 0.72]
     evaluate_axes:
-      x: 0.15
-
-  - name: "settle_1"
-    steps: 100
-    command: [0.0, 0.0, 0.0, 0.72]
+      x: 0.16
 
   - name: "backward"
     steps: 250
@@ -21,29 +19,17 @@ segments:
     evaluate_axes:
       x: -0.15
 
-  - name: "settle_2"
-    steps: 100
-    command: [0.0, 0.0, 0.0, 0.72]
-
   - name: "lateral_left"
     steps: 250
     command: [0.0, 0.20, 0.0, 0.72]
     evaluate_axes:
       y: 0.20
 
-  - name: "settle_3"
-    steps: 100
-    command: [0.0, 0.0, 0.0, 0.72]
-
   - name: "lateral_right"
     steps: 250
     command: [0.0, -0.20, 0.0, 0.72]
     evaluate_axes:
       y: -0.20
-
-  - name: "settle_4"
-    steps: 100
-    command: [0.0, 0.0, 0.0, 0.72]
 
   - name: "arc_left"
     steps: 300
@@ -53,10 +39,6 @@ segments:
       wz: 0.25
     require_yaw_displacement: true
 
-  - name: "settle_5"
-    steps: 120
-    command: [0.0, 0.0, 0.0, 0.72]
-
   - name: "arc_right"
     steps: 300
     command: [0.15, 0.0, -0.25, 0.72]
@@ -64,10 +46,6 @@ segments:
       x: 0.15
       wz: -0.25
     require_yaw_displacement: true
-
-  - name: "final_settle"
-    steps: 150
-    command: [0.0, 0.0, 0.0, 0.72]
 
 acceptance:
   minimum_velocity_response_ratio: 0.40

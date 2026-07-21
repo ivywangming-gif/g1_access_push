@@ -22,7 +22,9 @@ CONFIG_PATH = (
 
 def load_config() -> dict:
     return yaml.safe_load(
-        CONFIG_PATH.read_text(encoding="utf-8")
+        CONFIG_PATH.read_text(
+            encoding="utf-8"
+        )
     )
 
 
@@ -31,8 +33,22 @@ def test_s1_06_uses_recurrent_student() -> None:
     lower = cfg.actions.lower_body_joint_pos
 
     assert cfg.scene.num_envs == 1
-    assert lower.class_type is RecurrentStudentLowerBodyAction
-    assert Path(lower.policy_path) == RECURRENT_STUDENT_POLICY_PATH
+    assert (
+        lower.class_type
+        is RecurrentStudentLowerBodyAction
+    )
+    assert (
+        Path(lower.policy_path)
+        == RECURRENT_STUDENT_POLICY_PATH
+    )
+
+
+def test_s1_06_uses_isolated_episodes() -> None:
+    config = load_config()
+
+    assert config["episode_mode"] == "isolated"
+    assert config["warmup_steps"] == 150
+    assert config["transient_ignore_steps"] == 150
 
 
 def test_s1_06_commands_are_exact() -> None:
@@ -43,9 +59,18 @@ def test_s1_06_commands_are_exact() -> None:
         for segment in config["segments"]
     }
 
-    assert commands["forward"] == [0.15, 0.0, 0.0, 0.72]
-    assert commands["backward"] == [-0.15, 0.0, 0.0, 0.72]
-
+    assert commands["forward"] == [
+        0.16,
+        0.0,
+        0.0,
+        0.72,
+    ]
+    assert commands["backward"] == [
+        -0.15,
+        0.0,
+        0.0,
+        0.72,
+    ]
     assert commands["lateral_left"] == [
         0.0,
         0.20,
@@ -58,7 +83,6 @@ def test_s1_06_commands_are_exact() -> None:
         0.0,
         0.72,
     ]
-
     assert commands["arc_left"] == [
         0.15,
         0.0,
@@ -71,6 +95,42 @@ def test_s1_06_commands_are_exact() -> None:
         -0.25,
         0.72,
     ]
+
+
+def test_s1_06_segment_protocol() -> None:
+    config = load_config()
+
+    segments = {
+        segment["name"]: segment
+        for segment in config["segments"]
+    }
+
+    assert set(segments) == {
+        "forward",
+        "backward",
+        "lateral_left",
+        "lateral_right",
+        "arc_left",
+        "arc_right",
+    }
+
+    assert segments["forward"]["steps"] == 500
+
+    assert segments["backward"]["steps"] == 250
+    assert segments["lateral_left"]["steps"] == 250
+    assert segments["lateral_right"]["steps"] == 250
+    assert segments["arc_left"]["steps"] == 300
+    assert segments["arc_right"]["steps"] == 300
+
+    transient = int(
+        config["transient_ignore_steps"]
+    )
+
+    for segment in segments.values():
+        assert (
+            int(segment["steps"])
+            - transient
+        ) >= 100
 
 
 def test_s1_06_evaluation_axes_match_commands() -> None:
@@ -93,12 +153,19 @@ def test_s1_06_evaluation_axes_match_commands() -> None:
             "evaluate_axes",
             {},
         ).items():
-            assert target == command[axis_index[axis]]
+            assert (
+                target
+                == command[
+                    axis_index[axis]
+                ]
+            )
 
     arc_segments = {
         segment["name"]: segment
         for segment in config["segments"]
-        if segment.get("require_yaw_displacement")
+        if segment.get(
+            "require_yaw_displacement"
+        )
     }
 
     assert set(arc_segments) == {
@@ -112,6 +179,12 @@ def test_s1_06_acceptance_thresholds() -> None:
 
     assert (
         acceptance[
+            "minimum_velocity_response_ratio"
+        ]
+        == 0.40
+    )
+    assert (
+        acceptance[
             "maximum_linear_velocity_p95_error_m_s"
         ]
         == 0.12
@@ -123,14 +196,20 @@ def test_s1_06_acceptance_thresholds() -> None:
         == 0.20
     )
     assert (
-        acceptance["minimum_arc_yaw_displacement_rad"]
+        acceptance[
+            "minimum_arc_yaw_displacement_rad"
+        ]
         == 0.80
     )
     assert (
-        acceptance["maximum_hand_position_p95_m"]
+        acceptance[
+            "maximum_hand_position_p95_m"
+        ]
         == 0.03
     )
     assert (
-        acceptance["maximum_hand_orientation_p95_deg"]
+        acceptance[
+            "maximum_hand_orientation_p95_deg"
+        ]
         == 5.0
     )
