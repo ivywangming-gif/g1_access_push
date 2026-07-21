@@ -39,6 +39,14 @@ RECURRENT_STUDENT_POLICY_PATH = (
     / "unitree_g1_velocity_height_recurrent_student.pt"
 )
 
+# Stage-1 acceptance is deterministic. Actuator-delay robustness
+# is evaluated separately instead of being hidden in WBC regression.
+STAGE1_RECURRENT_ACTUATOR_DELAY_STEPS = 0
+STAGE1_RECURRENT_DELAYED_ACTUATOR_NAMES = (
+    "legs",
+    "feet",
+)
+
 
 @configclass
 class RecurrentStudentActionsCfg(ActionsCfg):
@@ -124,6 +132,19 @@ class G1Stage1NoBoxRecurrentEnvCfg(
 
     def __post_init__(self) -> None:
         super().__post_init__()
+
+        for actuator_name in (
+            STAGE1_RECURRENT_DELAYED_ACTUATOR_NAMES
+        ):
+            actuator_cfg = self.scene.robot.actuators[
+                actuator_name
+            ]
+            actuator_cfg.min_delay = (
+                STAGE1_RECURRENT_ACTUATOR_DELAY_STEPS
+            )
+            actuator_cfg.max_delay = (
+                STAGE1_RECURRENT_ACTUATOR_DELAY_STEPS
+            )
 
         if self.scene.num_envs != 1:
             raise ValueError(
