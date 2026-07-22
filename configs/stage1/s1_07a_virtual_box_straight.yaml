@@ -1,0 +1,56 @@
+test_id: s1_07a_recurrent_virtual_box_straight
+episode_mode: isolated
+seed: 42
+warmup_steps: 150
+transient_ignore_steps: 150
+case_timeout_s: 600
+base_command:
+  lin_vel_x: 0.0
+  lin_vel_y: 0.0
+  ang_vel_z: 0.0
+  base_height: 0.72
+trajectory:
+  frame: pelvis
+  axis: x
+  amplitude_m: 0.04
+  move_out_steps: 300
+  hold_steps: 300
+  move_back_steps: 300
+  settle_steps: 300
+  maximum_position_correction_m: 0.005
+  maximum_orientation_correction_rad: 0.03
+acceptance:
+  minimum_steady_hold_midpoint_x_m: 0.03
+  maximum_steady_hold_midpoint_x_p95_error_m: 0.015
+  maximum_hand_position_p95_m: 0.03
+  maximum_hand_position_max_m: 0.06
+  maximum_hand_orientation_p95_deg: 5.0
+  maximum_hand_orientation_max_deg: 8.0
+  maximum_contact_separation_p95_error_m: 0.015
+  maximum_contact_separation_max_error_m: 0.03
+  maximum_hand_return_p95_m: 0.015
+  maximum_hand_return_max_m: 0.03
+  maximum_arm_joint_target_p95_error_rad: 0.05
+  maximum_base_xy_excursion_m: 0.05
+  maximum_root_tilt_deg: 6.2075676918029785
+  minimum_root_height_m: 0.5
+  maximum_root_height_m: 1.0
+  maximum_arm_torque_ratio: 1.001
+  minimum_arm_joint_limit_margin_rad: 0.0
+reference_envelope:
+  type: empirical_non_regression
+  source_stage: S1-06
+  source_commit: 1e1cf3bc1244d96711ed7362d0a51129b2fe92e9
+  source_result: /root/autodl-tmp/robotics/runs/g1_access_push/stage1/s1_06_final_isolated_suite_20260722_000259/result.json
+  metric: root_tilt_max_deg
+  case_values_deg:
+    arc_left: 5.904749393463135
+    arc_right: 6.2075676918029785
+    backward: 4.837602138519287
+    forward: 5.657279968261719
+    lateral_left: 5.1736955642700195
+    lateral_right: 4.955391883850098
+  limiting_case: arc_right
+  maximum_root_tilt_deg: 6.2075676918029785
+  interpretation: S1-07A must not exceed the worst root tilt already accepted in the
+    deterministic S1-06 suite.
