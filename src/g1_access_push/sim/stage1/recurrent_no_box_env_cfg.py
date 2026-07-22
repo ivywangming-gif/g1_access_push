@@ -25,7 +25,6 @@ from .recurrent_student_action import (
     RecurrentStudentLowerBodyActionCfg,
 )
 
-
 AGILE_ROOT = Path(
     os.environ.get(
         "AGILE_PATH",
@@ -71,9 +70,7 @@ class RecurrentStudentActionsCfg(ActionsCfg):
 class RecurrentStudentObservationsCfg:
     """Logging observations plus the 64-value student state."""
 
-    control: ObservationsCfg.ControlCfg = (
-        ObservationsCfg.ControlCfg()
-    )
+    control: ObservationsCfg.ControlCfg = ObservationsCfg.ControlCfg()
 
     @configclass
     class StudentPolicyCfg(ObsGroup):
@@ -85,9 +82,7 @@ class RecurrentStudentObservationsCfg:
         # Previous 12 policy actions are maintained by the ActionTerm.
         base_ang_vel = ObsTerm(func=mdp.base_ang_vel)
 
-        projected_gravity = ObsTerm(
-            func=mdp.projected_gravity
-        )
+        projected_gravity = ObsTerm(func=mdp.projected_gravity)
 
         joint_pos = ObsTerm(
             func=mdp.joint_pos_rel,
@@ -118,35 +113,37 @@ class RecurrentStudentObservationsCfg:
 
 
 @configclass
-class G1Stage1NoBoxRecurrentEnvCfg(
-    G1Stage1NoBoxEnvCfg
-):
+class G1Stage1NoBoxRecurrentEnvCfg(G1Stage1NoBoxEnvCfg):
     """Preserve the verified scene while selecting the recurrent policy."""
 
-    observations: RecurrentStudentObservationsCfg = (
-        RecurrentStudentObservationsCfg()
-    )
-    actions: RecurrentStudentActionsCfg = (
-        RecurrentStudentActionsCfg()
-    )
+    observations: RecurrentStudentObservationsCfg = RecurrentStudentObservationsCfg()
+    actions: RecurrentStudentActionsCfg = RecurrentStudentActionsCfg()
 
     def __post_init__(self) -> None:
         super().__post_init__()
 
-        for actuator_name in (
-            STAGE1_RECURRENT_DELAYED_ACTUATOR_NAMES
-        ):
-            actuator_cfg = self.scene.robot.actuators[
-                actuator_name
-            ]
-            actuator_cfg.min_delay = (
-                STAGE1_RECURRENT_ACTUATOR_DELAY_STEPS
+        # The pinned WBC-AGILE G1-with-hands asset already
+        # defines zero actuator delay for legs and feet.
+        # Assert that upstream contract; do not mutate nested
+        # asset configuration at runtime.
+        for actuator_name in STAGE1_RECURRENT_DELAYED_ACTUATOR_NAMES:
+            actuator_cfg = self.scene.robot.actuators[actuator_name]
+            actual = (
+                actuator_cfg.min_delay,
+                actuator_cfg.max_delay,
             )
-            actuator_cfg.max_delay = (
-                STAGE1_RECURRENT_ACTUATOR_DELAY_STEPS
+            expected = (
+                STAGE1_RECURRENT_ACTUATOR_DELAY_STEPS,
+                STAGE1_RECURRENT_ACTUATOR_DELAY_STEPS,
             )
 
+            if actual != expected:
+                raise RuntimeError(
+                    "Pinned WBC-AGILE actuator-delay "
+                    "contract changed: "
+                    f"{actuator_name}={actual}, "
+                    f"expected={expected}."
+                )
+
         if self.scene.num_envs != 1:
-            raise ValueError(
-                "Recurrent student integration requires num_envs=1."
-            )
+            raise ValueError("Recurrent student integration requires num_envs=1.")

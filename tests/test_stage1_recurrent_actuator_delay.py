@@ -1,16 +1,19 @@
-"""Regression tests for deterministic recurrent Stage-1 actuator delay."""
+"""Regression tests for the pinned WBC-AGILE actuator-delay contract."""
 
 from g1_access_push.sim.stage1.no_box_env_cfg import (
     G1Stage1NoBoxEnvCfg,
 )
 from g1_access_push.sim.stage1.recurrent_no_box_env_cfg import (
-    G1Stage1NoBoxRecurrentEnvCfg,
     STAGE1_RECURRENT_ACTUATOR_DELAY_STEPS,
     STAGE1_RECURRENT_DELAYED_ACTUATOR_NAMES,
+    G1Stage1NoBoxRecurrentEnvCfg,
 )
 
 
-def _delay_bounds(cfg, actuator_name: str) -> tuple[int, int]:
+def _delay_bounds(
+    cfg,
+    actuator_name: str,
+) -> tuple[int, int]:
     actuator_cfg = cfg.scene.robot.actuators[actuator_name]
 
     return (
@@ -19,18 +22,12 @@ def _delay_bounds(cfg, actuator_name: str) -> tuple[int, int]:
     )
 
 
-def test_recurrent_stage1_fixes_lower_actuator_delay_to_zero() -> None:
-    base_before = G1Stage1NoBoxEnvCfg()
+def test_recurrent_stage1_uses_pinned_upstream_zero_delay() -> None:
+    """Ordinary and recurrent environments both inherit upstream lag zero."""
 
-    for actuator_name in (
-        STAGE1_RECURRENT_DELAYED_ACTUATOR_NAMES
-    ):
-        assert _delay_bounds(
-            base_before,
-            actuator_name,
-        ) == (0, 4)
-
+    ordinary_before = G1Stage1NoBoxEnvCfg()
     recurrent = G1Stage1NoBoxRecurrentEnvCfg()
+    ordinary_after = G1Stage1NoBoxEnvCfg()
 
     assert STAGE1_RECURRENT_ACTUATOR_DELAY_STEPS == 0
     assert STAGE1_RECURRENT_DELAYED_ACTUATOR_NAMES == (
@@ -38,20 +35,18 @@ def test_recurrent_stage1_fixes_lower_actuator_delay_to_zero() -> None:
         "feet",
     )
 
-    for actuator_name in (
-        STAGE1_RECURRENT_DELAYED_ACTUATOR_NAMES
-    ):
+    for actuator_name in STAGE1_RECURRENT_DELAYED_ACTUATOR_NAMES:
+        assert _delay_bounds(
+            ordinary_before,
+            actuator_name,
+        ) == (0, 0)
+
         assert _delay_bounds(
             recurrent,
             actuator_name,
         ) == (0, 0)
 
-    base_after = G1Stage1NoBoxEnvCfg()
-
-    for actuator_name in (
-        STAGE1_RECURRENT_DELAYED_ACTUATOR_NAMES
-    ):
         assert _delay_bounds(
-            base_after,
+            ordinary_after,
             actuator_name,
-        ) == (0, 4)
+        ) == (0, 0)
