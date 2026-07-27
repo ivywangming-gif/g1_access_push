@@ -190,5 +190,5 @@
   "runnable": true,
   "schema_version": 1,
   "source_config_path": "/root/autodl-tmp/robotics/projects/g1_access_push/configs/stage2/s2_01_box_stand_sanity.yaml",
-  "source_config_sha256": "1cc8f9c45196bef828d4b225dcf5717a582162fe0f550fcbcfe17e97611df2fb"
+  "source_config_sha256": "dab53a3b856eb73291a4b45ef2a5e26de38f86f493a823e35599af8c32dc8783"
 }

@@ -8,11 +8,44 @@ import hashlib
 import json
 import math
 import os
+import sys
+import traceback
 from pathlib import Path
+
+from g1_access_push.stage2.s2_01_process import write_implementation_exception
+
+bootstrap_parser = argparse.ArgumentParser(add_help=False)
+bootstrap_parser.add_argument("--run-root", type=Path, required=True)
+bootstrap_args, _ = bootstrap_parser.parse_known_args()
+RUN = bootstrap_args.run_root.resolve()
+RUNTIME_STATE = {"environment_created": False, "observed_frames": 0}
+RUNTIME_ENV = None
+
+def bootstrap_exception_hook(exc_type, exc, tb) -> None:
+    traceback.print_exception(exc_type, exc, tb, file=sys.stderr)
+    try:
+        write_implementation_exception(
+            RUN / "implementation_exception.json", exc,
+            {**RUNTIME_STATE, "exception_phase": "MODULE_BOOTSTRAP"},
+        )
+    finally:
+        for resource_name in ("RUNTIME_ENV", "simulation_app"):
+            resource = globals().get(resource_name)
+            if resource is not None:
+                try:
+                    resource.close()
+                except BaseException:
+                    traceback.print_exc(file=sys.stderr)
+        sys.stdout.flush()
+        sys.stderr.flush()
+        os._exit(1)
+
+sys.excepthook = bootstrap_exception_hook
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--run-root", type=Path, required=True)
 parser.add_argument("--config", type=Path, required=True)
+parser.add_argument("--resolved-config", type=Path, required=True)
 from isaaclab.app import AppLauncher
 
 AppLauncher.add_app_launcher_args(parser)
@@ -28,10 +61,9 @@ from isaaclab.envs import ManagerBasedEnv
 from isaacsim.core.utils.stage import get_current_stage
 from agile.rl_env.assets.robots.unitree_g1 import G1_W_HANDS_AGILE_ACTION_SCALE
 
-from g1_access_push.sim.stage2.s2_01_box_env import G1S201BoxStandEnvCfg
+from g1_access_push.sim.stage2.s2_01_box_env import build_s2_01_env_cfg
 from g1_access_push.stage2.s2_01_contract import load_config, sha256_file, write_json
 
-RUN = args.run_root.resolve()
 BOX_PRIM_PATH = "/World/envs/env_0/Box"
 BOX_COLLIDER_PATH = BOX_PRIM_PATH + "/geometry/mesh"
 BOX_MATERIAL_PATH = BOX_PRIM_PATH + "/geometry/material"
@@ -50,6 +82,45 @@ def process_count() -> int:
         if "run_s2_01_box_stand_sanity.py" in cmd:
             count += 1
     return count
+
+
+def config_instance_preflight(cfg, config: dict) -> dict:
+    """Persist the resolved scene-instance contract before environment creation."""
+    result = {
+        "schema_version": 1,
+        "status": "FAIL",
+        "config_type": f"{type(cfg).__module__}.{type(cfg).__qualname__}",
+        "scene_config_type": f"{type(cfg.scene).__module__}.{type(cfg.scene).__qualname__}",
+        "config_is_instance": not isinstance(cfg, type) and not isinstance(cfg.scene, type),
+        "terrain_present": hasattr(cfg.scene, "terrain") and cfg.scene.terrain is not None,
+        "robot_present": hasattr(cfg.scene, "robot") and cfg.scene.robot is not None,
+        "box_present": hasattr(cfg.scene, "box") and cfg.scene.box is not None,
+        "num_envs": getattr(cfg.scene, "num_envs", None),
+        "doorway_enabled": any("door" in name.lower() for name in vars(cfg.scene)),
+        "nearby_obstacles_enabled": any("obstacle" in name.lower() for name in vars(cfg.scene)),
+        "stage1_contract_sha": config["certification"]["standing_result_sha256"],
+        "resolved_config_sha": sha256_file(args.resolved_config),
+        "resolved_config_matches_pre_run_commit": sha256_file(args.resolved_config) == sha256_file(Path(__file__).resolve().parents[2] / "reports/stage2/s2_01_resolved_config.json"),
+        "controller_checkpoint_sha256": config["robot"]["controller_checkpoint_sha256"],
+        "failure_reason": None,
+    }
+    failed = [name for name in ("config_is_instance", "terrain_present", "robot_present", "box_present") if not result[name]]
+    if not result["resolved_config_matches_pre_run_commit"]:
+        failed.append("resolved_config_matches_pre_run_commit")
+    if result["num_envs"] != 1:
+        failed.append("num_envs")
+    if result["doorway_enabled"]:
+        failed.append("doorway_enabled")
+    if result["nearby_obstacles_enabled"]:
+        failed.append("nearby_obstacles_enabled")
+    if "model_1999" in json.dumps(config):
+        failed.append("forbidden_checkpoint")
+    result["failure_reason"] = ",".join(failed) if failed else None
+    result["status"] = "PASS" if not failed else "FAIL"
+    write_json(RUN / "config_instance_preflight.json", result)
+    if failed:
+        raise RuntimeError(f"CONFIG_INSTANCE_PREFLIGHT_FAILED:{result['failure_reason']}")
+    return result
 
 
 def quaternion_rpy(q: torch.Tensor) -> tuple[float, float, float, float]:
@@ -164,12 +235,14 @@ def aabb_overlap_count(records: list[dict], center: list[float], half: list[floa
 
 
 def main() -> None:
+    global RUNTIME_ENV
     RUN.mkdir(parents=True, exist_ok=True)
     env = None
     raw_status = {
         "status": "RUNNING", "primary_reason": None,
         "multiple_isaac_processes": process_count() > 1,
         "observed_frames": 0,
+        "environment_created": False,
     }
     write_json(RUN / "runner_status.json", raw_status)
     try:
@@ -182,11 +255,15 @@ def main() -> None:
             raise RuntimeError("STANDING_ACTION_CONTRACT_UNCERTIFIED")
         if sha256_file(collision_path) != config["certification"]["collision_backend_sha256"] or not json.loads(collision_path.read_text())["passed"]:
             raise RuntimeError("COLLISION_BACKEND_UNCERTIFIED")
-        cfg = G1S201BoxStandEnvCfg()
-        cfg.scene.num_envs = 1
+        cfg = build_s2_01_env_cfg()
+        config_instance_preflight(cfg, config)
         cfg.seed = int(config["robot"]["fixed_seed"])
         cfg.sim.device = args.device
         env = ManagerBasedEnv(cfg=cfg)
+        RUNTIME_ENV = env
+        RUNTIME_STATE["environment_created"] = True
+        raw_status["environment_created"] = True
+        write_json(RUN / "runner_status.json", raw_status)
         stage = get_current_stage()
         env.reset(seed=cfg.seed)
         box = env.scene["box"]
@@ -386,6 +463,7 @@ def main() -> None:
                     "finite": all(math.isfinite(value) for value in values),
                 }
                 trace.write(json.dumps(record, sort_keys=True) + "\n")
+                RUNTIME_STATE["observed_frames"] = frame + 1
                 raw_status["observed_frames"] = frame + 1
                 if frame % 100 == 99:
                     print(f"PHASE=qualification frame={frame + 1}/{expected_frames}", flush=True)
@@ -408,11 +486,31 @@ def main() -> None:
         raw_status.update({"status": "INVALID", "primary_reason": "IMPLEMENTATION_EXCEPTION", "error": repr(exc)})
         write_json(RUN / "runner_status.json", raw_status)
         raise
-    finally:
-        if env is not None:
-            env.close()
-        simulation_app.close()
 
 
 if __name__ == "__main__":
-    main()
+    exit_code = 0
+    try:
+        main()
+    except BaseException as exc:
+        traceback.print_exception(type(exc), exc, exc.__traceback__, file=sys.stderr)
+        write_implementation_exception(
+            RUN / "implementation_exception.json", exc,
+            {**RUNTIME_STATE, "exception_phase": "MAIN"},
+        )
+        exit_code = 1
+    try:
+        if RUNTIME_ENV is not None:
+            RUNTIME_ENV.close()
+        simulation_app.close()
+    except BaseException as exc:
+        traceback.print_exception(type(exc), exc, exc.__traceback__, file=sys.stderr)
+        if exit_code == 0:
+            write_implementation_exception(
+                RUN / "implementation_exception.json", exc,
+                {**RUNTIME_STATE, "exception_phase": "CLEANUP"},
+            )
+            exit_code = 1
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os._exit(exit_code)

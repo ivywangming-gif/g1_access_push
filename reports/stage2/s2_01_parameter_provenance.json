@@ -63,7 +63,7 @@
     "sha256": "a0151975a757a33f0f5ed236d5616e2a98643abe2b36e50ac9ad01b6dd1f6d7e"
   },
   "current_baseline_resolution": "RESEARCH_LEAD_EXPLICIT_DEVELOPMENT_DECISION_2026_07_27",
-  "git_head": "c252adb0a6d8e728875f491fee2c11fa21050aaf",
+  "git_head": "1184251c9c13f8f955de9f118807b51940fcd43b",
   "palm_box_material": {
     "blocking_s2_01": false,
     "status": "UNRESOLVED"

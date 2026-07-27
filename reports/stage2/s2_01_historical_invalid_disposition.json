@@ -1,0 +1,8 @@
+{
+  "historical_primary_reason": "MISSING_TRACE",
+  "historical_result_preserved": true,
+  "historical_root_cause": "IMPLEMENTATION_EXCEPTION_STAGE1_SCENE_CFG_TERRAIN_CLASS_ACCESS",
+  "historical_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_01_box_stand_20260727_133024",
+  "historical_status": "INVALID",
+  "schema_version": 1
+}

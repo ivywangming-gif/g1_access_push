@@ -15,12 +15,48 @@ from g1_access_push.stage2.s2_01_contract import (
 )
 
 
+def implementation_exception_evidence(run: Path) -> dict | None:
+    """Resolve implementation failure before checking whether a trace exists."""
+    marker = run / "implementation_exception.json"
+    if marker.is_file():
+        payload = json.loads(marker.read_text(encoding="utf-8"))
+        return {"source": marker.name, **payload}
+    traceback_logs = []
+    for name in ("stderr.log", "stdout.log", "console.log"):
+        path = run / name
+        if path.is_file() and "Traceback (most recent call last)" in path.read_text(encoding="utf-8", errors="replace"):
+            traceback_logs.append(name)
+    raw_path = run / "runner_status.json"
+    raw = json.loads(raw_path.read_text(encoding="utf-8")) if raw_path.is_file() else {}
+    runner_rc_path = run / "process_rc/runner.txt"
+    runner_rc = int(runner_rc_path.read_text().strip()) if runner_rc_path.is_file() else None
+    empty_pre_environment = raw.get("environment_created") is False and int(raw.get("observed_frames", 0)) == 0
+    if traceback_logs or raw.get("primary_reason") == "IMPLEMENTATION_EXCEPTION" or empty_pre_environment:
+        return {
+            "source": "DERIVED_PROCESS_EVIDENCE",
+            "traceback_logs": traceback_logs,
+            "runner_rc": runner_rc,
+            "environment_created": raw.get("environment_created"),
+            "observed_frames": raw.get("observed_frames"),
+        }
+    return None
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--run-root", type=Path, required=True)
     parser.add_argument("--config", type=Path, required=True)
     args = parser.parse_args()
     run = args.run_root
+    implementation = implementation_exception_evidence(run)
+    if implementation is not None:
+        result = {
+            "schema_version": 1, "stage": "S2-01", "status": "INVALID",
+            "primary_reason": "IMPLEMENTATION_EXCEPTION",
+            "implementation_exception_evidence": implementation,
+        }
+        write_json(run / "result.json", result)
+        return 2
     trace = run / "trace.jsonl"
     if not trace.is_file():
         result = {"schema_version": 1, "stage": "S2-01", "status": "INVALID", "primary_reason": "MISSING_TRACE"}
