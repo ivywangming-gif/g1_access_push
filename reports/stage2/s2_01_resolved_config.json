@@ -1,0 +1,194 @@
+{
+  "contract_digest_sha256": "750dbfffd9a153b06eda09d3ea46e1cc79687c4551c16532b14728f49b16d633",
+  "qualification_state": "READY_FOR_SINGLE_FORMAL_RUN",
+  "resolved": {
+    "baseline": {
+      "baseline_id": "S2_LIGHT_BOX_DEVELOPMENT_BASELINE_V1",
+      "not_claimed_as": [
+        "real hardware material measurement",
+        "final Stage 2 randomized range",
+        "safety-certified payload",
+        "proof of G1 pushing capacity",
+        "paper experimental result"
+      ],
+      "scope": "SIMULATION_DEVELOPMENT_ONLY",
+      "source": "RESEARCH_LEAD_EXPLICIT_DEVELOPMENT_DECISION_2026_07_27"
+    },
+    "certification": {
+      "collision_backend_path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage1/s1_08_formal_20260723_174831/backend_calibration_result.json",
+      "collision_backend_sha256": "5242cdf72d8f8847b75a0d197f7d3ea683d5b87a3b3c165dff56ea4f5bf6d2ce",
+      "standing_result_path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage1/s1_08t_corrected_scale_static_arm_60s_20260727_085249/result.json",
+      "standing_result_sha256": "14dcdbb2b0e22e999e3b32e79450e9a38df205546531d788816082f62f1a4652",
+      "standing_runner_snapshot_sha256": "909ea8481dcf1d8f533b3cbfbbc9def4e96cd33bac376aa5869b0792cfc54ddd"
+    },
+    "contact_model": {
+      "damping": {
+        "reason": "RIGID_CONTACT_MODEL",
+        "status": "NOT_APPLICABLE"
+      },
+      "stiffness": {
+        "reason": "RIGID_CONTACT_MODEL",
+        "status": "NOT_APPLICABLE"
+      },
+      "type": "RIGID"
+    },
+    "evaluation": {
+      "duration_s": 60.0,
+      "expected_frames": 3000,
+      "first_frame": 50,
+      "ground_support_force_rule": "STRICTLY_POSITIVE_EVERY_POST_SETTLE_FRAME",
+      "last_frame": 2999,
+      "stillness_thresholds": {
+        "max_box_abs_pitch_rad": 0.008726646259971648,
+        "max_box_abs_roll_rad": 0.008726646259971648,
+        "max_box_angular_speed_radps": 0.008726646259971648,
+        "max_box_linear_speed_mps": 0.005,
+        "max_box_translation_from_reference_m": 0.005,
+        "max_box_vertical_drift_m": 0.003,
+        "max_box_yaw_change_rad": 0.008726646259971648
+      }
+    },
+    "geometry": {
+      "collider_count": 1,
+      "half_extent_xyz_m": [
+        0.6,
+        0.3,
+        0.6
+      ],
+      "initial_yaw_rad": 0.0,
+      "object_frame": {
+        "xO": "long_axis",
+        "yO": "short_axis",
+        "zO": "up"
+      },
+      "rear_face_xO_m": -0.6,
+      "size_xyz_m": [
+        1.2,
+        0.6,
+        1.2
+      ]
+    },
+    "mass_properties": {
+      "authoring_api": "UsdPhysics.MassAPI",
+      "ballast_equivalent_size_xyz_m": [
+        1.0,
+        0.5,
+        0.2
+      ],
+      "center_of_mass_local_xyz_m": [
+        0.0,
+        0.0,
+        -0.4
+      ],
+      "com_height_above_bottom_m": 0.2,
+      "diagonal_inertia_kg_m2": [
+        0.12083333333333333,
+        0.43333333333333335,
+        0.5208333333333334
+      ],
+      "mass_kg": 5.0,
+      "mass_tolerance": 1e-05,
+      "principal_axes_quaternion_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "materials": {
+      "box": {
+        "dynamic_friction": 0.5,
+        "friction_combine_mode": "average",
+        "restitution": 0.0,
+        "restitution_combine_mode": "average",
+        "static_friction": 0.5
+      },
+      "effective_pair": {
+        "dynamic_friction": 0.5,
+        "friction_combine_mode": "average",
+        "restitution": 0.0,
+        "restitution_combine_mode": "average",
+        "static_friction": 0.5
+      },
+      "ground": {
+        "dynamic_friction": 0.5,
+        "friction_combine_mode": "average",
+        "restitution": 0.0,
+        "restitution_combine_mode": "average",
+        "static_friction": 0.5
+      },
+      "palm_box": {
+        "blocking_s2_01": false,
+        "status": "UNRESOLVED"
+      },
+      "source": "ISAAC_LAB_RIGID_BODY_MATERIAL_DEFAULT_BASELINE"
+    },
+    "placement": {
+      "box_spawn_bottom_gap_m": 0.002,
+      "box_spawn_center_z_m": 0.602,
+      "ground_z_m": 0.0,
+      "isolation_clearance_m": 0.5,
+      "minimum_allowed_clearance_m": 0.499,
+      "purpose": "S2_01_DELIBERATE_NO_CONTACT_SAFETY_GAP",
+      "temporary_nonexperimental_spawn_x_m": 25.0
+    },
+    "prohibitions": {
+      "attach": false,
+      "auto_reset": false,
+      "model_1999": false,
+      "planner": false,
+      "precontact": false,
+      "pushing": false,
+      "training": false
+    },
+    "robot": {
+      "bad_tilt_threshold_rad": 0.6108652381980153,
+      "controller_checkpoint_sha256": "a0151975a757a33f0f5ed236d5616e2a98643abe2b36e50ac9ad01b6dd1f6d7e",
+      "controller_env": "g1_access_push.sim.stage1.recurrent_no_box_env_cfg.G1Stage1NoBoxRecurrentEnvCfg",
+      "fall_root_height_threshold_m": 0.5,
+      "fixed_seed": 42,
+      "forbidden_checkpoint_substring": "model_1999",
+      "lower_body_action_scale": "G1_W_HANDS_AGILE_ACTION_SCALE",
+      "lower_body_command": [
+        0.0,
+        0.0,
+        0.0,
+        0.7
+      ],
+      "num_envs": 1,
+      "post_initial_reset_count_limit": 0,
+      "upper_body_action": "ZERO_DELTA_DEFAULT_ARMS_AND_WAIST"
+    },
+    "schema_version": 1,
+    "settling": {
+      "control_frames": 50,
+      "duration_s": 1.0,
+      "reference_after_control_frame_count": 50,
+      "reference_trace_frame": 49
+    },
+    "simulation": {
+      "actor_override": "NOT_AUTHORED",
+      "actor_properties_not_authored": [
+        "solver_position_iteration_count",
+        "solver_velocity_iteration_count",
+        "sleep_threshold",
+        "stabilization_threshold",
+        "max_depenetration_velocity",
+        "linear_damping",
+        "angular_damping"
+      ],
+      "control_decimation": 4,
+      "control_frequency_hz": 50,
+      "effective_source": "PHYSX_SCENE_OR_ENGINE_DEFAULT",
+      "physics_dt_s": 0.005,
+      "physics_frequency_hz": 200,
+      "source_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage1/s1_08t_corrected_scale_static_arm_60s_20260727_085249"
+    },
+    "stage": "S2-01",
+    "task": "BOX_SPAWN_NO_CONTACT_STAND_SANITY"
+  },
+  "runnable": true,
+  "schema_version": 1,
+  "source_config_path": "/root/autodl-tmp/robotics/projects/g1_access_push/configs/stage2/s2_01_box_stand_sanity.yaml",
+  "source_config_sha256": "1cc8f9c45196bef828d4b225dcf5717a582162fe0f550fcbcfe17e97611df2fb"
+}

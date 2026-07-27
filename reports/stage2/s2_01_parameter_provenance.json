@@ -1,0 +1,81 @@
+{
+  "baseline": {
+    "baseline_id": "S2_LIGHT_BOX_DEVELOPMENT_BASELINE_V1",
+    "not_claimed_as": [
+      "real hardware material measurement",
+      "final Stage 2 randomized range",
+      "safety-certified payload",
+      "proof of G1 pushing capacity",
+      "paper experimental result"
+    ],
+    "scope": "SIMULATION_DEVELOPMENT_ONLY",
+    "source": "RESEARCH_LEAD_EXPLICIT_DEVELOPMENT_DECISION_2026_07_27"
+  },
+  "box_actor_overrides": {
+    "angular_damping": {
+      "actor_override": "NOT_AUTHORED",
+      "effective_source": "PHYSX_SCENE_OR_ENGINE_DEFAULT"
+    },
+    "linear_damping": {
+      "actor_override": "NOT_AUTHORED",
+      "effective_source": "PHYSX_SCENE_OR_ENGINE_DEFAULT"
+    },
+    "max_depenetration_velocity": {
+      "actor_override": "NOT_AUTHORED",
+      "effective_source": "PHYSX_SCENE_OR_ENGINE_DEFAULT"
+    },
+    "sleep_threshold": {
+      "actor_override": "NOT_AUTHORED",
+      "effective_source": "PHYSX_SCENE_OR_ENGINE_DEFAULT"
+    },
+    "solver_position_iteration_count": {
+      "actor_override": "NOT_AUTHORED",
+      "effective_source": "PHYSX_SCENE_OR_ENGINE_DEFAULT"
+    },
+    "solver_velocity_iteration_count": {
+      "actor_override": "NOT_AUTHORED",
+      "effective_source": "PHYSX_SCENE_OR_ENGINE_DEFAULT"
+    },
+    "stabilization_threshold": {
+      "actor_override": "NOT_AUTHORED",
+      "effective_source": "PHYSX_SCENE_OR_ENGINE_DEFAULT"
+    }
+  },
+  "collision_backend": {
+    "expected_sha256": "5242cdf72d8f8847b75a0d197f7d3ea683d5b87a3b3c165dff56ea4f5bf6d2ce",
+    "passed": true,
+    "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage1/s1_08_formal_20260723_174831/backend_calibration_result.json",
+    "sha256": "5242cdf72d8f8847b75a0d197f7d3ea683d5b87a3b3c165dff56ea4f5bf6d2ce"
+  },
+  "contact_model": {
+    "damping": {
+      "reason": "RIGID_CONTACT_MODEL",
+      "status": "NOT_APPLICABLE"
+    },
+    "stiffness": {
+      "reason": "RIGID_CONTACT_MODEL",
+      "status": "NOT_APPLICABLE"
+    },
+    "type": "RIGID"
+  },
+  "controller_checkpoint": {
+    "forbidden_legacy_checkpoint_used": false,
+    "sha256": "a0151975a757a33f0f5ed236d5616e2a98643abe2b36e50ac9ad01b6dd1f6d7e"
+  },
+  "current_baseline_resolution": "RESEARCH_LEAD_EXPLICIT_DEVELOPMENT_DECISION_2026_07_27",
+  "git_head": "c252adb0a6d8e728875f491fee2c11fa21050aaf",
+  "palm_box_material": {
+    "blocking_s2_01": false,
+    "status": "UNRESOLVED"
+  },
+  "previous_invalid_evidence": "/tmp/g1_s2_01_20260727_124751/parameter_source_audit.json",
+  "previous_primary_reason": "BOX_PHYSICS_PARAMETER_SOURCE_AMBIGUOUS",
+  "previous_secondary_reason": "INITIAL_CLEARANCE_CONTRACT_UNRESOLVED",
+  "previous_status_retained": "INVALID",
+  "schema_version": 1,
+  "standing_source": {
+    "expected_sha256": "14dcdbb2b0e22e999e3b32e79450e9a38df205546531d788816082f62f1a4652",
+    "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage1/s1_08t_corrected_scale_static_arm_60s_20260727_085249/result.json",
+    "sha256": "14dcdbb2b0e22e999e3b32e79450e9a38df205546531d788816082f62f1a4652"
+  }
+}

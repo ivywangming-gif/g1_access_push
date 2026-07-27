@@ -1,0 +1,114 @@
+schema_version: 1
+stage: S2-01
+task: BOX_SPAWN_NO_CONTACT_STAND_SANITY
+baseline:
+  baseline_id: S2_LIGHT_BOX_DEVELOPMENT_BASELINE_V1
+  source: RESEARCH_LEAD_EXPLICIT_DEVELOPMENT_DECISION_2026_07_27
+  scope: SIMULATION_DEVELOPMENT_ONLY
+  not_claimed_as:
+    - real hardware material measurement
+    - final Stage 2 randomized range
+    - safety-certified payload
+    - proof of G1 pushing capacity
+    - paper experimental result
+geometry:
+  size_xyz_m: [1.2, 0.6, 1.2]
+  half_extent_xyz_m: [0.6, 0.3, 0.6]
+  object_frame: {xO: long_axis, yO: short_axis, zO: up}
+  rear_face_xO_m: -0.6
+  initial_yaw_rad: 0.0
+  collider_count: 1
+mass_properties:
+  mass_kg: 5.0
+  mass_tolerance: 1.0e-5
+  center_of_mass_local_xyz_m: [0.0, 0.0, -0.4]
+  com_height_above_bottom_m: 0.2
+  ballast_equivalent_size_xyz_m: [1.0, 0.5, 0.2]
+  diagonal_inertia_kg_m2:
+    [0.12083333333333333, 0.43333333333333335, 0.5208333333333334]
+  principal_axes_quaternion_wxyz: [1.0, 0.0, 0.0, 0.0]
+  authoring_api: UsdPhysics.MassAPI
+materials:
+  source: ISAAC_LAB_RIGID_BODY_MATERIAL_DEFAULT_BASELINE
+  box: &material
+    static_friction: 0.5
+    dynamic_friction: 0.5
+    restitution: 0.0
+    friction_combine_mode: average
+    restitution_combine_mode: average
+  ground: *material
+  effective_pair: *material
+  palm_box: {status: UNRESOLVED, blocking_s2_01: false}
+contact_model:
+  type: RIGID
+  stiffness: {status: NOT_APPLICABLE, reason: RIGID_CONTACT_MODEL}
+  damping: {status: NOT_APPLICABLE, reason: RIGID_CONTACT_MODEL}
+simulation:
+  source_run: /root/autodl-tmp/robotics/runs/g1_access_push/stage1/s1_08t_corrected_scale_static_arm_60s_20260727_085249
+  physics_frequency_hz: 200
+  control_frequency_hz: 50
+  physics_dt_s: 0.005
+  control_decimation: 4
+  actor_properties_not_authored:
+    - solver_position_iteration_count
+    - solver_velocity_iteration_count
+    - sleep_threshold
+    - stabilization_threshold
+    - max_depenetration_velocity
+    - linear_damping
+    - angular_damping
+  actor_override: NOT_AUTHORED
+  effective_source: PHYSX_SCENE_OR_ENGINE_DEFAULT
+placement:
+  isolation_clearance_m: 0.5
+  purpose: S2_01_DELIBERATE_NO_CONTACT_SAFETY_GAP
+  minimum_allowed_clearance_m: 0.499
+  ground_z_m: 0.0
+  box_spawn_bottom_gap_m: 0.002
+  box_spawn_center_z_m: 0.602
+  temporary_nonexperimental_spawn_x_m: 25.0
+settling:
+  duration_s: 1.0
+  control_frames: 50
+  reference_after_control_frame_count: 50
+  reference_trace_frame: 49
+evaluation:
+  duration_s: 60.0
+  expected_frames: 3000
+  first_frame: 50
+  last_frame: 2999
+  stillness_thresholds:
+    max_box_linear_speed_mps: 0.005
+    max_box_angular_speed_radps: 0.008726646259971648
+    max_box_translation_from_reference_m: 0.005
+    max_box_yaw_change_rad: 0.008726646259971648
+    max_box_abs_roll_rad: 0.008726646259971648
+    max_box_abs_pitch_rad: 0.008726646259971648
+    max_box_vertical_drift_m: 0.003
+  ground_support_force_rule: STRICTLY_POSITIVE_EVERY_POST_SETTLE_FRAME
+robot:
+  controller_env: g1_access_push.sim.stage1.recurrent_no_box_env_cfg.G1Stage1NoBoxRecurrentEnvCfg
+  controller_checkpoint_sha256: a0151975a757a33f0f5ed236d5616e2a98643abe2b36e50ac9ad01b6dd1f6d7e
+  lower_body_command: [0.0, 0.0, 0.0, 0.7]
+  lower_body_action_scale: G1_W_HANDS_AGILE_ACTION_SCALE
+  upper_body_action: ZERO_DELTA_DEFAULT_ARMS_AND_WAIST
+  fixed_seed: 42
+  num_envs: 1
+  post_initial_reset_count_limit: 0
+  fall_root_height_threshold_m: 0.5
+  bad_tilt_threshold_rad: 0.6108652381980153
+  forbidden_checkpoint_substring: model_1999
+certification:
+  standing_result_path: /root/autodl-tmp/robotics/runs/g1_access_push/stage1/s1_08t_corrected_scale_static_arm_60s_20260727_085249/result.json
+  standing_result_sha256: 14dcdbb2b0e22e999e3b32e79450e9a38df205546531d788816082f62f1a4652
+  standing_runner_snapshot_sha256: 909ea8481dcf1d8f533b3cbfbbc9def4e96cd33bac376aa5869b0792cfc54ddd
+  collision_backend_path: /root/autodl-tmp/robotics/runs/g1_access_push/stage1/s1_08_formal_20260723_174831/backend_calibration_result.json
+  collision_backend_sha256: 5242cdf72d8f8847b75a0d197f7d3ea683d5b87a3b3c165dff56ea4f5bf6d2ce
+prohibitions:
+  attach: false
+  precontact: false
+  pushing: false
+  planner: false
+  training: false
+  auto_reset: false
+  model_1999: false
