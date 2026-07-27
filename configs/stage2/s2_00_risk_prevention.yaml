@@ -1,0 +1,61 @@
+schema_version: 1
+stage: S2-00
+implementation_status: CONTRACT_DEFINED_NOT_EXECUTED
+risks:
+  - risk_id: RISK_A_IMPACT_EJECTION
+    symptom: impact_ejection_or_initial_penetration
+    possible_causes: [initial_penetration, excessive_approach_rate, force_spike]
+    mandatory_prevention: [precontact_gap, normal_ramp, speed_limit, acceleration_limit, jerk_limit, no_progress_reward, force_logging, impulse_logging, force_rate_logging]
+    config_references: [contact_geometry.precontact_gap, attach_motion.approach_speed, attach_motion.approach_acceleration_limit, attach_motion.approach_jerk_rate_limit, attach_gate.left_contact_impulse_threshold, attach_gate.right_contact_impulse_threshold, attach_gate.excessive_contact_impulse_threshold, attach_gate.contact_force_peak_threshold, attach_gate.contact_force_rate_threshold]
+    required_metrics: [object_translation_from_attach_start_m, contact_force_peak_n, contact_force_rate_nps, left_contact_impulse_ns, right_contact_impulse_ns]
+    abort_condition: excessive_impulse_or_force_rate
+    implementation_status: CONTRACT_DEFINED_NOT_EXECUTED
+    evidence_source: S2-00 contract; thresholds remain UNRESOLVED
+  - risk_id: RISK_B_CONTACT_WITHOUT_OBJECT_MOTION
+    symptom: contact_without_object_motion
+    possible_causes: [static_friction, palm_normal_offset, tracking_error]
+    mandatory_prevention: [base_command_logging, palm_normal_offset_logging, object_displacement_logging, contact_state_logging, friction_logging, hand_error_logging]
+    required_metrics: [object_translation_from_attach_start_m, object_position_xyz_m, left_contact, right_contact]
+    abort_condition: NOT_APPLICABLE_DURING_ATTACH_ONLY
+    implementation_status: CONTRACT_DEFINED_NOT_EXECUTED
+    evidence_source: S2-00 attach-only boundary
+  - risk_id: RISK_C_SINGLE_HAND_LOSS
+    symptom: one_palm_contact_loss
+    possible_causes: [mirror_asymmetry, joint_margin, prolonged_single_hand_state]
+    mandatory_prevention: [mirror_test, separate_left_right_error, contact_onset_loss, joint_margin, single_hand_duration_limit]
+    required_metrics: [left_contact, right_contact, joint_limit_margin_rad]
+    abort_condition: single_hand_state_exceeds_unresolved_limit
+    implementation_status: CONTRACT_DEFINED_NOT_EXECUTED
+    evidence_source: S2-00 contract; limit remains UNRESOLVED
+  - risk_id: RISK_D_OBJECT_YAW
+    symptom: object_yaw_drift
+    possible_causes: [force_imbalance, sign_error, rate_limit_mismatch]
+    mandatory_prevention: [Fx_equals_FL_plus_FR, tau_z_equals_s_times_FR_minus_FL, sign_test, mirror_input_output_test, equal_rate_limits]
+    required_metrics: [object_yaw_rad, object_yaw_change_rad, object_yaw_rate_radps, left_contact_force_n, right_contact_force_n]
+    abort_condition: yaw_threshold_exceeded
+    implementation_status: CONTRACT_DEFINED_NOT_EXECUTED
+    evidence_source: S2-00 wrench-sign contract; threshold remains UNRESOLVED
+  - risk_id: RISK_E_ROBOT_FALL_OR_LEAN
+    symptom: fall_or_excessive_lean
+    possible_causes: [wrong_lower_body_scale, geometric_center_com, contact_force_growth]
+    mandatory_prevention: [G1_W_HANDS_AGILE_ACTION_SCALE, explicit_contact_height, root_pitch_tilt_height, foot_contact, torque_ratio, unload_on_force_growth]
+    required_metrics: [root_height_m, root_pitch_rad, root_tilt_rad, foot_contact_state, torque_ratio_max]
+    abort_condition: robot_fall_or_bad_tilt
+    implementation_status: CONTRACT_DEFINED_NOT_EXECUTED
+    evidence_source: S1-06 scale source and S2-00 contract
+  - risk_id: RISK_F_AUTO_RESET_AMBIGUITY
+    symptom: reset_misclassified_as_continuation
+    possible_causes: [merged_done_signal, missing_episode_id, hidden_auto_reset]
+    mandatory_prevention: [separate_time_out_fall_bad_tilt_nonfinite, reset_count, episode_id, no_post_reset_accumulation]
+    required_metrics: [time_out, fall, bad_tilt, nonfinite, reset_count, episode_id]
+    abort_condition: termination_api_ambiguous
+    implementation_status: CONTRACT_DEFINED_NOT_EXECUTED
+    evidence_source: S2-00 termination contract
+  - risk_id: RISK_G_NON_PALM_COLLISION
+    symptom: forbidden_body_box_contact
+    possible_causes: [non_palm_contact, backend_reconfiguration]
+    mandatory_prevention: [only_palm_patch_allowed, all_other_body_links_forbidden, reuse_calibrated_backend, no_backend_retuning]
+    required_metrics: [forbidden_contact_links, left_contact, right_contact]
+    abort_condition: any_non_palm_contact
+    implementation_status: CONTRACT_DEFINED_NOT_EXECUTED
+    evidence_source: S2-00 collision semantic contract; backend not connected

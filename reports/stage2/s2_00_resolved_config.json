@@ -1,0 +1,734 @@
+{
+  "branch": "stage2/attach-light-box",
+  "contract_digest_sha256": "02c83618479eb87d288bf1ba866a84f6c22b602d244525b31f96dbf1443c0bfb",
+  "contradictions": [],
+  "frozen_parameters": {
+    "attach_gate": {
+      "contact_force_peak_threshold": {
+        "rationale": "Abort threshold for peak contact force is not calibrated.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "N",
+        "value": "UNRESOLVED"
+      },
+      "contact_force_rate_threshold": {
+        "rationale": "Abort threshold for contact force rate is not calibrated.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "N_per_s",
+        "value": "UNRESOLVED"
+      },
+      "contact_loss_grace_duration": {
+        "rationale": "Loss grace period is not calibrated.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "s",
+        "value": "UNRESOLVED"
+      },
+      "excessive_contact_impulse_threshold": {
+        "rationale": "Abort threshold for excessive contact impulse is not calibrated.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "N_s",
+        "value": "UNRESOLVED"
+      },
+      "left_contact_force_threshold": {
+        "rationale": "Contact force threshold is not calibrated.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "N",
+        "value": "UNRESOLVED"
+      },
+      "left_contact_impulse_threshold": {
+        "rationale": "Left-palm contact impulse threshold is not calibrated.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "N_s",
+        "value": "UNRESOLVED"
+      },
+      "object_linear_speed_threshold": {
+        "rationale": "Attach stability threshold is not calibrated.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "m_per_s",
+        "value": "UNRESOLVED"
+      },
+      "object_translation_drift_threshold": {
+        "rationale": "Attach stability threshold is not calibrated.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "m",
+        "value": "UNRESOLVED"
+      },
+      "object_yaw_drift_threshold": {
+        "rationale": "Attach stability threshold is not calibrated.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "rad",
+        "value": "UNRESOLVED"
+      },
+      "object_yaw_rate_threshold": {
+        "rationale": "Attach stability threshold is not calibrated.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "rad_per_s",
+        "value": "UNRESOLVED"
+      },
+      "right_contact_force_threshold": {
+        "rationale": "Contact force threshold is not calibrated.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "N",
+        "value": "UNRESOLVED"
+      },
+      "right_contact_impulse_threshold": {
+        "rationale": "Right-palm contact impulse threshold is not calibrated.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "N_s",
+        "value": "UNRESOLVED"
+      },
+      "single_hand_contact_max_duration": {
+        "rationale": "Single-hand limit is not calibrated.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "s",
+        "value": "UNRESOLVED"
+      }
+    },
+    "attach_motion": {
+      "active_pushing": {
+        "rationale": "S2-00 stops at attachment.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": false
+      },
+      "approach_acceleration_limit": {
+        "rationale": "Must be frozen before a runtime contract exists.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "m_per_s2",
+        "value": "UNRESOLVED"
+      },
+      "approach_jerk_rate_limit": {
+        "rationale": "Must be frozen before a runtime contract exists.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "m_per_s3",
+        "value": "UNRESOLVED"
+      },
+      "approach_speed": {
+        "rationale": "Must be frozen before a runtime contract exists.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "m_per_s",
+        "value": "UNRESOLVED"
+      },
+      "attach_hold_duration": {
+        "rationale": "Hold duration is not calibrated.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "s",
+        "value": "UNRESOLVED"
+      },
+      "base_motion_command": {
+        "rationale": "Base is stationary during attach-only phases.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": [
+          "m_per_s",
+          "m_per_s",
+          "rad_per_s"
+        ],
+        "value": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "box_displacement_subgoal": {
+        "rationale": "Attach-only has no push progress target.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": [
+          "m",
+          "m",
+          "rad"
+        ],
+        "value": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "contact_verification_window": {
+        "rationale": "Verification duration is not calibrated.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "s",
+        "value": "UNRESOLVED"
+      },
+      "progress_reward": {
+        "rationale": "No progress reward is active during attach.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": false
+      }
+    },
+    "contact_geometry": {
+      "allowed_contact_semantics": {
+        "rationale": "Only the two palm patches are allowed to contact the box.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "semantic_categories",
+        "value": [
+          "left_palm_allowed_patch",
+          "right_palm_allowed_patch"
+        ]
+      },
+      "approach_along_normal_only": {
+        "rationale": "Approach has no tangential motion.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": true
+      },
+      "bilateral": {
+        "rationale": "Both palms are required.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": true
+      },
+      "contact_height": {
+        "rationale": "Must not default to geometric center height.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "m",
+        "value": "UNRESOLVED"
+      },
+      "equal_contact_height": {
+        "rationale": "Both contact heights are constrained equal, without choosing a value.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": true
+      },
+      "forbidden_contact_semantics": {
+        "rationale": "Any non-palm body contact is forbidden; link-name mapping remains asset-dependent.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "semantic_categories",
+        "value": [
+          "forearm",
+          "upper_arm",
+          "shoulder",
+          "chest_torso",
+          "pelvis",
+          "thigh",
+          "shank",
+          "foot",
+          "head",
+          "other_non_palm_link"
+        ]
+      },
+      "mirrored_about_yO_zero": {
+        "rationale": "Left/right tangential coordinates are mirrored.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": true
+      },
+      "nominal_base_to_box_distance": {
+        "rationale": "Contact stance has not been frozen.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "m",
+        "value": "UNRESOLVED"
+      },
+      "palm_normals_plus_xO": {
+        "rationale": "Both palm normals point inward along +xO.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": true
+      },
+      "palm_orientation_fixed_during_approach": {
+        "rationale": "Orientation is held during the normal approach.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": true
+      },
+      "precontact_gap": {
+        "rationale": "Initial no-penetration gap must be selected before execution.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "m",
+        "value": "UNRESOLVED"
+      },
+      "precontact_outside_rear": {
+        "rationale": "Precontact is outside the rear surface.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": true
+      },
+      "surface": {
+        "rationale": "Contacts are on the rear surface.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "identifier",
+        "value": "rear"
+      },
+      "tangential_separation": {
+        "rationale": "Must be calibrated or sourced before execution.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "m",
+        "value": "UNRESOLVED"
+      },
+      "template_id": {
+        "rationale": "Only the centered bilateral rear template is described.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "identifier",
+        "value": "rear_centered_bilateral"
+      }
+    },
+    "development_only": true,
+    "end_to_end_rl_enabled": false,
+    "environment": {
+      "known_object_state": {
+        "rationale": "Object state is known in the development contract.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": true
+      },
+      "rigid_box": {
+        "rationale": "The object is rigid.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": true
+      },
+      "rolling_allowed": {
+        "rationale": "Rolling is outside this contact contract.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": false
+      },
+      "tipping_allowed": {
+        "rationale": "Tipping is outside this contact contract.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": false
+      }
+    },
+    "geometry": {
+      "box_half_height_zO": {
+        "rationale": "Vertical half extent; not a CoM assumption.",
+        "source": "Derived from box_height_zO",
+        "status": "FROZEN",
+        "unit": "m",
+        "value": 0.6
+      },
+      "box_half_length_xO": {
+        "rationale": "Rear face is at negative half length.",
+        "source": "Derived from box_length_xO",
+        "status": "FROZEN",
+        "unit": "m",
+        "value": 0.6
+      },
+      "box_half_width_yO": {
+        "rationale": "Lateral half extent.",
+        "source": "Derived from box_width_yO",
+        "status": "FROZEN",
+        "unit": "m",
+        "value": 0.3
+      },
+      "box_height_zO": {
+        "rationale": "Vertical box dimension.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "m",
+        "value": 1.2
+      },
+      "box_length_xO": {
+        "rationale": "Long axis of the rigid box.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "m",
+        "value": 1.2
+      },
+      "box_width_yO": {
+        "rationale": "Short axis of the rigid box.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "m",
+        "value": 0.6
+      },
+      "door_disabled_in_stage2": {
+        "rationale": "No doorway is generated for S2-00.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": true
+      },
+      "door_width": {
+        "rationale": "Provisional width, disabled in Stage 2.",
+        "source": "S2-00 contract",
+        "status": "PROVISIONAL",
+        "unit": "m",
+        "value": 0.8
+      },
+      "doorway_enabled": {
+        "rationale": "Door geometry is reserved for a later stage.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": false
+      },
+      "flat_ground": {
+        "rationale": "Attach-only development scene uses a flat ground plane.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": true
+      },
+      "rear_inward_normal_xO": {
+        "rationale": "Inward surface normal points along positive xO.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": 1.0
+      },
+      "rear_surface_xO": {
+        "rationale": "Rear surface of the box.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "m",
+        "value": -0.6
+      },
+      "rear_tangent_axis": {
+        "rationale": "Bilateral contacts mirror across yO=0.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "axis",
+        "value": "yO"
+      },
+      "xO_axis": {
+        "rationale": "xO follows the 1.20 m edge.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "axis",
+        "value": "long_box_axis"
+      },
+      "yO_axis": {
+        "rationale": "yO follows the 0.60 m edge.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "axis",
+        "value": "short_box_axis"
+      },
+      "zO_axis": {
+        "rationale": "zO is vertical.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "axis",
+        "value": "vertical_up"
+      }
+    },
+    "isaac_execution_enabled": false,
+    "logging": {
+      "contact_safety_supervisor_frequency": {
+        "rationale": "Contact and safety-supervisor rate must be independently frozen.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "Hz",
+        "value": "UNRESOLVED"
+      },
+      "episode_count": {
+        "rationale": "Contract describes one attach-only episode.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "episode",
+        "value": 1
+      },
+      "final_image_phase": {
+        "rationale": "Image would be taken at hold end, but is not generated here.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "phase",
+        "value": "ATTACHED_HOLD"
+      },
+      "logging_trace_frequency": {
+        "rationale": "Trace logging rate must be independently frozen.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "Hz",
+        "value": "UNRESOLVED"
+      },
+      "simulation_control_frequency": {
+        "rationale": "Simulation and control rate require an authoritative runtime interface.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "Hz",
+        "value": "UNRESOLVED"
+      }
+    },
+    "object_physics": {
+      "box_com_height": {
+        "rationale": "GEOMETRIC_CENTER_COM_NOT_ACCEPTED_BY_DEFAULT.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "m",
+        "value": "UNRESOLVED"
+      },
+      "box_com_x_offset": {
+        "rationale": "No authoritative CoM offset has been audited.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "m",
+        "value": "UNRESOLVED"
+      },
+      "box_com_y_offset": {
+        "rationale": "No authoritative CoM offset has been audited.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "m",
+        "value": "UNRESOLVED"
+      },
+      "box_ground_dynamic_friction": {
+        "rationale": "Must be calibrated before execution.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "coefficient",
+        "value": "UNRESOLVED"
+      },
+      "box_ground_static_friction": {
+        "rationale": "Must be calibrated before execution.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "coefficient",
+        "value": "UNRESOLVED"
+      },
+      "box_mass": {
+        "rationale": "Requires an authoritative Stage 2 asset or calibration.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "kg",
+        "value": "UNRESOLVED"
+      },
+      "contact_damping": {
+        "rationale": "Contact model parameter is not frozen.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "N_s_per_m",
+        "value": "UNRESOLVED"
+      },
+      "contact_stiffness": {
+        "rationale": "Contact model parameter is not frozen.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "N_per_m",
+        "value": "UNRESOLVED"
+      },
+      "palm_box_dynamic_friction": {
+        "rationale": "Must be calibrated before execution.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "coefficient",
+        "value": "UNRESOLVED"
+      },
+      "palm_box_static_friction": {
+        "rationale": "Must be calibrated before execution.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "coefficient",
+        "value": "UNRESOLVED"
+      },
+      "restitution": {
+        "rationale": "Must be calibrated before execution.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "coefficient",
+        "value": "UNRESOLVED"
+      }
+    },
+    "object_randomization_enabled": false,
+    "planner_enabled": false,
+    "provenance": {
+      "checkpoint": {
+        "rationale": "S2-00 is static contract infrastructure only.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "identifier",
+        "value": "NOT_USED"
+      },
+      "lower_body_scale_source": {
+        "rationale": "Preserve the authoritative per-joint scale source.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "identifier",
+        "value": "G1_W_HANDS_AGILE_ACTION_SCALE"
+      },
+      "source_stage1_head": {
+        "rationale": "Stage 2 starts from the audited Stage 1 baseline.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "git_sha",
+        "value": "fdc908c8ff4cf7179318d53aff37d3ab98b8b797"
+      }
+    },
+    "pushing_enabled": false,
+    "reposition_enabled": false,
+    "robot_stability": {
+      "foot_contact_stability_threshold": {
+        "rationale": "Foot-contact gate is not frozen.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "dimensionless",
+        "value": "UNRESOLVED"
+      },
+      "joint_limit_safety_margin": {
+        "rationale": "Safety margin is not frozen.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "rad",
+        "value": "UNRESOLVED"
+      },
+      "robot_bad_tilt_threshold": {
+        "rationale": "Stage 2 threshold must be explicitly selected.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "rad",
+        "value": "UNRESOLVED"
+      },
+      "robot_fall_threshold": {
+        "rationale": "Stage 2 threshold must be explicitly selected.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "m",
+        "value": "UNRESOLVED"
+      },
+      "root_height_acceptable_range": {
+        "rationale": "Acceptable range is not frozen.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "m",
+        "value": "UNRESOLVED"
+      },
+      "torque_limit_ratio_threshold": {
+        "rationale": "Torque gate is not frozen.",
+        "source": "UNRESOLVED",
+        "status": "UNRESOLVED",
+        "unit": "ratio",
+        "value": "UNRESOLVED"
+      }
+    },
+    "runnable": false,
+    "schema_version": 1,
+    "stage": "S2-00",
+    "task": "attach_light_box_contract",
+    "termination_contract": {
+      "auto_reset_accumulation": {
+        "rationale": "One episode only; reset cannot continue the same episode.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": "forbidden"
+      },
+      "bad_tilt": {
+        "rationale": "Tilt must be logged independently.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": "separate_field"
+      },
+      "fall": {
+        "rationale": "Fall must be logged independently.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": "separate_field"
+      },
+      "nonfinite": {
+        "rationale": "Nonfinite state must be logged independently.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": "separate_field"
+      },
+      "time_out": {
+        "rationale": "Timeout must not be conflated with fall.",
+        "source": "S2-00 contract",
+        "status": "FROZEN",
+        "unit": "dimensionless",
+        "value": "separate_field"
+      }
+    },
+    "turning_enabled": false,
+    "vision_enabled": false
+  },
+  "generated_at_utc": "2026-07-27T12:32:36.194080+00:00",
+  "qualification_state": "CONTRACT_ONLY_NOT_EXECUTED",
+  "repository_head": "fdc908c8ff4cf7179318d53aff37d3ab98b8b797",
+  "runnable": false,
+  "schema_version": 1,
+  "source_audit": "PASSED_PARAMETER_METADATA_SCAN",
+  "source_config_path": "/root/autodl-tmp/robotics/projects/g1_access_push/configs/stage2/s2_00_attach_light_box_development.yaml",
+  "source_config_sha256": "d0d359a6ef27fa21f9c22828eb607bd643cc3826bd42612f230e139a3358e222",
+  "stage": "S2-00",
+  "unit_audit": "PASSED_PARAMETER_METADATA_SCAN",
+  "unresolved_count": 42,
+  "unresolved_parameters": [
+    "attach_gate.contact_force_peak_threshold",
+    "attach_gate.contact_force_rate_threshold",
+    "attach_gate.contact_loss_grace_duration",
+    "attach_gate.excessive_contact_impulse_threshold",
+    "attach_gate.left_contact_force_threshold",
+    "attach_gate.left_contact_impulse_threshold",
+    "attach_gate.object_linear_speed_threshold",
+    "attach_gate.object_translation_drift_threshold",
+    "attach_gate.object_yaw_drift_threshold",
+    "attach_gate.object_yaw_rate_threshold",
+    "attach_gate.right_contact_force_threshold",
+    "attach_gate.right_contact_impulse_threshold",
+    "attach_gate.single_hand_contact_max_duration",
+    "attach_motion.approach_acceleration_limit",
+    "attach_motion.approach_jerk_rate_limit",
+    "attach_motion.approach_speed",
+    "attach_motion.attach_hold_duration",
+    "attach_motion.contact_verification_window",
+    "contact_geometry.contact_height",
+    "contact_geometry.nominal_base_to_box_distance",
+    "contact_geometry.precontact_gap",
+    "contact_geometry.tangential_separation",
+    "logging.contact_safety_supervisor_frequency",
+    "logging.logging_trace_frequency",
+    "logging.simulation_control_frequency",
+    "object_physics.box_com_height",
+    "object_physics.box_com_x_offset",
+    "object_physics.box_com_y_offset",
+    "object_physics.box_ground_dynamic_friction",
+    "object_physics.box_ground_static_friction",
+    "object_physics.box_mass",
+    "object_physics.contact_damping",
+    "object_physics.contact_stiffness",
+    "object_physics.palm_box_dynamic_friction",
+    "object_physics.palm_box_static_friction",
+    "object_physics.restitution",
+    "robot_stability.foot_contact_stability_threshold",
+    "robot_stability.joint_limit_safety_margin",
+    "robot_stability.robot_bad_tilt_threshold",
+    "robot_stability.robot_fall_threshold",
+    "robot_stability.root_height_acceptable_range",
+    "robot_stability.torque_limit_ratio_threshold"
+  ]
+}

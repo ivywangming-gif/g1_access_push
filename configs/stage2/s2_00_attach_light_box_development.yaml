@@ -1,0 +1,555 @@
+schema_version: 1
+stage: S2-00
+task: attach_light_box_contract
+development_only: true
+runnable: false
+isaac_execution_enabled: false
+planner_enabled: false
+pushing_enabled: false
+object_randomization_enabled: false
+vision_enabled: false
+reposition_enabled: false
+turning_enabled: false
+end_to_end_rl_enabled: false
+
+geometry:
+  flat_ground:
+    status: FROZEN
+    value: true
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: Attach-only development scene uses a flat ground plane.
+  doorway_enabled:
+    status: FROZEN
+    value: false
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: Door geometry is reserved for a later stage.
+  door_width:
+    status: PROVISIONAL
+    value: 0.80
+    unit: m
+    source: S2-00 contract
+    rationale: Provisional width, disabled in Stage 2.
+  door_disabled_in_stage2:
+    status: FROZEN
+    value: true
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: No doorway is generated for S2-00.
+  box_length_xO:
+    status: FROZEN
+    value: 1.20
+    unit: m
+    source: S2-00 contract
+    rationale: Long axis of the rigid box.
+  box_width_yO:
+    status: FROZEN
+    value: 0.60
+    unit: m
+    source: S2-00 contract
+    rationale: Short axis of the rigid box.
+  box_height_zO:
+    status: FROZEN
+    value: 1.20
+    unit: m
+    source: S2-00 contract
+    rationale: Vertical box dimension.
+  box_half_length_xO:
+    status: FROZEN
+    value: 0.60
+    unit: m
+    source: Derived from box_length_xO
+    rationale: Rear face is at negative half length.
+  box_half_width_yO:
+    status: FROZEN
+    value: 0.30
+    unit: m
+    source: Derived from box_width_yO
+    rationale: Lateral half extent.
+  box_half_height_zO:
+    status: FROZEN
+    value: 0.60
+    unit: m
+    source: Derived from box_height_zO
+    rationale: Vertical half extent; not a CoM assumption.
+  rear_surface_xO:
+    status: FROZEN
+    value: -0.60
+    unit: m
+    source: S2-00 contract
+    rationale: Rear surface of the box.
+  rear_inward_normal_xO:
+    status: FROZEN
+    value: 1.0
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: Inward surface normal points along positive xO.
+  rear_tangent_axis:
+    status: FROZEN
+    value: yO
+    unit: axis
+    source: S2-00 contract
+    rationale: Bilateral contacts mirror across yO=0.
+  xO_axis:
+    status: FROZEN
+    value: long_box_axis
+    unit: axis
+    source: S2-00 contract
+    rationale: xO follows the 1.20 m edge.
+  yO_axis:
+    status: FROZEN
+    value: short_box_axis
+    unit: axis
+    source: S2-00 contract
+    rationale: yO follows the 0.60 m edge.
+  zO_axis:
+    status: FROZEN
+    value: vertical_up
+    unit: axis
+    source: S2-00 contract
+    rationale: zO is vertical.
+
+environment:
+  known_object_state:
+    status: FROZEN
+    value: true
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: Object state is known in the development contract.
+  rigid_box:
+    status: FROZEN
+    value: true
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: The object is rigid.
+  rolling_allowed:
+    status: FROZEN
+    value: false
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: Rolling is outside this contact contract.
+  tipping_allowed:
+    status: FROZEN
+    value: false
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: Tipping is outside this contact contract.
+
+object_physics:
+  box_mass:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: kg
+    source: UNRESOLVED
+    rationale: Requires an authoritative Stage 2 asset or calibration.
+  box_ground_static_friction:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: coefficient
+    source: UNRESOLVED
+    rationale: Must be calibrated before execution.
+  box_ground_dynamic_friction:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: coefficient
+    source: UNRESOLVED
+    rationale: Must be calibrated before execution.
+  palm_box_static_friction:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: coefficient
+    source: UNRESOLVED
+    rationale: Must be calibrated before execution.
+  palm_box_dynamic_friction:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: coefficient
+    source: UNRESOLVED
+    rationale: Must be calibrated before execution.
+  restitution:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: coefficient
+    source: UNRESOLVED
+    rationale: Must be calibrated before execution.
+  contact_stiffness:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: N_per_m
+    source: UNRESOLVED
+    rationale: Contact model parameter is not frozen.
+  contact_damping:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: N_s_per_m
+    source: UNRESOLVED
+    rationale: Contact model parameter is not frozen.
+  box_com_x_offset:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: m
+    source: UNRESOLVED
+    rationale: No authoritative CoM offset has been audited.
+  box_com_y_offset:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: m
+    source: UNRESOLVED
+    rationale: No authoritative CoM offset has been audited.
+  box_com_height:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: m
+    source: UNRESOLVED
+    rationale: GEOMETRIC_CENTER_COM_NOT_ACCEPTED_BY_DEFAULT.
+
+contact_geometry:
+  template_id:
+    status: FROZEN
+    value: rear_centered_bilateral
+    unit: identifier
+    source: S2-00 contract
+    rationale: Only the centered bilateral rear template is described.
+  surface:
+    status: FROZEN
+    value: rear
+    unit: identifier
+    source: S2-00 contract
+    rationale: Contacts are on the rear surface.
+  bilateral:
+    status: FROZEN
+    value: true
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: Both palms are required.
+  mirrored_about_yO_zero:
+    status: FROZEN
+    value: true
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: Left/right tangential coordinates are mirrored.
+  equal_contact_height:
+    status: FROZEN
+    value: true
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: Both contact heights are constrained equal, without choosing a value.
+  palm_normals_plus_xO:
+    status: FROZEN
+    value: true
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: Both palm normals point inward along +xO.
+  precontact_outside_rear:
+    status: FROZEN
+    value: true
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: Precontact is outside the rear surface.
+  approach_along_normal_only:
+    status: FROZEN
+    value: true
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: Approach has no tangential motion.
+  palm_orientation_fixed_during_approach:
+    status: FROZEN
+    value: true
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: Orientation is held during the normal approach.
+  allowed_contact_semantics:
+    status: FROZEN
+    value: [left_palm_allowed_patch, right_palm_allowed_patch]
+    unit: semantic_categories
+    source: S2-00 contract
+    rationale: Only the two palm patches are allowed to contact the box.
+  forbidden_contact_semantics:
+    status: FROZEN
+    value: [forearm, upper_arm, shoulder, chest_torso, pelvis, thigh, shank, foot, head, other_non_palm_link]
+    unit: semantic_categories
+    source: S2-00 contract
+    rationale: Any non-palm body contact is forbidden; link-name mapping remains asset-dependent.
+  contact_height:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: m
+    source: UNRESOLVED
+    rationale: Must not default to geometric center height.
+  tangential_separation:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: m
+    source: UNRESOLVED
+    rationale: Must be calibrated or sourced before execution.
+  nominal_base_to_box_distance:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: m
+    source: UNRESOLVED
+    rationale: Contact stance has not been frozen.
+  precontact_gap:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: m
+    source: UNRESOLVED
+    rationale: Initial no-penetration gap must be selected before execution.
+
+attach_motion:
+  base_motion_command:
+    status: FROZEN
+    value: [0.0, 0.0, 0.0]
+    unit: [m_per_s, m_per_s, rad_per_s]
+    source: S2-00 contract
+    rationale: Base is stationary during attach-only phases.
+  box_displacement_subgoal:
+    status: FROZEN
+    value: [0.0, 0.0, 0.0]
+    unit: [m, m, rad]
+    source: S2-00 contract
+    rationale: Attach-only has no push progress target.
+  progress_reward:
+    status: FROZEN
+    value: false
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: No progress reward is active during attach.
+  active_pushing:
+    status: FROZEN
+    value: false
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: S2-00 stops at attachment.
+  approach_speed:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: m_per_s
+    source: UNRESOLVED
+    rationale: Must be frozen before a runtime contract exists.
+  approach_acceleration_limit:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: m_per_s2
+    source: UNRESOLVED
+    rationale: Must be frozen before a runtime contract exists.
+  approach_jerk_rate_limit:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: m_per_s3
+    source: UNRESOLVED
+    rationale: Must be frozen before a runtime contract exists.
+  contact_verification_window:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: s
+    source: UNRESOLVED
+    rationale: Verification duration is not calibrated.
+  attach_hold_duration:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: s
+    source: UNRESOLVED
+    rationale: Hold duration is not calibrated.
+
+attach_gate:
+  left_contact_force_threshold:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: N
+    source: UNRESOLVED
+    rationale: Contact force threshold is not calibrated.
+  right_contact_force_threshold:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: N
+    source: UNRESOLVED
+    rationale: Contact force threshold is not calibrated.
+  left_contact_impulse_threshold:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: N_s
+    source: UNRESOLVED
+    rationale: Left-palm contact impulse threshold is not calibrated.
+  right_contact_impulse_threshold:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: N_s
+    source: UNRESOLVED
+    rationale: Right-palm contact impulse threshold is not calibrated.
+  excessive_contact_impulse_threshold:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: N_s
+    source: UNRESOLVED
+    rationale: Abort threshold for excessive contact impulse is not calibrated.
+  contact_force_peak_threshold:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: N
+    source: UNRESOLVED
+    rationale: Abort threshold for peak contact force is not calibrated.
+  contact_force_rate_threshold:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: N_per_s
+    source: UNRESOLVED
+    rationale: Abort threshold for contact force rate is not calibrated.
+  object_linear_speed_threshold:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: m_per_s
+    source: UNRESOLVED
+    rationale: Attach stability threshold is not calibrated.
+  object_yaw_rate_threshold:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: rad_per_s
+    source: UNRESOLVED
+    rationale: Attach stability threshold is not calibrated.
+  object_translation_drift_threshold:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: m
+    source: UNRESOLVED
+    rationale: Attach stability threshold is not calibrated.
+  object_yaw_drift_threshold:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: rad
+    source: UNRESOLVED
+    rationale: Attach stability threshold is not calibrated.
+  contact_loss_grace_duration:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: s
+    source: UNRESOLVED
+    rationale: Loss grace period is not calibrated.
+  single_hand_contact_max_duration:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: s
+    source: UNRESOLVED
+    rationale: Single-hand limit is not calibrated.
+
+robot_stability:
+  joint_limit_safety_margin:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: rad
+    source: UNRESOLVED
+    rationale: Safety margin is not frozen.
+  torque_limit_ratio_threshold:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: ratio
+    source: UNRESOLVED
+    rationale: Torque gate is not frozen.
+  robot_fall_threshold:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: m
+    source: UNRESOLVED
+    rationale: Stage 2 threshold must be explicitly selected.
+  robot_bad_tilt_threshold:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: rad
+    source: UNRESOLVED
+    rationale: Stage 2 threshold must be explicitly selected.
+  root_height_acceptable_range:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: m
+    source: UNRESOLVED
+    rationale: Acceptable range is not frozen.
+  foot_contact_stability_threshold:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: dimensionless
+    source: UNRESOLVED
+    rationale: Foot-contact gate is not frozen.
+
+termination_contract:
+  time_out:
+    status: FROZEN
+    value: separate_field
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: Timeout must not be conflated with fall.
+  fall:
+    status: FROZEN
+    value: separate_field
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: Fall must be logged independently.
+  bad_tilt:
+    status: FROZEN
+    value: separate_field
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: Tilt must be logged independently.
+  nonfinite:
+    status: FROZEN
+    value: separate_field
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: Nonfinite state must be logged independently.
+  auto_reset_accumulation:
+    status: FROZEN
+    value: forbidden
+    unit: dimensionless
+    source: S2-00 contract
+    rationale: One episode only; reset cannot continue the same episode.
+
+logging:
+  episode_count:
+    status: FROZEN
+    value: 1
+    unit: episode
+    source: S2-00 contract
+    rationale: Contract describes one attach-only episode.
+  simulation_control_frequency:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: Hz
+    source: UNRESOLVED
+    rationale: Simulation and control rate require an authoritative runtime interface.
+  contact_safety_supervisor_frequency:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: Hz
+    source: UNRESOLVED
+    rationale: Contact and safety-supervisor rate must be independently frozen.
+  logging_trace_frequency:
+    status: UNRESOLVED
+    value: UNRESOLVED
+    unit: Hz
+    source: UNRESOLVED
+    rationale: Trace logging rate must be independently frozen.
+  final_image_phase:
+    status: FROZEN
+    value: ATTACHED_HOLD
+    unit: phase
+    source: S2-00 contract
+    rationale: Image would be taken at hold end, but is not generated here.
+
+provenance:
+  source_stage1_head:
+    status: FROZEN
+    value: fdc908c8ff4cf7179318d53aff37d3ab98b8b797
+    unit: git_sha
+    source: S2-00 contract
+    rationale: Stage 2 starts from the audited Stage 1 baseline.
+  lower_body_scale_source:
+    status: FROZEN
+    value: G1_W_HANDS_AGILE_ACTION_SCALE
+    unit: identifier
+    source: S2-00 contract
+    rationale: Preserve the authoritative per-joint scale source.
+  checkpoint:
+    status: FROZEN
+    value: NOT_USED
+    unit: identifier
+    source: S2-00 contract
+    rationale: S2-00 is static contract infrastructure only.

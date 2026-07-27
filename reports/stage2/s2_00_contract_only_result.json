@@ -1,0 +1,75 @@
+{
+  "all_failure_reasons": [],
+  "auto_reset_detected": false,
+  "branch": "stage2/attach-light-box",
+  "checkpoint": "NOT_USED",
+  "checkpoint_qualification": "NOT_APPLICABLE",
+  "code_head": "fdc908c8ff4cf7179318d53aff37d3ab98b8b797",
+  "config_path": "configs/stage2/s2_00_attach_light_box_development.yaml",
+  "config_sha256": "d0d359a6ef27fa21f9c22828eb607bd643cc3826bd42612f230e139a3358e222",
+  "contract_flags": {
+    "qualification_state": "CONTRACT_ONLY_NOT_EXECUTED",
+    "runnable": false
+  },
+  "episode_count": 0,
+  "episode_id": "NOT_RUN",
+  "evidence": {
+    "ATTACH_NOT_RUN": true,
+    "BOX_NOT_PUSHED": true
+  },
+  "expected_frames": "UNRESOLVED",
+  "final_image_path": "NOT_CREATED",
+  "final_image_phase": "NOT_APPLICABLE",
+  "fsm_summary": {
+    "states": [],
+    "terminal_state": "NOT_RUN"
+  },
+  "metrics": {
+    "bad_tilt": "UNRESOLVED",
+    "bilateral_contact_duration_s": "UNRESOLVED",
+    "contact_force_peak_n": "UNRESOLVED",
+    "contact_force_rate_nps": "UNRESOLVED",
+    "fall": "UNRESOLVED",
+    "foot_contact_state": "UNRESOLVED",
+    "forbidden_contact_links": "UNRESOLVED",
+    "joint_limit_margin_rad": "UNRESOLVED",
+    "left_contact": "UNRESOLVED",
+    "left_contact_force_n": "UNRESOLVED",
+    "left_contact_impulse_ns": "UNRESOLVED",
+    "nonfinite": "UNRESOLVED",
+    "object_linear_speed_mps": "UNRESOLVED",
+    "object_position_xyz_m": "UNRESOLVED",
+    "object_translation_from_attach_start_m": "UNRESOLVED",
+    "object_yaw_change_rad": "UNRESOLVED",
+    "object_yaw_rad": "UNRESOLVED",
+    "object_yaw_rate_radps": "UNRESOLVED",
+    "right_contact": "UNRESOLVED",
+    "right_contact_force_n": "UNRESOLVED",
+    "right_contact_impulse_ns": "UNRESOLVED",
+    "root_height_m": "UNRESOLVED",
+    "root_pitch_rad": "UNRESOLVED",
+    "root_roll_rad": "UNRESOLVED",
+    "root_tilt_rad": "UNRESOLVED",
+    "time_out": "UNRESOLVED",
+    "torque_ratio_max": "UNRESOLVED"
+  },
+  "observed_frames": 0,
+  "primary_reason": "S2_00_STATIC_CONTRACT_ONLY",
+  "process_audit": {
+    "isaac_started": false,
+    "multiple_isaac_processes": false
+  },
+  "reset_count": 0,
+  "resolved_config_path": "reports/stage2/s2_00_resolved_config.json",
+  "run_id": "s2_00_static_contract",
+  "schema_version": 1,
+  "source_stage1_head": "fdc908c8ff4cf7179318d53aff37d3ab98b8b797",
+  "stage": "S2-00",
+  "status": "NOT_RUN",
+  "task": "attach_light_box_contract",
+  "timestamps": {
+    "finished_at_utc": "NOT_RUN",
+    "started_at_utc": "NOT_RUN"
+  },
+  "trace_path": "NOT_CREATED"
+}
