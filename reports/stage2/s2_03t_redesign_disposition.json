@@ -1,0 +1,31 @@
+{
+  "development_only_decision": [
+    "2D bilateral normal-correction authority and its limits",
+    "nominal approach speed/acceleration/jerk and IK damping",
+    "reward weights and three-mode switching",
+    "curriculum promotion thresholds",
+    "pilot fall-explosion and long-term-saturation thresholds"
+  ],
+  "falcon_migration_decision": "NO",
+  "generated_at_utc": "2026-07-28T20:52:46Z",
+  "next_step": "\u7b49\u5f85\u7814\u7a76\u8d1f\u8d23\u4eba\u67e5\u770b\u8bad\u7ec3\u540e\u89c6\u9891\u548c screening \u8bc1\u636e\uff0c\u518d\u51b3\u5b9a\u662f\u5426\u8fdb\u5165 S2-03 \u6b63\u5f0f Attach qualification\uff1b\u4e0d\u5f97\u81ea\u52a8\u5f00\u59cb pushing \u6216 S2-04\u3002",
+  "primary_reason": "REQUIRED_30MM_OR_60MM_GAP_NOT_REACHABLE",
+  "project_evidence": {
+    "formal_training_status": null,
+    "new_policy_status": "INVALID",
+    "pilot_gate_status": null,
+    "reachability_status": "FAIL",
+    "video_status": null
+  },
+  "project_inference": "The redesign did not produce evidence sufficient for promotion.",
+  "promotion_to_formal_attach_qualification": "RESEARCH_LEAD_REVIEW_REQUIRED",
+  "pushing_authorized": false,
+  "s2_04_authorized": false,
+  "schema_version": 1,
+  "source_fact": [
+    "Persisted runner/evaluator JSON is authoritative over post-result Kit teardown return codes.",
+    "The formal S2-03 no-pushing safety gates were not changed by this campaign."
+  ],
+  "stage": "S2-03T_REDESIGN_DISPOSITION",
+  "status": "FAIL"
+}

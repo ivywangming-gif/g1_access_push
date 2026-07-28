@@ -1,0 +1,17 @@
+{
+  "authoritative_result_path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_redesign_campaign_20260728_204131/checkpoint_screening/screening_result.json",
+  "authoritative_result_sha256": null,
+  "best_checkpoint": null,
+  "candidate_count": null,
+  "candidates": [],
+  "classification": "PROJECT_EVIDENCE",
+  "diagnostic_valid": null,
+  "generated_at_utc": "2026-07-28T20:52:46Z",
+  "primary_reason": null,
+  "qualified_checkpoint_count": null,
+  "schema_version": 1,
+  "screening_episode_count": null,
+  "screening_seeds": null,
+  "stage": "S2-03T_REDESIGN_CHECKPOINT_SCREENING",
+  "status": null
+}

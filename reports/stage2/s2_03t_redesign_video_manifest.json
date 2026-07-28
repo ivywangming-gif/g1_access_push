@@ -1,0 +1,14 @@
+{
+  "archive": null,
+  "files": {},
+  "generated_at_utc": "2026-07-28T20:52:46Z",
+  "large_artifacts_committed_to_git": false,
+  "package": "S2_03T_TRAINED_POLICY_VIDEO_DELIVERY",
+  "primary_reason": null,
+  "primary_seed": 42,
+  "primary_video_recorded": false,
+  "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_redesign_campaign_20260728_204131",
+  "schema_version": 1,
+  "status": null,
+  "supplemental_video_recorded": false
+}

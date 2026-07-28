@@ -1,0 +1,75 @@
+{
+  "bootstrap_bool_bug_fixed": true,
+  "bootstrap_bool_bug_present": true,
+  "campaign": "S2_03T_REDESIGN_TRAIN_SCREEN_AND_VIDEO_CAMPAIGN",
+  "classification": "PROJECT_EVIDENCE",
+  "formal": {
+    "bilateral_contact_max": null,
+    "env_count": null,
+    "highest_curriculum_level": null,
+    "hold_max": null,
+    "iterations_completed": null,
+    "status": null,
+    "verify_max": null
+  },
+  "generated_at_utc": "2026-07-28T20:52:46Z",
+  "implementation_branch": "stage2/s2-03t-reward-action-redesign",
+  "implementation_commit": "2b22117b6b74da8563585626a120d1209c832a81",
+  "new_action_dim": 2,
+  "new_action_name": "HYBRID_NOMINAL_NORMAL_APPROACH_PLUS_LEARNED_BILATERAL_NORMAL_CORRECTION",
+  "new_action_reachability_smoke": "FAIL",
+  "old_no_qualified_contact_policy_preserved": true,
+  "old_reward_has_hover_local_optimum": "YES",
+  "pilot": {
+    "bilateral_contact_max": null,
+    "gate": null,
+    "iterations_completed": null,
+    "status": null,
+    "verify_max": null
+  },
+  "primary_reason": "REQUIRED_30MM_OR_60MM_GAP_NOT_REACHABLE",
+  "result_commit": "RECORDED_POST_COMMIT_IN_RUN_ROOT_FINALIZER_RESULT",
+  "reward_landscape_audit": "PASS",
+  "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_redesign_campaign_20260728_204131",
+  "safety_boundaries": {
+    "box_motion_evidence": {
+      "artifacts": [
+        {
+          "artifact": "reachability",
+          "pushing_case_count": 0
+        }
+      ],
+      "evidence_artifact_count": 1,
+      "observed": false
+    },
+    "box_motion_violation_observed": false,
+    "box_push_commanded": false,
+    "box_pushed": false,
+    "falcon_migration_decision": "NO",
+    "falcon_migration_started": false,
+    "formal_s2_03_gates_unchanged": true,
+    "model_1999_used": false,
+    "old_checkpoint_resumed": false,
+    "planner_started": false,
+    "s2_04_started": false,
+    "second_instance_started": false
+  },
+  "schema_version": 1,
+  "screening": {
+    "best_checkpoint": null,
+    "episode_count": null,
+    "new_policy_status": "INVALID",
+    "qualified_checkpoint_count": null,
+    "status": null
+  },
+  "source_manifest_sha256": "8d64e7f3ee1c6bcdc9d45eb8b0f40dd6e4b67e295498f1264d98d1239622e6ea",
+  "status": "FAIL",
+  "tmux_session": "s2_03t_redesign_20260728_204131",
+  "training_failure_preserved": true,
+  "video": {
+    "archive": null,
+    "primary_recorded": false,
+    "status": null,
+    "supplemental_recorded": false
+  }
+}
