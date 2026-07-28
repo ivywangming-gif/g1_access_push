@@ -318,3 +318,7 @@ def test_generated_artifacts_are_current_and_encode_four_conflicts() -> None:
     pilot = next(item for item in conflicts["conflicts"] if item["id"] == "PILOT_CLOSE_PROCESS_VS_NO_RESUME")
     assert pilot["pilot_total_iteration_targets"] == [25, 50, 75, 100]
     assert "iteration zero" in pilot["resolution"]
+    resolved = json.loads((ROOT / "reports/stage2/s2_03t_resolved_config.json").read_text(encoding="utf-8"))
+    assert resolved["pilot"]["development_evaluation_seeds"] == [42, 43, 44, 45]
+    assert resolved["formal"]["screening_development_seeds"] == [42, 43, 44]
+    assert resolved["formal"]["qualification_seed"] == 42

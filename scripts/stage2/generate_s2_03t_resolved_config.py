@@ -306,6 +306,7 @@ def build_artifacts() -> dict[str, dict[str, Any]]:
         "pilot": {
             "num_envs": 64,
             "baseline_evaluation_episodes": 4,
+            "development_evaluation_seeds": [42, 43, 44, 45],
             "total_iteration_targets": [25, 50, 75, 100],
             "process_semantics": "INDEPENDENT_CLEAN_FROM_ITERATION_ZERO",
             "resume": False,
@@ -317,6 +318,8 @@ def build_artifacts() -> dict[str, dict[str, Any]]:
             "num_env_candidates_oom_only": [256, 128, 64],
             "maximum_iterations": 1000,
             "save_interval": 100,
+            "screening_development_seeds": [42, 43, 44],
+            "qualification_seed": 42,
             "clean_actor": True,
             "resume": False,
             "pilot_checkpoint_used": False,

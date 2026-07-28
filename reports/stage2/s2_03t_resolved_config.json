@@ -44,8 +44,14 @@
       64
     ],
     "pilot_checkpoint_used": false,
+    "qualification_seed": 42,
     "resume": false,
-    "save_interval": 100
+    "save_interval": 100,
+    "screening_development_seeds": [
+      42,
+      43,
+      44
+    ]
   },
   "initialization": {
     "clean_actor": true,
@@ -308,6 +314,12 @@
   "pilot": {
     "baseline_evaluation_episodes": 4,
     "checkpoint_load": false,
+    "development_evaluation_seeds": [
+      42,
+      43,
+      44,
+      45
+    ],
     "evaluation_episodes_per_target_maximum": 4,
     "minimum_mean_gap_improvement_m": 0.005,
     "num_envs": 64,
