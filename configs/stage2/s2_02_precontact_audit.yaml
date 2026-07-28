@@ -1,0 +1,95 @@
+stage: S2-02
+task: PRECONTACT_GEOMETRY_AND_BIMANUAL_TARGET_AUDIT
+schema_version: 1
+development_scope: SIMULATION_DEVELOPMENT_ONLY
+
+certification:
+  s2_01_pass_commit: e5149a3c3098f8c1a04ef4eafd5a86cd1110456b
+  s2_01_result_path: reports/stage2/s2_01_formal_result.json
+  controller_checkpoint_sha256: a0151975a757a33f0f5ed236d5616e2a98643abe2b36e50ac9ad01b6dd1f6d7e
+  forbidden_checkpoint_sha256: c3e147f90400598fdd97f61022acf599305254a2ccc3fdba1d3ace512ce133a0
+
+object:
+  baseline_id: S2_LIGHT_BOX_DEVELOPMENT_BASELINE_V1
+  size_xyz_m: [1.2, 0.6, 1.2]
+  rear_face_xO_m: -0.6
+  bottom_zO_m: -0.6
+  spawn_center_z_m: 0.602
+  yaw_rad: 0.0
+  mass_kg: 5.0
+  center_of_mass_local_xyz_m: [0.0, 0.0, -0.4]
+  diagonal_inertia_kg_m2: [0.12083333333333333, 0.43333333333333335, 0.5208333333333334]
+
+controller:
+  source: S1_07_DIFFERENTIAL_IK_PLUS_CERTIFIED_RECURRENT_LOWER_BODY
+  lower_body_command: [0.0, 0.0, 0.0, 0.7]
+  waist_command: [0.0, 0.0, 0.0]
+  palm_local_normal_axis: [0.0, 0.0, 1.0]
+  desired_palm_quaternion_in_object_wxyz: [0.7071067811865476, 0.0, 0.7071067811865476, 0.0]
+  maximum_position_correction_m: 0.005
+  maximum_orientation_correction_rad: 0.03
+
+search:
+  maximum_candidates: 40
+  warmup_steps: 100
+  transition_steps: 60
+  hold_steps: 15
+  return_steps: 20
+  candidates:
+    - {contact_height_m: 0.62, tangential_separation_m: 0.30, base_to_box_center_distance_m: 0.84, precontact_gap_m: 0.08}
+    - {contact_height_m: 0.62, tangential_separation_m: 0.36, base_to_box_center_distance_m: 0.84, precontact_gap_m: 0.06}
+    - {contact_height_m: 0.68, tangential_separation_m: 0.30, base_to_box_center_distance_m: 0.84, precontact_gap_m: 0.06}
+    - {contact_height_m: 0.68, tangential_separation_m: 0.36, base_to_box_center_distance_m: 0.90, precontact_gap_m: 0.08}
+    - {contact_height_m: 0.62, tangential_separation_m: 0.30, base_to_box_center_distance_m: 0.90, precontact_gap_m: 0.06}
+    - {contact_height_m: 0.68, tangential_separation_m: 0.36, base_to_box_center_distance_m: 0.84, precontact_gap_m: 0.08}
+    - {contact_height_m: 0.62, tangential_separation_m: 0.36, base_to_box_center_distance_m: 0.90, precontact_gap_m: 0.06}
+    - {contact_height_m: 0.68, tangential_separation_m: 0.30, base_to_box_center_distance_m: 0.90, precontact_gap_m: 0.08}
+
+selection:
+  status: UNRESOLVED
+  candidate_index: null
+  contact_height_m: null
+  tangential_separation_m: null
+  base_to_box_center_distance_m: null
+  precontact_gap_m: null
+  desired_palm_quaternion_in_object_wxyz: null
+
+formal:
+  stand_settle_steps: 100
+  move_to_precontact_steps: 150
+  precontact_hold_steps: 150
+  expected_frames: 400
+  episode_count: 1
+  auto_reset: false
+
+acceptance:
+  maximum_robot_box_contact_force_n: 0.0
+  maximum_robot_box_overlap_count: 0
+  minimum_palm_normal_alignment_dot: 0.984807753012208
+  maximum_hand_position_p95_m: 0.03
+  maximum_hand_position_max_m: 0.06
+  maximum_hand_orientation_p95_deg: 5.0
+  maximum_hand_orientation_max_deg: 8.0
+  maximum_left_right_position_error_asymmetry_m: 0.02
+  minimum_actual_precontact_gap_m: 0.02
+  maximum_actual_gap_error_m: 0.04
+  minimum_arm_joint_limit_margin_rad: 0.10
+  maximum_arm_joint_target_p95_error_rad: 0.05
+  maximum_arm_torque_ratio: 1.001
+  maximum_base_xy_excursion_m: 0.05
+  minimum_root_height_m: 0.5
+  maximum_root_height_m: 1.0
+  maximum_root_tilt_deg: 6.2075676918029785
+  maximum_box_linear_speed_mps: 0.005
+  maximum_box_angular_speed_radps: 0.008726646259971648
+  maximum_box_translation_m: 0.005
+  maximum_box_yaw_change_rad: 0.008726646259971648
+
+prohibitions:
+  contact: false
+  attach: false
+  pushing: false
+  training: false
+  planner: false
+  base_motion_command: false
+  model_1999: false
