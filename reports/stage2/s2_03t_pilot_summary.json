@@ -7,12 +7,14 @@
   "checkpoint": {
     "actor_input_dim": 77,
     "actor_output_dim": 14,
-    "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_pilot25_20260728_095241/model_24.pt",
+    "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_pilot25_contactfix_20260728_110301/model_24.pt",
     "sha256": "199d509551f111b854888013ad3bfc900a31f09d1508c65722fcb7fd93e9c67d",
     "size_bytes": 1503313
   },
   "clean_actor": true,
-  "code_commit": "286b4c4978704c55352ca83fe2e5ebe31f034219",
+  "code_commit": "9c99d520bc18d27690b16b6f731ebaefd3e743bb",
+  "contact_sensor_code_commit": "f0f94d61a21030edaab0a6df3ffba15559aae057",
+  "console_filter_pattern_errors": 0,
   "development_evaluations": [
     {
       "bilateral_contact": false,
@@ -25,7 +27,8 @@
       "right_minimum_surface_gap_m": 0.02818530797958374,
       "root_height_minimum_m": 0.7246726751327515,
       "root_tilt_maximum_deg": 4.274618148803711,
-      "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_pilot25_eval_seed42_20260728_095511",
+      "installed_reference_audit_status": "PASS",
+      "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_pilot25_contactfix_eval_seed42_20260728_110533",
       "seed": 42,
       "status": "FAIL",
       "time_out": true,
@@ -39,6 +42,15 @@
   "mode": "PILOT_GATE",
   "model_1999_used": false,
   "num_envs": 64,
+  "prior_pilot_evidence": {
+    "authoritative_training_status": "PASS",
+    "evidence_disposition": "INVALID",
+    "evaluation_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_pilot25_eval_seed42_20260728_095511",
+    "primary_reason": "UNSUPPORTED_BATCHED_MULTI_BODY_FILTER_SENSOR_NOT_AUDITED",
+    "training_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_pilot25_20260728_095241"
+  },
+  "pilot_evaluation_result_sha256": "364a03a828575851239c10d37472a26b00c16e9fb61fd6d3568732f57dd9cd55",
+  "pilot_training_result_sha256": "180d8bb9ab813798aa96bb6d5ad104ea77188cdf35963158b7ac9985bd0d1555",
   "pilot_checkpoint_allowed_for_formal": false,
   "primary_reason": "MEAN_MINIMUM_SURFACE_GAP_IMPROVED_BY_AT_LEAST_5MM",
   "resume": false,
@@ -47,5 +59,33 @@
   "stage": "S2-03T",
   "status": "PASS",
   "training_contract_sha256": "221f27d2a22d3e07f9bd9a05680d61d57f3b2af59a2cf0ed4f5bd8af424e6316",
-  "training_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_pilot25_20260728_095241"
+  "provenance": {
+    "baseline_reuse_scope": "GAP_METRIC_ONLY",
+    "baseline_safety_not_extrapolated": true,
+    "baseline_summary_path": "reports/stage2/s2_03t_pilot_baseline_summary.json",
+    "baseline_summary_sha256": "1794fd202b443b9bc53e0b7664601af7ed8aa25c457f2347bdfda8f40f266c8d",
+    "checkpoint_independently_generated": true,
+    "checkpoint_sha_matches_superseded_deterministic_run": true,
+    "clean_initialization_sha256": "c4675d149241e4bbe1e7d53ff1e3ab3228b8807e6d03a80c94d81e51f987185b",
+    "contact_sensor_repair_commits": [
+      "266657a361eaf4fa50f6b8e33c28b5f672293c5c",
+      "c13114478419be4fa7218ed05e0070326098eac1",
+      "f0f94d61a21030edaab0a6df3ffba15559aae057"
+    ],
+    "contract_smoke_result_sha256": "85df094aa80807f9cedcb6eed9012e473efdab7a614544ae175abc8deeaca533",
+    "contract_smoke_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_104740",
+    "forbidden_backend_filter_count": 46,
+    "forbidden_force_matrix_shape": [1, 1, 46, 3],
+    "forbidden_filter_provenance_path": "reports/stage2/s2_03t_forbidden_filter_provenance.json",
+    "forbidden_filter_provenance_sha256": "ff7328f17393b36f4094cb12174999057ca5efe22cafb6b6754b26692ce4a260",
+    "installed_reference_audit_sha256": "cfb4dde6bb0d3b5f492d02f77b0020926e04e47f12b516632f6f064d3ee84e2c",
+    "pilot_actor_metadata_sha256": "0e14972fe214ec4d136f55b7acd15569e4d807cc780dc697bf755b1b78543d3b",
+    "reference_path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_104740/precontact_reference.pt",
+    "reference_sha256": "1e537e075af7f888fb95a63501d3976d0d7740eff51c6bd9000f574b00cd0e6c",
+    "runner_rc": 0,
+    "evaluator_rc": 0,
+    "launcher_rc": 0,
+    "initial_actor_state_sha256": "080580a1754bce302a4ccbaaa754d9e83fd86880c274453fe736867a6acfdd0b"
+  },
+  "training_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_pilot25_contactfix_20260728_110301"
 }
