@@ -182,6 +182,27 @@ def test_actor_evaluation_stops_on_first_done_and_calls_unchanged_evaluator() ->
     assert "--enable_cameras" in wrapper
 
 
+def test_launchers_derive_effective_rc_from_authoritative_json() -> None:
+    smoke = (ROOT / "scripts/stage2_isaac/run_s2_03t_smoke_once.sh").read_text(encoding="utf-8")
+    train = (ROOT / "scripts/stage2_isaac/run_s2_03t_training_once.sh").read_text(encoding="utf-8")
+    evaluate = EVAL_WRAPPER.read_text(encoding="utf-8")
+    assert "contract_smoke_result.json\" PASS" in smoke
+    assert "training_result.json\" PASS" in train
+    assert "runner_status.json\" COMPLETE" in evaluate
+    assert "result.json\" PASS FAIL" in evaluate
+    for wrapper in (smoke, train, evaluate):
+        assert "AUTHORITATIVE_STATUS={status}" in wrapper
+        assert "STATUS_RC=${PIPESTATUS[0]}" in wrapper
+
+
+def test_runtime_metric_values_and_failure_masks_have_disjoint_namespaces() -> None:
+    source = MDP.read_text(encoding="utf-8")
+    assert "failure_arm_joint_margin" in source
+    assert "failure_forbidden_non_palm_box_collision" in source
+    assert "runtime_state(env).ensure()[f\"failure_{metric_name}\"]" in source
+    assert "[name.removeprefix(\"failure_\") for name in reasons]" in source
+
+
 def test_original_54_path_hash_snapshot_remains_unchanged() -> None:
     snapshot = Path("/tmp/g1_s2_01_20260727_124751/worktree_before.json")
     assert snapshot.is_file()

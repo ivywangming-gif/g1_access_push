@@ -13,6 +13,11 @@ set +e
 python /root/autodl-tmp/robotics/projects/g1_access_push/scripts/stage2_isaac/train_s2_03t.py \
   --run-root "${RUN_ROOT}" --headless "$@" 2>&1 | tee "${EXTERNAL_LOG}"
 RC=${PIPESTATUS[0]}
+python -c "import json,sys; payload=json.loads(open(sys.argv[1], encoding=\"utf-8\").read()); status=payload[\"status\"]; print(f\"AUTHORITATIVE_STATUS={status} PATH={sys.argv[1]}\", flush=True); raise SystemExit(0 if status in sys.argv[2:] else 2)" "${RUN_ROOT}/training_result.json" PASS 2>&1 | tee -a "${EXTERNAL_LOG}"
+STATUS_RC=${PIPESTATUS[0]}
+if [[ "${STATUS_RC}" -ne 0 ]]; then
+  RC=${STATUS_RC}
+fi
 set -e
 if [[ -d "${RUN_ROOT}" ]]; then
   mkdir -p "${RUN_ROOT}/process_rc"

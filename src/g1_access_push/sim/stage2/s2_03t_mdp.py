@@ -218,22 +218,22 @@ class S203TRuntimeState:
             self.impulse += torch.where(within_impulse, forces * self.dt, torch.zeros_like(forces))
 
         physical_masks = {
-            "nonfinite": ~finite,
-            "forbidden_non_palm_box_collision": forbidden,
-            "force_peak": forces.max(dim=-1).values > FORCE_PEAK_THRESHOLD_N,
-            "palm_impulse": (self.impulse > PALM_IMPULSE_THRESHOLD_NS).any(dim=-1),
-            "combined_impulse": self.impulse.sum(dim=-1) > COMBINED_IMPULSE_THRESHOLD_NS,
-            "force_rate": force_rate > FORCE_RATE_THRESHOLD_NPS,
-            "box_linear_speed": box_linear_speed > BOX_LINEAR_SPEED_THRESHOLD_MPS,
-            "box_angular_speed": box_angular_speed > BOX_ANGULAR_SPEED_THRESHOLD_RADPS,
-            "box_translation": box_translation > BOX_TRANSLATION_THRESHOLD_M,
-            "box_yaw_change": box_yaw_delta.abs() > BOX_YAW_THRESHOLD_RAD,
-            "base_excursion": base_excursion > BASE_EXCURSION_THRESHOLD_M,
-            "root_height": (self.robot.data.root_link_pos_w[:, 2] < ROOT_HEIGHT_MIN_M)
+            "failure_nonfinite": ~finite,
+            "failure_forbidden_non_palm_box_collision": forbidden,
+            "failure_force_peak": forces.max(dim=-1).values > FORCE_PEAK_THRESHOLD_N,
+            "failure_palm_impulse": (self.impulse > PALM_IMPULSE_THRESHOLD_NS).any(dim=-1),
+            "failure_combined_impulse": self.impulse.sum(dim=-1) > COMBINED_IMPULSE_THRESHOLD_NS,
+            "failure_force_rate": force_rate > FORCE_RATE_THRESHOLD_NPS,
+            "failure_box_linear_speed": box_linear_speed > BOX_LINEAR_SPEED_THRESHOLD_MPS,
+            "failure_box_angular_speed": box_angular_speed > BOX_ANGULAR_SPEED_THRESHOLD_RADPS,
+            "failure_box_translation": box_translation > BOX_TRANSLATION_THRESHOLD_M,
+            "failure_box_yaw_change": box_yaw_delta.abs() > BOX_YAW_THRESHOLD_RAD,
+            "failure_base_excursion": base_excursion > BASE_EXCURSION_THRESHOLD_M,
+            "failure_root_height": (self.robot.data.root_link_pos_w[:, 2] < ROOT_HEIGHT_MIN_M)
             | (self.robot.data.root_link_pos_w[:, 2] > ROOT_HEIGHT_MAX_M),
-            "root_tilt": root_tilt > ROOT_TILT_MAX_DEG,
-            "arm_joint_margin": margin < ARM_MARGIN_MIN_RAD,
-            "arm_torque": torque_ratio > ARM_TORQUE_RATIO_MAX,
+            "failure_root_tilt": root_tilt > ROOT_TILT_MAX_DEG,
+            "failure_arm_joint_margin": margin < ARM_MARGIN_MIN_RAD,
+            "failure_arm_torque": torque_ratio > ARM_TORQUE_RATIO_MAX,
         }
         safety_failure = torch.zeros_like(finite)
         for mask in physical_masks.values():
@@ -361,13 +361,15 @@ class S203TRuntimeState:
             reasons = [
                 name
                 for name, value in metrics.items()
-                if name in TERMINATION_METRIC_NAMES and bool(value[env_id])
+                if name.startswith("failure_")
+                and name.removeprefix("failure_") in TERMINATION_METRIC_NAMES
+                and bool(value[env_id])
             ]
             snapshots[env_id] = {
                 "episode_steps": int(self.env.episode_length_buf[env_id]),
                 "success": bool(metrics["success"][env_id]),
                 "time_out": bool(self.env.reset_time_outs[env_id]) if hasattr(self.env, "reset_time_outs") else False,
-                "termination_reasons": reasons,
+                "termination_reasons": [name.removeprefix("failure_") for name in reasons],
                 "verify_steps": int(self.verify_count[env_id]),
                 "attached_hold_steps": int(self.hold_count[env_id]),
                 "minimum_surface_gap_m": [float(value) for value in self.episode_min_gap[env_id]],
@@ -520,7 +522,7 @@ def action_rate(env: ManagerBasedRLEnv) -> torch.Tensor:
 
 
 def forbidden_collision_terminal(env: ManagerBasedRLEnv) -> torch.Tensor:
-    return runtime_state(env).ensure()["forbidden_non_palm_box_collision"].float()
+    return runtime_state(env).ensure()["failure_forbidden_non_palm_box_collision"].float()
 
 
 def contact_timeout_terminal(env: ManagerBasedRLEnv) -> torch.Tensor:
@@ -536,7 +538,7 @@ def success(env: ManagerBasedRLEnv) -> torch.Tensor:
 def metric_termination(env: ManagerBasedRLEnv, metric_name: str) -> torch.Tensor:
     if getattr(env, "_s2_03t_bootstrap_mode", False):
         return torch.zeros(env.num_envs, dtype=torch.bool, device=env.device)
-    return runtime_state(env).ensure()[metric_name]
+    return runtime_state(env).ensure()[f"failure_{metric_name}"]
 
 
 def time_out(env: ManagerBasedRLEnv) -> torch.Tensor:

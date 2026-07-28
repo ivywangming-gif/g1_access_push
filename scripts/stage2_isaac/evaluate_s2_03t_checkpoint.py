@@ -105,7 +105,7 @@ try:
             joint_margin = float(metric["arm_joint_margin"][0])
             torque_ratio = float(metric["arm_torque_ratio"][0])
             finite = bool(metric["finite"][0])
-            forbidden = bool(metric["forbidden_non_palm_box_collision"][0])
+            forbidden = bool(metric["failure_forbidden_non_palm_box_collision"][0])
             position_error = metric["palm_position_error"][0]
             orientation_error = metric["palm_orientation_error"][0]
         else:

@@ -157,7 +157,7 @@ def derive_precontact_reference(
     metric = runtime_state(env).ensure()
     if not bool(metric["finite"].all()):
         raise RuntimeError("PRECONTACT_REFERENCE_NONFINITE")
-    if bool(metric["contacts"].any() or metric["forbidden_non_palm_box_collision"].any()):
+    if bool(metric["contacts"].any() or metric["failure_forbidden_non_palm_box_collision"].any()):
         raise RuntimeError("PRECONTACT_REFERENCE_HAS_COLLISION")
     if bool((metric["arm_joint_margin"] < 0.10).any()):
         raise RuntimeError("PRECONTACT_REFERENCE_JOINT_MARGIN")

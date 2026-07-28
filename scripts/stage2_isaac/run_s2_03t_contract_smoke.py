@@ -120,7 +120,7 @@ try:
                 "right_force_n": float(metric["forces"][0, 1]),
                 "left_gap_m": float(metric["gaps"][0, 0]),
                 "right_gap_m": float(metric["gaps"][0, 1]),
-                "forbidden_collision": bool(metric["forbidden_non_palm_box_collision"][0]),
+                "forbidden_collision": bool(metric["failure_forbidden_non_palm_box_collision"][0]),
                 "observation_finite": bool(torch.isfinite(observation["policy"]).all()),
             }
         )
