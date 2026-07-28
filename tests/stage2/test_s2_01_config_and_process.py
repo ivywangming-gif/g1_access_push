@@ -18,6 +18,7 @@ from g1_access_push.stage2.s2_01_process import (
     derive_effective_runner_status,
     persist_effective_runner_status,
     summarize_partner_forces,
+    validate_net_force_tensor,
     validate_resolved_sensor_body,
     validate_robot_filter_tensor,
     validate_controller_checkpoint,
@@ -251,33 +252,65 @@ def test_sensor_body_template_and_resolved_expression_are_separate() -> None:
     assert audit["sensor_body_audit_pass"] is True
 
 
-def test_robot_filter_one_expression_can_resolve_34_bodies() -> None:
-    paths = [f"/World/envs/env_0/Robot/body_{index}" for index in range(34)]
+@pytest.mark.parametrize(
+    ("backend_filter_count", "shape", "usd_count", "console_count"),
+    [
+        (1, (1, 1, 1, 3), 46, None),
+        (1, (1, 1, 1, 3), 46, 34),
+        (2, (1, 1, 2, 3), 46, 34),
+    ],
+)
+def test_backend_filter_count_is_the_only_force_matrix_m_contract(
+    backend_filter_count: int, shape: tuple[int, ...], usd_count: int, console_count: int | None,
+) -> None:
     audit = validate_robot_filter_tensor(
-        ["{ENV_REGEX_NS}/Robot/.*"], paths, (1, 1, 34, 3),
-        num_envs=1, box_body_count=1, robot_root_prefix="/World/envs/env_0/Robot",
+        ["{ENV_REGEX_NS}/Robot/.*"], backend_filter_count, shape,
+        num_envs=1, box_body_count=1,
+        usd_candidate_robot_rigid_body_count=usd_count, console_match_count=console_count,
     )
-    assert audit["filter_expression_count"] == 1
-    assert audit["resolved_filter_body_count"] == 34
-    assert audit["filter_one_to_many_valid"] is True
+    assert audit["force_matrix_shape_pass"] is True
+    assert audit["force_matrix_m_matches_backend_filter_count"] is True
+    assert audit["usd_body_count_used_as_shape_contract"] is False
+    assert audit["console_match_count_used_as_shape_contract"] is False
 
 
-def test_robot_filter_rejects_force_matrix_shape_mismatch() -> None:
-    paths = [f"/World/envs/env_0/Robot/body_{index}" for index in range(34)]
+def test_backend_filter_count_shape_mismatch_fails() -> None:
     audit = validate_robot_filter_tensor(
-        ["{ENV_REGEX_NS}/Robot/.*"], paths, (1, 1, 1, 3),
-        num_envs=1, box_body_count=1, robot_root_prefix="/World/envs/env_0/Robot",
+        ["pattern_a", "pattern_b"], 2, (1, 1, 1, 3),
+        num_envs=1, box_body_count=1, usd_candidate_robot_rigid_body_count=46,
     )
     assert audit["force_matrix_shape_pass"] is False
-    assert audit["filter_one_to_many_valid"] is False
+    assert audit["filter_tensor_initialization_pass"] is False
+
+
+def test_missing_force_matrix_is_initialization_failure() -> None:
+    audit = validate_robot_filter_tensor(
+        ["{ENV_REGEX_NS}/Robot/.*"], 1, None,
+        num_envs=1, box_body_count=1, usd_candidate_robot_rigid_body_count=46,
+        force_matrix_available=False,
+    )
+    assert audit["filter_tensor_initialization_pass"] is False
+
+
+def test_net_force_shape_and_missing_tensor_contract() -> None:
+    valid = validate_net_force_tensor(
+        (1, 1, 3), num_envs=1, box_body_count=1,
+        net_force_available=True, net_force_finite=True,
+    )
+    assert valid["net_force_initialization_pass"] is True
+    missing = validate_net_force_tensor(
+        None, num_envs=1, box_body_count=1,
+        net_force_available=False, net_force_finite=False,
+    )
+    assert missing["net_force_initialization_pass"] is False
 
 
 def test_partner_force_norms_do_not_cancel_opposite_forces() -> None:
     summary = summarize_partner_forces([[3.0, 0.0, 0.0], [-3.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
-    assert summary["robot_partner_force_norms_n"] == [3.0, 3.0, 0.0]
+    assert summary["robot_filter_force_norms_n"] == [3.0, 3.0, 0.0]
     assert summary["robot_contact_force_max_n"] == 3.0
-    assert summary["robot_contact_force_sum_of_norms_n"] == 6.0
-    assert summary["robot_contact_nonzero_body_count"] == 2
+    assert summary["robot_contact_force_sum_n"] == 6.0
+    assert summary["robot_contact_nonzero_filter_count"] == 2
 
 
 def test_contact_audit_forbidden_false_negative_patterns_are_absent() -> None:
@@ -286,6 +319,9 @@ def test_contact_audit_forbidden_false_negative_patterns_are_absent() -> None:
         "resolved_path == \"{ENV_REGEX_NS}/Box\"",
         "resolved_filter_count == len(filter_prim_paths_expr)",
         "force_matrix_w.shape[2] == 1",
+        "force_matrix.shape[2] == usd_body_count",
+        "force_matrix.shape[2] == console_match_count",
+        "expected_m = len(resolved_robot_bodies)",
     ):
         assert forbidden not in source
 

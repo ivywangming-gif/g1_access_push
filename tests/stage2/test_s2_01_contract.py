@@ -167,6 +167,18 @@ def test_contact_sensor_initialization_failure_is_invalid() -> None:
     assert result["primary_reason"] == "CONTACT_SENSOR_INITIALIZATION_FAILED"
 
 
+def test_runtime_collision_backend_overlap_is_a_valid_physical_failure() -> None:
+    config = cfg()
+    records = valid_records(config)
+    records[100]["runtime_forbidden_overlap_count"] = 1
+    result = classify_evidence(
+        config, records, valid_audits(), runner_rc=0,
+        final_image_present=True, multiple_isaac_processes=False,
+    )
+    assert result["status"] == "FAIL"
+    assert result["primary_reason"] == "FORBIDDEN_BODY_BOX_COLLISION"
+
+
 def test_required_runtime_audit_fields_are_frozen() -> None:
     assert set(REQUIRED_AUDIT_FIELDS) == {
         "box_mass_properties_audit.json", "physics_material_audit.json", "scene_geometry_audit.json", "box_rigid_body_audit.json", "contact_sensor_audit.json"

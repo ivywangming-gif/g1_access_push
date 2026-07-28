@@ -39,10 +39,13 @@ REQUIRED_AUDIT_FIELDS = {
         "net_forces_available", "robot_force_matrix_available",
         "contact_reporter_initialized", "sensor_audit_pass",
         "configured_prim_path", "resolved_prim_expression",
-        "resolved_body_names", "num_bodies", "filter_expression_count",
-        "resolved_filter_body_count", "resolved_filter_body_names",
-        "resolved_filter_body_paths", "force_matrix_shape", "rigid_body_bound",
-        "filter_one_to_many_valid",
+        "resolved_body_names", "num_bodies", "rigid_body_bound",
+        "configured_filter_patterns", "configured_filter_pattern_count",
+        "backend_filter_count", "filter_semantics", "force_matrix_shape",
+        "force_matrix_m", "force_matrix_m_matches_backend_filter_count",
+        "usd_candidate_robot_rigid_body_count", "usd_body_count_used_as_shape_contract",
+        "net_force_shape", "net_force_finite", "net_force_xyz_n",
+        "net_force_norm_n", "filter_tensor_initialization_pass",
     },
 }
 
@@ -233,6 +236,8 @@ def classify_evidence(
             failures.append("NONFINITE")
         if any(bool(record["robot_box_contact"]) for record in records):
             failures.append("UNEXPECTED_ROBOT_BOX_CONTACT")
+        if any(int(record.get("runtime_forbidden_overlap_count", 0)) > 0 for record in records):
+            failures.append("FORBIDDEN_BODY_BOX_COLLISION")
         if any(bool(record["robot_fall"]) for record in records):
             failures.append("ROBOT_FALL")
         if any(bool(record["robot_bad_tilt"]) for record in records):

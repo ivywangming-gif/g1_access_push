@@ -13,6 +13,7 @@ from pathlib import Path
 
 from g1_access_push.stage2.s2_01_process import (
     validate_controller_checkpoint,
+    validate_net_force_tensor,
     validate_resolved_sensor_body,
     validate_robot_filter_tensor,
     write_implementation_exception,
@@ -305,17 +306,22 @@ def main() -> None:
         contact_reporter_enabled = bool(box_prim.HasAPI(PhysxSchema.PhysxContactReportAPI))
         robot_root_path = "/World/envs/env_0/Robot"
         robot_root = stage.GetPrimAtPath(robot_root_path)
-        resolved_robot_body_paths = [
+        usd_candidate_robot_body_paths = [
             str(prim.GetPath()) for prim in Usd.PrimRange(robot_root)
             if prim.HasAPI(UsdPhysics.RigidBodyAPI)
         ]
+        net_force_available = net_forces is not None
+        force_matrix_available = robot_force_matrix is not None
+        net_force_finite = bool(net_force_available and torch.isfinite(net_forces).all())
+        force_matrix_finite = bool(force_matrix_available and torch.isfinite(robot_force_matrix).all())
+        backend_filter_count = int(box_robot.contact_physx_view.filter_count)
         net_body_audit = validate_resolved_sensor_body(
             S2_01_BOX_SENSOR_CONFIGURED_PRIM_PATH, box_net.cfg.prim_path,
             list(box_net.body_names), box_net.num_bodies,
             initialized=box_net.is_initialized,
             contact_reporter_enabled=contact_reporter_enabled,
             rigid_body_bound=bool(box_prim.HasAPI(UsdPhysics.RigidBodyAPI)),
-            data_available=net_forces is not None,
+            data_available=net_force_available,
         )
         robot_body_audit = validate_resolved_sensor_body(
             S2_01_BOX_SENSOR_CONFIGURED_PRIM_PATH, box_robot.cfg.prim_path,
@@ -323,14 +329,24 @@ def main() -> None:
             initialized=box_robot.is_initialized,
             contact_reporter_enabled=contact_reporter_enabled,
             rigid_body_bound=bool(box_prim.HasAPI(UsdPhysics.RigidBodyAPI)),
-            data_available=robot_force_matrix is not None,
+            data_available=force_matrix_available,
+        )
+        net_tensor_audit = validate_net_force_tensor(
+            None if net_forces is None else list(net_forces.shape),
+            num_envs=cfg.scene.num_envs, box_body_count=box_net.num_bodies,
+            net_force_available=net_force_available, net_force_finite=net_force_finite,
         )
         filter_audit = validate_robot_filter_tensor(
             list(S2_01_ROBOT_FILTER_CONFIGURED_EXPRESSIONS),
-            resolved_robot_body_paths,
+            backend_filter_count,
             None if robot_force_matrix is None else list(robot_force_matrix.shape),
             num_envs=cfg.scene.num_envs, box_body_count=box_robot.num_bodies,
-            robot_root_prefix=robot_root_path,
+            usd_candidate_robot_rigid_body_count=len(usd_candidate_robot_body_paths),
+            force_matrix_available=force_matrix_available,
+            force_matrix_finite=force_matrix_finite,
+        )
+        initial_net_force_xyz = (
+            [float(value) for value in net_forces[0, 0]] if net_force_available else None
         )
         contact_sensor_audit = {
             "box_net_sensor_prim_path": box_net.cfg.prim_path,
@@ -338,17 +354,26 @@ def main() -> None:
             "box_net_body_names": list(box_net.body_names),
             "box_robot_body_names": list(box_robot.body_names),
             "box_robot_filter_paths": list(box_robot.cfg.filter_prim_paths_expr),
-            "net_forces_available": net_forces is not None,
-            "robot_force_matrix_available": robot_force_matrix is not None,
+            "net_forces_available": net_force_available,
+            "robot_force_matrix_available": force_matrix_available,
             "contact_reporter_initialized": bool(box_net.is_initialized and box_robot.is_initialized),
+            "net_force_xyz_n": initial_net_force_xyz,
+            "net_force_norm_n": (
+                float(torch.linalg.vector_norm(net_forces[0, 0]).item()) if net_force_available else None
+            ),
+            "usd_candidate_robot_rigid_body_paths": usd_candidate_robot_body_paths,
             **net_body_audit,
             "robot_sensor_body_audit": robot_body_audit,
+            **net_tensor_audit,
             **filter_audit,
         }
         contact_sensor_audit["sensor_audit_pass"] = bool(
             net_body_audit["sensor_body_audit_pass"]
             and robot_body_audit["sensor_body_audit_pass"]
-            and filter_audit["filter_one_to_many_valid"]
+            and net_tensor_audit["net_force_initialization_pass"]
+            and filter_audit["filter_tensor_initialization_pass"]
+            and filter_audit["configured_filter_pattern_count"] == 1
+            and filter_audit["backend_filter_count"] == 1
         )
         write_json(RUN / "contact_sensor_audit.json", contact_sensor_audit)
         if not net_body_audit["path_audit_pass"] or not robot_body_audit["path_audit_pass"]:
@@ -508,13 +533,28 @@ def main() -> None:
         reference_yaw = None
         last_image = None
         episode_robot_contact_force_max_n = 0.0
-        episode_robot_contact_force_sum_of_norms_max_n = 0.0
-        episode_robot_contact_nonzero_body_count_max = 0
+        episode_robot_contact_force_sum_n_max = 0.0
+        episode_robot_contact_nonzero_filter_count_max = 0
+        runtime_forbidden_overlap_count_max = 0
+        runtime_minimum_clearance_m = math.inf
         with (RUN / "trace.jsonl").open("w", encoding="utf-8", buffering=1) as trace:
             for frame in range(expected_frames):
                 env.step(actions)
                 box_pos = box.data.root_link_pos_w[0].clone()
                 box_quat = box.data.root_link_quat_w[0].clone()
+                runtime_robot_max_x, runtime_collider_records = robot_collider_bounds(stage)
+                runtime_box_center = [float(value) for value in box_pos]
+                runtime_overlap_count = aabb_overlap_count(
+                    runtime_collider_records, runtime_box_center, config["geometry"]["half_extent_xyz_m"]
+                )
+                runtime_clearance_m = (
+                    runtime_box_center[0] - float(config["geometry"]["half_extent_xyz_m"][0])
+                    - runtime_robot_max_x
+                )
+                runtime_forbidden_overlap_count_max = max(
+                    runtime_forbidden_overlap_count_max, runtime_overlap_count
+                )
+                runtime_minimum_clearance_m = min(runtime_minimum_clearance_m, runtime_clearance_m)
                 roll, pitch, yaw, _ = quaternion_rpy(box_quat)
                 if frame == reference_frame:
                     reference_pos = box_pos.clone()
@@ -532,11 +572,11 @@ def main() -> None:
                 robot_force_sum = sum(partner_force_norms_n)
                 robot_nonzero_count = sum(value > 0.0 for value in partner_force_norms_n)
                 episode_robot_contact_force_max_n = max(episode_robot_contact_force_max_n, robot_force)
-                episode_robot_contact_force_sum_of_norms_max_n = max(
-                    episode_robot_contact_force_sum_of_norms_max_n, robot_force_sum
+                episode_robot_contact_force_sum_n_max = max(
+                    episode_robot_contact_force_sum_n_max, robot_force_sum
                 )
-                episode_robot_contact_nonzero_body_count_max = max(
-                    episode_robot_contact_nonzero_body_count_max, robot_nonzero_count
+                episode_robot_contact_nonzero_filter_count_max = max(
+                    episode_robot_contact_nonzero_filter_count_max, robot_nonzero_count
                 )
                 values = [
                     *[float(value) for value in box_pos], *[float(value) for value in box_quat],
@@ -559,12 +599,13 @@ def main() -> None:
                     "box_robot_contact_force_n": robot_force,
                     "box_net_normal_force_xyz_n": [float(value) for value in net_force_xyz],
                     "box_net_normal_force_norm_n": ground_force,
-                    "robot_filter_body_count": len(partner_force_norms_n),
-                    "robot_partner_force_norms_n": partner_force_norms_n,
+                    "robot_filter_force_norms_n": partner_force_norms_n,
                     "robot_contact_force_max_n": robot_force,
-                    "robot_contact_force_sum_of_norms_n": robot_force_sum,
-                    "robot_contact_nonzero_body_count": robot_nonzero_count,
+                    "robot_contact_force_sum_n": robot_force_sum,
+                    "robot_contact_nonzero_filter_count": robot_nonzero_count,
                     "robot_box_contact": robot_force > 0.0,
+                    "runtime_forbidden_overlap_count": runtime_overlap_count,
+                    "runtime_minimum_clearance_m": runtime_clearance_m,
                     "root_height_m": values[9], "root_roll_rad": root_roll,
                     "root_pitch_rad": root_pitch, "root_tilt_rad": root_tilt,
                     "robot_fall": values[9] < config["robot"]["fall_root_height_threshold_m"],
@@ -579,10 +620,18 @@ def main() -> None:
                     print(f"PHASE=qualification frame={frame + 1}/{expected_frames}", flush=True)
                 rgb = camera.data.output["rgb"][0].detach().cpu().numpy()
                 last_image = Image.fromarray(rgb.astype("uint8"))
+        geometry_audit.update({
+            "runtime_forbidden_overlap_count_max": runtime_forbidden_overlap_count_max,
+            "runtime_minimum_clearance_m": runtime_minimum_clearance_m,
+            "runtime_collision_backend_pass": runtime_forbidden_overlap_count_max == 0,
+        })
+        write_json(RUN / "scene_geometry_audit.json", geometry_audit)
         contact_sensor_audit.update({
+            "net_force_xyz_n": [float(value) for value in box_net.data.net_forces_w[0, 0]],
+            "net_force_norm_n": float(torch.linalg.vector_norm(box_net.data.net_forces_w[0, 0]).item()),
             "episode_robot_contact_force_max_n": episode_robot_contact_force_max_n,
-            "episode_robot_contact_force_sum_of_norms_max_n": episode_robot_contact_force_sum_of_norms_max_n,
-            "episode_robot_contact_nonzero_body_count_max": episode_robot_contact_nonzero_body_count_max,
+            "episode_robot_contact_force_sum_n_max": episode_robot_contact_force_sum_n_max,
+            "episode_robot_contact_nonzero_filter_count_max": episode_robot_contact_nonzero_filter_count_max,
         })
         write_json(RUN / "contact_sensor_audit.json", contact_sensor_audit)
         if last_image is None:

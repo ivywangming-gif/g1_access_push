@@ -93,43 +93,70 @@ def validate_resolved_sensor_body(
 
 
 def validate_robot_filter_tensor(
-    configured_expressions: list[str],
-    resolved_filter_body_paths: list[str],
+    configured_filter_patterns: list[str],
+    backend_filter_count: int,
     force_matrix_shape: list[int] | tuple[int, ...] | None,
     *,
     num_envs: int,
     box_body_count: int,
-    robot_root_prefix: str,
+    usd_candidate_robot_rigid_body_count: int,
+    console_match_count: int | None = None,
+    force_matrix_available: bool = True,
+    force_matrix_finite: bool = True,
 ) -> dict[str, Any]:
-    resolved_count = len(resolved_filter_body_paths)
     shape = list(force_matrix_shape) if force_matrix_shape is not None else None
-    resolved_paths_pass = resolved_count >= 1 and all(
-        path.startswith(robot_root_prefix + "/") for path in resolved_filter_body_paths
-    )
-    expected_shape = [num_envs, box_body_count, resolved_count, 3]
+    expected_shape = [num_envs, box_body_count, int(backend_filter_count), 3]
+    shape_pass = bool(backend_filter_count >= 1 and shape == expected_shape)
+    force_matrix_m = shape[2] if shape is not None and len(shape) == 4 else None
+    initialization_pass = bool(force_matrix_available and force_matrix_finite and shape_pass)
+    return {
+        "configured_filter_patterns": list(configured_filter_patterns),
+        "configured_filter_pattern_count": len(configured_filter_patterns),
+        "backend_filter_count": int(backend_filter_count),
+        "filter_semantics": "PHYSX_FILTER_PATTERN_AGGREGATE",
+        "force_matrix_shape": shape,
+        "force_matrix_m": force_matrix_m,
+        "expected_force_matrix_shape": expected_shape,
+        "force_matrix_available": bool(force_matrix_available),
+        "force_matrix_finite": bool(force_matrix_finite),
+        "force_matrix_shape_pass": shape_pass,
+        "force_matrix_m_matches_backend_filter_count": force_matrix_m == backend_filter_count,
+        "usd_candidate_robot_rigid_body_count": int(usd_candidate_robot_rigid_body_count),
+        "usd_body_count_used_as_shape_contract": False,
+        "console_match_count": console_match_count,
+        "console_match_count_used_as_shape_contract": False,
+        "filter_tensor_initialization_pass": initialization_pass,
+    }
+
+
+def validate_net_force_tensor(
+    net_force_shape: list[int] | tuple[int, ...] | None,
+    *,
+    num_envs: int,
+    box_body_count: int,
+    net_force_available: bool,
+    net_force_finite: bool,
+) -> dict[str, Any]:
+    shape = list(net_force_shape) if net_force_shape is not None else None
+    expected_shape = [num_envs, box_body_count, 3]
     shape_pass = shape == expected_shape
     return {
-        "filter_expression_count": len(configured_expressions),
-        "configured_filter_expressions": list(configured_expressions),
-        "resolved_filter_body_count": resolved_count,
-        "resolved_filter_body_paths": list(resolved_filter_body_paths),
-        "resolved_filter_body_names": [path.rsplit("/", 1)[-1] for path in resolved_filter_body_paths],
-        "force_matrix_shape": shape,
-        "expected_force_matrix_shape": expected_shape,
-        "resolved_filter_paths_pass": resolved_paths_pass,
-        "force_matrix_shape_pass": shape_pass,
-        "filter_one_to_many_valid": resolved_paths_pass and shape_pass,
+        "net_force_shape": shape,
+        "expected_net_force_shape": expected_shape,
+        "net_force_available": bool(net_force_available),
+        "net_force_finite": bool(net_force_finite),
+        "net_force_shape_pass": shape_pass,
+        "net_force_initialization_pass": bool(net_force_available and net_force_finite and shape_pass),
     }
 
 
 def summarize_partner_forces(force_vectors_xyz: list[list[float]], threshold_n: float = 0.0) -> dict[str, Any]:
     norms = [math.sqrt(sum(float(value) ** 2 for value in vector)) for vector in force_vectors_xyz]
     return {
-        "robot_filter_body_count": len(norms),
-        "robot_partner_force_norms_n": norms,
+        "robot_filter_force_norms_n": norms,
         "robot_contact_force_max_n": max(norms, default=0.0),
-        "robot_contact_force_sum_of_norms_n": sum(norms),
-        "robot_contact_nonzero_body_count": sum(value > threshold_n for value in norms),
+        "robot_contact_force_sum_n": sum(norms),
+        "robot_contact_nonzero_filter_count": sum(value > threshold_n for value in norms),
     }
 
 
