@@ -181,6 +181,8 @@ class ArmResidualAction(ActionTerm):
 
     def set_reference(self, reference: torch.Tensor) -> None:
         reference = reference.to(device=self.device, dtype=self._reference.dtype)
+        if reference.ndim == 1:
+            reference = reference.unsqueeze(0)
         if reference.shape == (1, self.action_dim):
             reference = reference.expand(self.num_envs, -1)
         if tuple(reference.shape) != tuple(self._reference.shape):

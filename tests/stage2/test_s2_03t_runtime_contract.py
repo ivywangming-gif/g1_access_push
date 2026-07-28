@@ -147,6 +147,7 @@ def test_precontact_reference_captures_full_exact_state_and_restores_on_subset_r
     ):
         assert field in environment
         assert field in bootstrap or field in ACTIONS.read_text(encoding="utf-8")
+    assert "if reference.ndim == 1:" in ACTIONS.read_text(encoding="utf-8")
     assert "arm.restore_reference(env_ids" in environment
     assert "lower.restore_reference(env_ids" in environment
     assert "runtime_state(self).reset(env_ids)" in environment
