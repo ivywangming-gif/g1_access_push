@@ -1,0 +1,23 @@
+{
+  "contact_training_justified": true,
+  "failure_image_committed": false,
+  "formal_attempts": 1,
+  "formal_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03_formal_20260728_071611",
+  "geometry_feasible": true,
+  "implementation_error": false,
+  "next_branch": "stage2/s2-03t-contact-training",
+  "precontact_stage_status": "PASS",
+  "preflight_attempts": 2,
+  "preflight_pass_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03_preflight_20260728_071358",
+  "primary_reason": "BILATERAL_CONTACT_TIMEOUT",
+  "raw_trace_committed": false,
+  "robot_stability": "PASS",
+  "schema_version": 1,
+  "source_commit_sha": "9dd8e76f76e5d8d58c66ac50a561048d6e671f1a",
+  "stage": "S2-03",
+  "status": "FAIL",
+  "thresholds_changed_after_formal": false,
+  "thresholds_changed_after_preflight": false,
+  "training_started": false,
+  "valid_physical_result": true
+}

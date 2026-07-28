@@ -1,0 +1,68 @@
+{
+  "all_reasons": [
+    "BILATERAL_CONTACT_TIMEOUT"
+  ],
+  "approach_evidence": {
+    "maximum_commanded_normal_displacement_m": 0.07013199999999996,
+    "maximum_left_position_error_m": 0.03459995985031128,
+    "maximum_right_position_error_m": 0.0348731093108654,
+    "minimum_left_actual_surface_gap_m": 0.022305786609649658,
+    "minimum_right_actual_surface_gap_m": 0.024465501308441162
+  },
+  "box_push_commanded": false,
+  "config_sha256": "fa53584719fc9730e1d87a451f8f69132c7396d07336eef1546a1ec5423d77bd",
+  "contact_evidence": {
+    "attached_hold_observed_frames": 0,
+    "bilateral_contact_achieved": false,
+    "contact_occurred": false,
+    "left_contact": false,
+    "left_contact_onset_frame": null,
+    "left_force_peak_n": 0.0,
+    "left_impulse_ns": 0.0,
+    "right_contact": false,
+    "right_contact_onset_frame": null,
+    "right_force_peak_n": 0.0,
+    "right_impulse_ns": 0.0
+  },
+  "episode_count": 1,
+  "evaluator_rc": 0,
+  "evidence_boundaries": {
+    "ACTIVE_MANIFEST_NOT_UPDATED": true,
+    "BOX_NOT_PUSHED": true,
+    "MODEL_1999_NOT_USED": true,
+    "PLANNER_NOT_STARTED": true,
+    "TRAINING_NOT_STARTED": true
+  },
+  "failure_image_present": true,
+  "forbidden_contact_links": [],
+  "launcher_rc": 0,
+  "maximum_metrics": {
+    "arm_torque_ratio_max": 0.589676022529602,
+    "base_xy_excursion_m": 0.010093245655298233,
+    "box_angular_speed_radps": 0.0018747813301160932,
+    "box_linear_speed_mps": 0.001037174486555159,
+    "box_translation_m": 1.141499524237588e-06,
+    "box_yaw_change_rad": 6.456562947944589e-07,
+    "combined_impulse_ns": 0.0,
+    "contact_force_peak_n": 0.0,
+    "root_tilt_deg": 3.8830648844379327
+  },
+  "minimum_arm_joint_limit_margin_rad": 0.7198072671890259,
+  "minimum_root_height_m": 0.7251545786857605,
+  "observed_frames": 692,
+  "preflight_run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03_preflight_20260728_071358",
+  "primary_reason": "BILATERAL_CONTACT_TIMEOUT",
+  "reset_count": 0,
+  "resolved_config_sha256": "5a46fe48890f97566e9d4815688ae42545e929b634ffe1e807dc4bdc4d4bc3cd",
+  "result_json_sha256": "a766842beed8859b4e9e160954ea263579d7b9075b0fb22da4e314b8d14732bb",
+  "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03_formal_20260728_071611",
+  "runner_effective_rc": 0,
+  "runner_raw_rc": 0,
+  "schema_version": 1,
+  "source_commit_sha": "9dd8e76f76e5d8d58c66ac50a561048d6e671f1a",
+  "stage": "S2-03",
+  "status": "FAIL",
+  "task": "BILATERAL_ATTACH_ONLY",
+  "valid_physical_result": true,
+  "wall_time_seconds": 99
+}
