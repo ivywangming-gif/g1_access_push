@@ -51,6 +51,9 @@ from g1_access_push.sim.stage2.s2_03t_env_cfg import (  # noqa: E402
     S203TContactEnvCfg,
 )
 from g1_access_push.sim.stage2.s2_03t_mdp import TERMINATION_METRIC_NAMES, runtime_state  # noqa: E402
+from g1_access_push.stage2.s2_03t_contact_filter_contract import (  # noqa: E402
+    FORBIDDEN_ROBOT_RELATIVE_PATHS,
+)
 
 
 env = None
@@ -77,6 +80,10 @@ try:
     sensor_right = env.scene["right_palm_box_contact"]
     sensor_forbidden = env.scene["robot_box_contact"]
     configured_forbidden_filters = list(sensor_forbidden.cfg.filter_prim_paths_expr)
+    configured_forbidden_suffixes = tuple(
+        item.split("/Robot/", 1)[1] if item.count("/Robot/") == 1 else ""
+        for item in configured_forbidden_filters
+    )
     action_names = list(env.action_manager.active_terms)
     action_dims = list(env.action_manager.action_term_dim)
     termination_names = set(env.termination_manager.active_terms)
@@ -100,7 +107,12 @@ try:
         "forbidden_sensor_single_body": int(sensor_forbidden.num_bodies) == 1,
         "forbidden_sensor_body_name": list(sensor_forbidden.body_names) == ["Box"],
         "forbidden_configured_filter_count_46": len(configured_forbidden_filters) == 46,
-        "forbidden_filters_exact_no_wildcard": all(".*" not in item for item in configured_forbidden_filters),
+        "forbidden_filters_exact_no_body_wildcard": all(
+            ".*" not in suffix for suffix in configured_forbidden_suffixes
+        ),
+        "forbidden_filter_suffixes_match_authoritative": (
+            configured_forbidden_suffixes == FORBIDDEN_ROBOT_RELATIVE_PATHS
+        ),
         "forbidden_filter_count_matches_config": (
             int(sensor_forbidden.contact_physx_view.filter_count) == len(configured_forbidden_filters)
         ),

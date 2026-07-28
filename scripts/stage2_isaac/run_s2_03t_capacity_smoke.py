@@ -57,6 +57,9 @@ from g1_access_push.sim.stage2.s2_03t_env_cfg import (  # noqa: E402
     CERTIFIED_STUDENT_SHA256,
     S203TContactEnvCfg,
 )
+from g1_access_push.stage2.s2_03t_contact_filter_contract import (  # noqa: E402
+    FORBIDDEN_ROBOT_RELATIVE_PATHS,
+)
 
 
 env = None
@@ -105,6 +108,10 @@ try:
     right_matrix = right_sensor.data.force_matrix_w
     forbidden_matrix = forbidden_sensor.data.force_matrix_w
     configured_forbidden_filters = list(forbidden_sensor.cfg.filter_prim_paths_expr)
+    configured_forbidden_suffixes = tuple(
+        item.split("/Robot/", 1)[1] if item.count("/Robot/") == 1 else ""
+        for item in configured_forbidden_filters
+    )
     forbidden_filter_count = int(forbidden_sensor.contact_physx_view.filter_count)
     checks = {
         "formal_candidate": args.num_envs in (256, 128, 64),
@@ -132,7 +139,12 @@ try:
         "forbidden_sensor_single_body": int(forbidden_sensor.num_bodies) == 1,
         "forbidden_sensor_body_name": list(forbidden_sensor.body_names) == ["Box"],
         "forbidden_configured_filter_count_46": len(configured_forbidden_filters) == 46,
-        "forbidden_filters_exact_no_wildcard": all(".*" not in item for item in configured_forbidden_filters),
+        "forbidden_filters_exact_no_body_wildcard": all(
+            ".*" not in suffix for suffix in configured_forbidden_suffixes
+        ),
+        "forbidden_filter_suffixes_match_authoritative": (
+            configured_forbidden_suffixes == FORBIDDEN_ROBOT_RELATIVE_PATHS
+        ),
         "forbidden_filter_count_matches_config": (
             forbidden_filter_count == len(configured_forbidden_filters)
         ),

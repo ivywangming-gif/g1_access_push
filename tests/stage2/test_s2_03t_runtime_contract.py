@@ -220,7 +220,8 @@ def test_formal_capacity_smoke_allocates_clean_runner_storage_without_training()
     assert '"training_started": False' in source
     assert '"checkpoint_created": False' in source
     assert '"forbidden_configured_filter_count_46"' in source
-    assert '"forbidden_filters_exact_no_wildcard"' in source
+    assert '"forbidden_filters_exact_no_body_wildcard"' in source
+    assert '"forbidden_filter_suffixes_match_authoritative"' in source
     assert '"forbidden_filter_count_matches_config"' in source
     assert "runner.learn(" not in source
 
