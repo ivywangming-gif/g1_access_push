@@ -1,0 +1,128 @@
+{
+  "all_reasons": [],
+  "config_sha256": "7392cfdd98781a5699f3db4dc766ba0a6d6f5eaf5a40cf07e94d7f3518a8ae36",
+  "episode_count": 1,
+  "evaluator_rc": 0,
+  "evidence_boundaries": {
+    "ATTACH_NOT_RUN": true,
+    "BOX_NOT_PUSHED": true,
+    "CONTACT_NOT_OCCURRED": true,
+    "PLANNER_NOT_STARTED": true,
+    "TRAINING_NOT_STARTED": true
+  },
+  "expected_frames": 400,
+  "final_image_present": true,
+  "launcher_rc": 0,
+  "metrics": {
+    "arm_joint_target_error_max_rad": {
+      "maximum": 0.030131861567497253,
+      "minimum": 0.0013585090637207031
+    },
+    "arm_torque_ratio_max": {
+      "maximum": 0.5877012610435486,
+      "minimum": 0.005207960493862629
+    },
+    "base_xy_excursion_m": {
+      "maximum": 0.005532978102564812,
+      "minimum": 3.834318704321049e-05
+    },
+    "box_angular_speed_radps": {
+      "maximum": 0.007445748895406723,
+      "minimum": 0.00012141407933086157
+    },
+    "box_linear_speed_mps": {
+      "maximum": 0.0036880362313240767,
+      "minimum": 9.172137652058154e-05
+    },
+    "box_translation_m": {
+      "maximum": 0.0020008087158203125,
+      "minimum": 0.00199967622756958
+    },
+    "box_yaw_change_rad": {
+      "maximum": 4.2834568822902656e-07,
+      "minimum": 7.404495704230506e-10
+    },
+    "left_actual_gap_m": {
+      "maximum": 0.06216341257095337,
+      "minimum": 0.05721193552017212
+    },
+    "left_orientation_error_deg": {
+      "maximum": 1.9774671792984009,
+      "minimum": 0.0
+    },
+    "left_palm_normal_alignment_dot": {
+      "maximum": 0.999999463558197,
+      "minimum": 0.9989931583404541
+    },
+    "left_position_error_m": {
+      "maximum": 0.002608866197988391,
+      "minimum": 6.699578079860657e-05
+    },
+    "minimum_arm_joint_limit_margin_rad": {
+      "maximum": 1.1816827058792114,
+      "minimum": 0.7213183641433716
+    },
+    "right_actual_gap_m": {
+      "maximum": 0.0685465931892395,
+      "minimum": 0.059658586978912354
+    },
+    "right_orientation_error_deg": {
+      "maximum": 1.9212534427642822,
+      "minimum": 0.0
+    },
+    "right_palm_normal_alignment_dot": {
+      "maximum": 1.0,
+      "minimum": 0.9989745616912842
+    },
+    "right_position_error_m": {
+      "maximum": 0.002295226324349642,
+      "minimum": 6.0030826716683805e-05
+    },
+    "robot_box_contact_force_n": {
+      "maximum": 0.0,
+      "minimum": 0.0
+    },
+    "robot_box_overlap_count": {
+      "maximum": 0,
+      "minimum": 0
+    },
+    "root_height_m": {
+      "maximum": 0.7318819165229797,
+      "minimum": 0.724936306476593
+    },
+    "root_tilt_deg": {
+      "maximum": 3.647363533636099,
+      "minimum": 3.275041737684976
+    }
+  },
+  "observed_frames": 400,
+  "preflight_run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_02_frozen_preflight_20260728_063119",
+  "primary_reason": "ALL_S2_02_GATES_PASSED",
+  "reset_count": 0,
+  "resolved_config_sha256": "2437c5b24fab0a2608bb78606484179db6c59fe05400552662b34667da271393",
+  "result_json_sha256": "ad0d765ede3de29560cab0bd83f5885d16c387600def0ccf77194ec196852d46",
+  "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_02_formal_20260728_063446",
+  "runner_effective_rc": 0,
+  "runner_raw_rc": 0,
+  "schema_version": 1,
+  "selected_candidate": {
+    "base_to_box_center_distance_m": 1.06,
+    "candidate_index": 9,
+    "contact_height_m": 0.62,
+    "desired_palm_quaternion_in_object_wxyz": [
+      0.7071067811865476,
+      0.0,
+      0.7071067811865476,
+      0.0
+    ],
+    "palm_collision_support_offset_m": 0.44023889869451527,
+    "precontact_gap_m": 0.06,
+    "status": "FROZEN",
+    "tangential_separation_m": 0.3
+  },
+  "source_commit_sha": "dea1104f26b0f8fcdb81d8cd225f6880d5075ca7",
+  "stage": "S2-02",
+  "status": "PASS",
+  "task": "PRECONTACT_GEOMETRY_AND_BIMANUAL_TARGET_AUDIT",
+  "wall_time_seconds": 67
+}

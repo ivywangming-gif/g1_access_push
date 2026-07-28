@@ -1,0 +1,18 @@
+{
+  "development_search_preflight_attempts": 3,
+  "final_image_committed": false,
+  "formal_attempts": 1,
+  "formal_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_02_formal_20260728_063446",
+  "frozen_preflight_attempts": 1,
+  "next_branch": "stage2/s2-03-attach-only",
+  "preflight_pass_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_02_frozen_preflight_20260728_063119",
+  "primary_reason": "ALL_S2_02_GATES_PASSED",
+  "raw_trace_committed": false,
+  "schema_version": 1,
+  "selected_candidate_index": 9,
+  "source_commit_sha": "dea1104f26b0f8fcdb81d8cd225f6880d5075ca7",
+  "stage": "S2-02",
+  "status": "PASS",
+  "thresholds_changed_after_formal": false,
+  "thresholds_changed_after_preflight": false
+}
