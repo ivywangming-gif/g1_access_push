@@ -33,6 +33,14 @@ parser.add_argument("--reference", type=Path, required=True)
 parser.add_argument("--reference-sha256", required=True)
 parser.add_argument("--checkpoint", default="NONE")
 parser.add_argument("--checkpoint-sha256", default="NONE")
+parser.add_argument("--checkpoint-iteration", type=int)
+parser.add_argument("--controller-id", choices=("actor", "original_s2_03"), default="actor")
+parser.add_argument("--visual-evidence", action="store_true")
+parser.add_argument(
+    "--visual-evidence-id",
+    choices=("CLEAN_UNTRAINED_ACTOR", "BEST_GAP_CHECKPOINT", "ORIGINAL_S2_03_CONTROLLER"),
+)
+parser.add_argument("--visual-frame-stride", type=int, default=2)
 parser.add_argument("--mode", choices=("baseline", "pilot", "screening", "formal", "preflight"), required=True)
 parser.add_argument("--development-seed", type=int, required=True)
 from isaaclab.app import AppLauncher
@@ -48,35 +56,107 @@ checkpoint_path = None if args.checkpoint == "NONE" else Path(args.checkpoint).r
 if checkpoint_path is not None:
     if not checkpoint_path.is_file() or sha256_file(checkpoint_path) != args.checkpoint_sha256:
         raise SystemExit("ACTOR_CHECKPOINT_SHA_MISMATCH")
+if args.controller_id == "original_s2_03" and checkpoint_path is not None:
+    raise SystemExit("ORIGINAL_CONTROLLER_MUST_NOT_LOAD_ACTOR_CHECKPOINT")
+if args.controller_id == "original_s2_03" and not args.visual_evidence:
+    raise SystemExit("ORIGINAL_CONTROLLER_IS_VISUAL_DIAGNOSTIC_ONLY")
+if args.visual_evidence and not args.enable_cameras:
+    raise SystemExit("VISUAL_EVIDENCE_REQUIRES_ENABLE_CAMERAS")
+if args.visual_evidence and args.visual_evidence_id is None:
+    raise SystemExit("VISUAL_EVIDENCE_ID_REQUIRED")
+if args.visual_evidence_id == "CLEAN_UNTRAINED_ACTOR" and checkpoint_path is not None:
+    raise SystemExit("CLEAN_UNTRAINED_ACTOR_MUST_NOT_LOAD_CHECKPOINT")
+if args.visual_evidence_id == "BEST_GAP_CHECKPOINT" and checkpoint_path is None:
+    raise SystemExit("BEST_GAP_CHECKPOINT_REQUIRES_CHECKPOINT")
+if args.visual_evidence_id == "ORIGINAL_S2_03_CONTROLLER" and args.controller_id != "original_s2_03":
+    raise SystemExit("ORIGINAL_VISUAL_ID_REQUIRES_ORIGINAL_CONTROLLER")
+if args.controller_id == "original_s2_03" and args.visual_evidence_id != "ORIGINAL_S2_03_CONTROLLER":
+    raise SystemExit("ORIGINAL_CONTROLLER_VISUAL_ID_MISMATCH")
 write_json(RUN / "runner_status.json", {"status": "STARTING", "phase": "APP_LAUNCH"})
 simulation_app = AppLauncher(args).app
 
 import torch  # noqa: E402
+import isaaclab.utils.math as math_utils  # noqa: E402
 from PIL import Image  # noqa: E402
 from rsl_rl.runners import OnPolicyRunner  # noqa: E402
 
 from agile.rl_env.rsl_rl import RslRlVecEnvWrapper  # noqa: E402
 from g1_access_push.sim.stage2.s2_03t_agent_cfg import S203TPPORunnerCfg  # noqa: E402
-from g1_access_push.sim.stage2.s2_03t_bootstrap import derive_precontact_reference  # noqa: E402
+from g1_access_push.sim.stage2.s2_03t_bootstrap import (  # noqa: E402
+    MAXIMUM_ORIENTATION_CORRECTION_RAD,
+    MAXIMUM_POSITION_CORRECTION_M,
+    _clamp_norm,
+    _target_pose_in_pelvis,
+    derive_precontact_reference,
+)
 from g1_access_push.sim.stage2.s2_03t_env import S203TContactEnv  # noqa: E402
 from g1_access_push.sim.stage2.s2_03t_eval_cfg import S203TContactEvaluationEnvCfg  # noqa: E402
 from g1_access_push.sim.stage2.s2_03t_mdp import runtime_state  # noqa: E402
+from g1_access_push.sim.stage2.s2_03t_visual_cfg import S203TVisualEvidenceEnvCfg  # noqa: E402
+from g1_access_push.stage2.s2_03_contract import advance_rate_limited, load_config  # noqa: E402
+
+from s2_03t_visual_recorder import VisualEvidenceRecorder  # noqa: E402
+
+class VisualS203TContactEnv(S203TContactEnv):
+    """Visual-only subclass that captures the terminal physics frame before auto-reset."""
+
+    def __init__(self, *env_args, **env_kwargs) -> None:
+        self.visual_terminal_callback = None
+        super().__init__(*env_args, **env_kwargs)
+
+    def _reset_idx(self, env_ids) -> None:
+        if (
+            self.visual_terminal_callback is not None
+            and hasattr(self, "episode_length_buf")
+            and not self._s2_03t_bootstrap_mode
+        ):
+            ids = torch.as_tensor(env_ids, dtype=torch.long, device=self.device)
+            completed = ids[self.episode_length_buf[ids] > 0]
+            if bool((completed == 0).any()):
+                self.visual_terminal_callback()
+        super()._reset_idx(env_ids)
+
 
 
 env = None
+visual_recorder = None
 try:
     torch.manual_seed(42)
     torch.cuda.manual_seed_all(42)
-    cfg = S203TContactEvaluationEnvCfg()
+    cfg = S203TVisualEvidenceEnvCfg() if args.visual_evidence else S203TContactEvaluationEnvCfg()
     cfg.seed = args.development_seed
     cfg.scene.num_envs = 1
     cfg.sim.device = args.device
-    env = S203TContactEnv(cfg=cfg)
+    env_class = VisualS203TContactEnv if args.visual_evidence else S203TContactEnv
+    render_mode = "rgb_array" if args.visual_evidence else None
+    env = env_class(cfg=cfg, render_mode=render_mode)
     camera = env.scene["audit_camera"]
     camera.set_world_poses_from_view(
-        torch.tensor([[2.0, -2.0, 1.55]], device=env.device),
+        torch.tensor([[-1.6, -2.2, 1.40]], device=env.device),
         torch.tensor([[0.45, 0.0, 0.70]], device=env.device),
     )
+    if args.visual_evidence:
+        side_camera = env.scene["side_camera"]
+        side_camera.set_world_poses_from_view(
+            torch.tensor([[0.55, -2.35, 0.92]], device=env.device),
+            torch.tensor([[0.55, 0.0, 0.68]], device=env.device),
+        )
+    else:
+        side_camera = None
+    if args.visual_evidence:
+        visual_recorder = VisualEvidenceRecorder(
+            RUN,
+            env,
+            controller_id=args.visual_evidence_id,
+            checkpoint_path=None if checkpoint_path is None else str(checkpoint_path),
+            checkpoint_sha256=None if checkpoint_path is None else args.checkpoint_sha256,
+            checkpoint_iteration=args.checkpoint_iteration,
+            seed=args.development_seed,
+            reference_path=str(reference_path),
+            reference_sha256=args.reference_sha256,
+            frame_stride=args.visual_frame_stride,
+        )
+
     records: list[dict[str, object]] = []
     transitions = [
         {"frame": -1, "state": "RESET", "reason": None},
@@ -87,7 +167,7 @@ try:
     right_losses: list[int] = []
     previous_contacts = [False, False]
 
-    def append_record(fsm_state: str, metric, *, terminal_snapshot=None) -> None:
+    def append_record(fsm_state: str, metric, *, terminal_snapshot=None) -> dict[str, object]:
         global left_onset, right_onset, bilateral_onset, previous_contacts
         frame = len(records)
         if terminal_snapshot is None:
@@ -176,11 +256,15 @@ try:
         }
         records.append(record)
 
+        return record
     def bootstrap_record(phase: str, _step: int, metric) -> None:
         state_name = "STAND_SETTLE" if phase == "STAND_SETTLE" else "PRECONTACT"
         if records and records[-1]["fsm_state"] != state_name:
             transitions.append({"frame": len(records) - 1, "state": state_name, "reason": None})
-        append_record(state_name, metric)
+        record = append_record(state_name, metric)
+        if visual_recorder is not None:
+            keyframe = "initial" if int(record["frame"]) == 0 else None
+            visual_recorder.observe(record, keyframe=keyframe)
 
     replay_reference, replay_audit = derive_precontact_reference(env, record_callback=bootstrap_record)
     stored_reference = torch.load(reference_path, map_location="cpu", weights_only=True)
@@ -266,17 +350,115 @@ try:
     )
     if not installed_valid:
         raise RuntimeError(f"INSTALLED_PRECONTACT_REFERENCE_MISMATCH:{installed_max_diff}")
+    if visual_recorder is not None:
+        precontact_visual_record = dict(records[-1])
+        precontact_visual_record.update(
+            {
+                "left_actual_surface_gap_m": float(installed_metric["gaps"][0, 0]),
+                "right_actual_surface_gap_m": float(installed_metric["gaps"][0, 1]),
+                "left_contact": bool(installed_metric["contacts"][0, 0]),
+                "right_contact": bool(installed_metric["contacts"][0, 1]),
+                "left_force_n": float(installed_metric["forces"][0, 0]),
+                "right_force_n": float(installed_metric["forces"][0, 1]),
+                "root_tilt_deg": float(installed_metric["root_tilt_deg"][0]),
+            }
+        )
+        visual_recorder.mark_precontact(precontact_visual_record)
     transitions.append({"frame": len(records) - 1, "state": "APPROACH_NORMAL", "reason": None})
+    visual_terminal_captured = [False]
+
+    def current_state_name() -> str:
+        state = runtime_state(env)
+        metric = state.ensure()
+        if bool(state.contact_verified[0]):
+            return "ATTACHED_HOLD" if int(state.hold_count[0]) > 0 else "BILATERAL_CONTACT_VERIFY"
+        if bool(metric["contacts"][0].any()):
+            return "BILATERAL_CONTACT_VERIFY"
+        return "APPROACH_NORMAL"
+
     wrapped = RslRlVecEnvWrapper(env, clip_actions=1.0)
+    def capture_visual_terminal() -> None:
+        if visual_recorder is None or visual_terminal_captured[0]:
+            return
+        metric = runtime_state(env).ensure()
+        record = append_record(current_state_name(), metric)
+        visual_recorder.observe(record, keyframe="terminal", actor_phase=True, force_video_frame=True)
+        visual_terminal_captured[0] = True
+
+    if visual_recorder is not None:
+        env.visual_terminal_callback = capture_visual_terminal
     agent_cfg = S203TPPORunnerCfg()
     agent_cfg.resume = False
     agent_cfg.load_run = None
     agent_cfg.load_checkpoint = None
     agent_cfg.load_optimizer = False
-    runner = OnPolicyRunner(wrapped, agent_cfg.to_dict(), log_dir=None, device=agent_cfg.device)
+    runner = OnPolicyRunner(wrapped, agent_cfg.to_dict(), log_dir=None, device=agent_cfg.device) if args.controller_id == "actor" else None
     if checkpoint_path is not None:
+        if runner is None:
+            raise RuntimeError("ORIGINAL_CONTROLLER_RUNNER_MUST_BE_NONE")
         runner.load(str(checkpoint_path), load_optimizer=False)
-    policy = runner.get_inference_policy(device=env.device)
+    if runner is None:
+        arm = env.action_manager.get_term("arm_residual")
+        arm.set_bootstrap_mode(True)
+        original_config = load_config(Path("/root/autodl-tmp/robotics/projects/g1_access_push/configs/stage2/s2_03_attach_only.yaml"))
+        box_fixed_pos = env.scene["box"].data.root_link_pos_w.clone()
+        box_fixed_quat = env.scene["box"].data.root_link_quat_w.clone()
+        original_state = {"displacement": 0.0, "speed": 0.0, "acceleration": 0.0, "frozen": None}
+        object_x = torch.tensor([[1.0, 0.0, 0.0]], device=env.device)
+
+        def original_policy(_observation):
+            metric = runtime_state(env).ensure()
+            if original_state["frozen"] is None and bool(metric["contacts"][0, 0] and metric["contacts"][0, 1]):
+                original_state["frozen"] = original_state["displacement"]
+            maximum_distance = float(original_config["motion"]["maximum_approach_distance_m"])
+            if original_state["frozen"] is None and original_state["displacement"] < maximum_distance:
+                displacement, speed, acceleration = advance_rate_limited(
+                    original_state["displacement"], original_state["speed"], original_state["acceleration"],
+                    dt_s=float(original_config["controller"]["control_dt_s"]),
+                    speed_limit_mps=float(original_config["motion"]["approach_speed_mps"]),
+                    acceleration_limit_mps2=float(original_config["motion"]["approach_acceleration_limit_mps2"]),
+                    jerk_limit_mps3=float(original_config["motion"]["approach_jerk_limit_mps3"]),
+                )
+                original_state.update(displacement=min(displacement, maximum_distance), speed=speed, acceleration=acceleration)
+            commanded = original_state["frozen"] if original_state["frozen"] is not None else original_state["displacement"]
+            target_pos, target_quat = _target_pose_in_pelvis(env, box_fixed_pos, box_fixed_quat)
+            _, object_quat_b = math_utils.subtract_frame_transforms(
+                env.scene["robot"].data.root_link_pos_w,
+                env.scene["robot"].data.root_link_quat_w,
+                box_fixed_pos,
+                box_fixed_quat,
+            )
+            object_x_b = math_utils.quat_apply(object_quat_b, object_x)
+            desired_pos = target_pos + float(commanded) * object_x_b[:, None, :]
+            palms = env.scene["hand_frames"]
+            pos_error, orientation_error = math_utils.compute_pose_error(
+                palms.data.target_pos_source.reshape(-1, 3),
+                palms.data.target_quat_source.reshape(-1, 4),
+                desired_pos.reshape(-1, 3),
+                target_quat.reshape(-1, 4),
+                rot_error_type="axis_angle",
+            )
+            commands = torch.cat(
+                (
+                    _clamp_norm(
+                        pos_error.reshape(env.num_envs, 2, 3),
+                        MAXIMUM_POSITION_CORRECTION_M,
+                    ),
+                    _clamp_norm(
+                        orientation_error.reshape(env.num_envs, 2, 3),
+                        MAXIMUM_ORIENTATION_CORRECTION_RAD,
+                    ),
+                ),
+                dim=-1,
+            )
+            arm.set_bootstrap_commands(commands)
+            if visual_recorder is not None:
+                visual_recorder.set_original_commanded_normal_displacement(float(commanded))
+            return torch.zeros((1, 14), device=env.device)
+
+        policy = original_policy
+    else:
+        policy = runner.get_inference_policy(device=env.device)
     observation, _ = wrapped.get_observations()
     terminal_snapshot = None
     last_state_name = "APPROACH_NORMAL"
@@ -293,7 +475,10 @@ try:
             if terminal_snapshot is None:
                 raise RuntimeError("TERMINAL_SNAPSHOT_MISSING")
             state_name = "ATTACHED_HOLD" if terminal_snapshot["success"] else last_state_name
-            append_record(state_name, None, terminal_snapshot=terminal_snapshot)
+            if visual_recorder is None:
+                append_record(state_name, None, terminal_snapshot=terminal_snapshot)
+            elif not visual_terminal_captured[0]:
+                raise RuntimeError("VISUAL_TERMINAL_CAPTURE_MISSING")
             break
         state = runtime_state(env)
         metric = state.ensure()
@@ -306,7 +491,9 @@ try:
         if state_name != last_state_name:
             transitions.append({"frame": len(records) - 1, "state": state_name, "reason": None})
             last_state_name = state_name
-        append_record(state_name, metric)
+        record = append_record(state_name, metric)
+        if visual_recorder is not None:
+            visual_recorder.observe(record, actor_phase=True)
         if (step + 1) % 25 == 0:
             print(f"PHASE=ACTOR_EVALUATION step={step + 1}", flush=True)
     if terminal_snapshot is None:
@@ -375,10 +562,12 @@ try:
             "stage": "S2-03T",
             "mode": args.mode.upper(),
             "development_seed": args.development_seed,
+            "controller_id": args.visual_evidence_id if args.visual_evidence else args.controller_id,
             "checkpoint": None if checkpoint_path is None else str(checkpoint_path),
             "checkpoint_sha256": None if checkpoint_path is None else args.checkpoint_sha256,
-            "clean_untrained_actor": checkpoint_path is None,
-            "deterministic_actor_mean": True,
+            "checkpoint_iteration": args.checkpoint_iteration,
+            "clean_untrained_actor": args.controller_id == "actor" and checkpoint_path is None,
+            "deterministic_actor_mean": args.controller_id == "actor",
             "reference_path": str(reference_path),
             "reference_sha256": args.reference_sha256,
             "reference_replay_max_abs_diff": replay_max_diff,
@@ -393,6 +582,19 @@ try:
             "planner_started": False,
         },
     )
+    if visual_recorder is not None:
+        try:
+            visual_recorder.finalize(
+                records=records,
+                terminal_state=terminal_state,
+                failure_reason=failure_reason,
+                result_primary_reason=failure_reason or "ALL_S2_03_GATES_PASSED",
+                installed_reference_max_abs_diff=installed_max_diff,
+                reference_replay_max_abs_diff=replay_max_diff,
+            )
+        except BaseException as visual_exc:
+            print(f"VISUALIZATION_INVALID reason={visual_exc!r}", file=sys.stderr, flush=True)
+            visual_recorder.close_incomplete(reason=f"VISUALIZATION_EXCEPTION:{visual_exc!r}")
     write_json(RUN / "runner_status.json", {"status": "COMPLETE", "phase": "EVIDENCE_READY"})
 except BaseException as exc:
     traceback.print_exception(type(exc), exc, exc.__traceback__, file=sys.stderr)
@@ -402,6 +604,8 @@ except BaseException as exc:
     )
     raise
 finally:
+    if visual_recorder is not None and not visual_recorder.finalized:
+        visual_recorder.close_incomplete(reason="EVALUATOR_EXCEPTION_BEFORE_VISUAL_FINALIZE")
     if env is not None:
         env.close()
     simulation_app.close()

@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "package": "S2_03T_VISUAL_EVIDENCE_PACKAGE",
+  "visualization_package_status": "PASS",
+  "visualization_package_primary_reason": "ALL_THREE_EPISODES_COMPLETE",
+  "scientific_authority": "TRACE_SENSOR_EVALUATOR_ONLY",
+  "frozen_scientific_status": "FAIL",
+  "frozen_scientific_primary_reason": "NO_QUALIFIED_CONTACT_POLICY",
+  "source_run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_visual_evidence_camera_fix_retry_20260728_161244",
+  "source_summary_sha256": "995314c7b8279ec7f0022db93064cfcf1f6a5091cbc8228b19cb7f9621dbf057",
+  "source_manifest_sha256": "a4f19d3715fcc378dbc7d18bad53fbc518bd38449bca3ad55434e4c6b4f9bed9",
+  "best_gap_selection": {
+    "checkpoint_iteration": 500,
+    "checkpoint_path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/model_500.pt",
+    "checkpoint_sha256": "4865e70690a273ec2619ab5d7a02d22ce2957a3c663919a8ec29ad54aa8a8871",
+    "seed": 42,
+    "selection_rule": "minimum_mean_left_right_surface_gap_across_all_screening_episodes"
+  },
+  "episodes": {
+    "CLEAN_UNTRAINED_ACTOR": {
+      "scientific_status": "FAIL",
+      "scientific_primary_reason": "BILATERAL_CONTACT_TIMEOUT",
+      "visualization_status": "PASS",
+      "observed_frames": 1300,
+      "minimum_mean_gap_m": 0.059585750102996826,
+      "minimum_gap_frame": 1299,
+      "left_minimum_gap_m": 0.05942291021347046,
+      "right_minimum_gap_m": 0.05525928735733032,
+      "bilateral_contact_seen": false,
+      "maximum_abs_commanded_residual_rad": 0.007536239456385374,
+      "maximum_actual_palm_displacement_m": [0.005970855243504047, 0.006627003662288189]
+    },
+    "BEST_GAP_CHECKPOINT": {
+      "scientific_status": "FAIL",
+      "scientific_primary_reason": "BILATERAL_CONTACT_TIMEOUT",
+      "visualization_status": "PASS",
+      "observed_frames": 1300,
+      "minimum_mean_gap_m": 0.020385801792144775,
+      "minimum_gap_frame": 415,
+      "left_minimum_gap_m": 0.02508622407913208,
+      "right_minimum_gap_m": 0.01568537950515747,
+      "bilateral_contact_seen": false,
+      "maximum_abs_commanded_residual_rad": 0.05000000074505806,
+      "maximum_actual_palm_displacement_m": [0.042356859892606735, 0.04575135558843613]
+    },
+    "ORIGINAL_S2_03_CONTROLLER": {
+      "scientific_status": "FAIL",
+      "scientific_primary_reason": "BILATERAL_CONTACT_TIMEOUT",
+      "visualization_status": "PASS",
+      "observed_frames": 1300,
+      "minimum_mean_gap_m": 0.01976597309112549,
+      "minimum_gap_frame": 1262,
+      "left_minimum_gap_m": 0.019317567348480225,
+      "right_minimum_gap_m": 0.01948946714401245,
+      "bilateral_contact_seen": false,
+      "maximum_commanded_normal_displacement_m": 0.07,
+      "maximum_actual_palm_displacement_m": [0.04024042189121246, 0.0410207100212574]
+    }
+  },
+  "visual_review": {
+    "arms_obviously_raised": false,
+    "palms_move_toward_rear_surface": true,
+    "left_right_motion_symmetric": "ORIGINAL_CONTROLLER_YES; BEST_CHECKPOINT_APPROXIMATE_WITH_NONZERO_GAP_ASYMMETRY",
+    "joint_residual_changes_palm_pose": true,
+    "visible_gap_remains_at_minimum": true,
+    "policy_saturation_or_stop": "BEST_CHECKPOINT_SATURATES_14D_RESIDUAL_BOUND_AND_RETAINS_POSITIVE_GAP",
+    "classification": "PROJECT_EVIDENCE_AND_PROJECT_INFERENCE; NOT_A_SCIENTIFIC_PASS"
+  },
+  "prohibitions_verified": {
+    "training_started": false,
+    "second_ppo_started": false,
+    "box_push_commanded": false,
+    "planner_started": false,
+    "auto_reset_accumulation": false,
+    "one_env_one_episode_each": true,
+    "same_seed": true,
+    "same_frozen_reference": true
+  }
+}

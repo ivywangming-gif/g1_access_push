@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "stage": "S2-03T",
+  "audit": "ACTION_AUTHORITY_AUDIT",
+  "audit_status": "PASS",
+  "audit_status_semantics": "DIAGNOSTIC_VALIDITY_ONLY",
+  "authority_status": "INSUFFICIENT_FOR_CONTACT",
+  "primary_diagnosis": "ARM_RESIDUAL_AUTHORITY_INSUFFICIENT",
+  "source_run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_action_authority_20260728_165102",
+  "same_frozen_ik_reference": true,
+  "same_joint_order": true,
+  "residual_bound_rad": 0.05,
+  "minimum_predicted_surface_gap_m": [0.01383008062839508, 0.011478431522846222],
+  "minimum_actual_counterfactual_gap_m": [0.027219951152801514, 0.02638775110244751],
+  "safe_replay_metrics": {
+    "observed_steps": 20,
+    "finite": true,
+    "minimum_root_height_m": 0.7250316143035889,
+    "maximum_root_tilt_deg": 4.020974636077881,
+    "minimum_joint_margin_rad": 1.095560073852539,
+    "maximum_torque_ratio": 0.295819491147995,
+    "forbidden_collision": false,
+    "contact_force_observed": false
+  },
+  "source_artifacts": {
+    "result.json": {
+      "size_bytes": 993,
+      "sha256": "654496d1c2ed58500f4e99244f849b6491049a5af03a53f52de7a3ff562b767e"
+    },
+    "reference_audit.json": {
+      "size_bytes": 3673,
+      "sha256": "2c576707117786f7b03cb5c168b13192ae68d0db0bf854edabb879e8f142ee3e"
+    },
+    "jacobian_audit.json": {
+      "size_bytes": 2740,
+      "sha256": "2b18cb3a444131eca700934f67cd656fd6f43f1f6271443e8fd2d8acc027be0f"
+    },
+    "finite_safe_action_sweep.json": {
+      "size_bytes": 50084,
+      "sha256": "82f30e749fe0875f28180865ba92fe7cb63629a95a7a1c8a361a8c5082b4eafd"
+    },
+    "safe_counterfactual_trace.jsonl": {
+      "size_bytes": 8615,
+      "sha256": "aae3083b2136987dcdb551bcbc7392632b7d2be15fe2ae7cb4ed2fec8f248534"
+    }
+  },
+  "disposition": {
+    "old_no_qualified_contact_policy_preserved": true,
+    "training_started": false,
+    "checkpoint_loaded": false,
+    "box_push_commanded": false,
+    "falcon_migration_decision": "NO",
+    "next_design_requirement": "REPLACE_14D_JOINT_RESIDUAL_WITH_REACHABLE_NORMAL_APPROACH_ACTION"
+  }
+}

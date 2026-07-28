@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "package": "S2_03T_VISUAL_EVIDENCE_PACKAGE_SHA256_MANIFEST",
+  "source_run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_visual_evidence_camera_fix_retry_20260728_161244",
+  "files": {
+    "visual_evidence_summary.json": {
+      "size_bytes": 21438,
+      "sha256": "995314c7b8279ec7f0022db93064cfcf1f6a5091cbc8228b19cb7f9621dbf057"
+    },
+    "visual_evidence_sha256_manifest.json": {
+      "size_bytes": 18775,
+      "sha256": "a4f19d3715fcc378dbc7d18bad53fbc518bd38449bca3ad55434e4c6b4f9bed9"
+    },
+    "CLEAN_UNTRAINED_ACTOR/video_three_quarter.mp4": {
+      "size_bytes": 260898,
+      "sha256": "bbda8c11a763ca9a43944f4cb0284f4a08815681ef24c35c121f030329fc1ac4"
+    },
+    "CLEAN_UNTRAINED_ACTOR/video_side.mp4": {
+      "size_bytes": 279674,
+      "sha256": "5d70fe626209904c0f246024fc948fb1e14a52d5f0049a15f0fb5e1166f54102"
+    },
+    "BEST_GAP_CHECKPOINT/video_three_quarter.mp4": {
+      "size_bytes": 259168,
+      "sha256": "e733349489a57bbff4d9bcb804ae886bf33d06bd2c6b4d10b106405e44fe0ab6"
+    },
+    "BEST_GAP_CHECKPOINT/video_side.mp4": {
+      "size_bytes": 293728,
+      "sha256": "bfe8cbbb1499bb694ab5e34e502b92e3c7d70c9cb155c6d2bcab6c157981798c"
+    },
+    "ORIGINAL_S2_03_CONTROLLER/video_three_quarter.mp4": {
+      "size_bytes": 276172,
+      "sha256": "ee66fb2fea60bfafdf26a7c2149093397bb8d514a64ae0fa89f85569dcfa0c26"
+    },
+    "ORIGINAL_S2_03_CONTROLLER/video_side.mp4": {
+      "size_bytes": 271768,
+      "sha256": "393f9d76db067b8fb27dc9b4b5c0d602dfc0beb613f6180bebb9c08a51e352c4"
+    }
+  },
+  "media_committed_to_git": false
+}
