@@ -76,6 +76,7 @@ try:
     sensor_left = env.scene["left_palm_box_contact"]
     sensor_right = env.scene["right_palm_box_contact"]
     sensor_forbidden = env.scene["robot_box_contact"]
+    configured_forbidden_filters = list(sensor_forbidden.cfg.filter_prim_paths_expr)
     action_names = list(env.action_manager.active_terms)
     action_dims = list(env.action_manager.action_term_dim)
     termination_names = set(env.termination_manager.active_terms)
@@ -98,7 +99,11 @@ try:
         "right_filter_count_one": int(sensor_right.contact_physx_view.filter_count) == 1,
         "forbidden_sensor_single_body": int(sensor_forbidden.num_bodies) == 1,
         "forbidden_sensor_body_name": list(sensor_forbidden.body_names) == ["Box"],
-        "forbidden_filter_count_positive": int(sensor_forbidden.contact_physx_view.filter_count) >= 1,
+        "forbidden_configured_filter_count_46": len(configured_forbidden_filters) == 46,
+        "forbidden_filters_exact_no_wildcard": all(".*" not in item for item in configured_forbidden_filters),
+        "forbidden_filter_count_matches_config": (
+            int(sensor_forbidden.contact_physx_view.filter_count) == len(configured_forbidden_filters)
+        ),
         "forbidden_force_matrix_available": sensor_forbidden.data.force_matrix_w is not None,
         "termination_fields_complete": termination_names == expected_termination_names,
         "reference_installed": env.precontact_reference is not None,
@@ -184,6 +189,11 @@ try:
         "reference_path": str(reference_path),
         "reference_sha256": reference_sha,
         "certified_checkpoint_sha256": lower.checkpoint_sha256,
+        "contact_sensor_audit": {
+            "configured_filter_count": len(configured_forbidden_filters),
+            "backend_filter_count": forbidden_filter_count,
+            "forbidden_force_matrix_shape": list(forbidden_matrix.shape) if forbidden_matrix is not None else None,
+        },
         "box_mass_audit": env._s2_03t_mass_audit,
         "scientific_result_created": False,
     }

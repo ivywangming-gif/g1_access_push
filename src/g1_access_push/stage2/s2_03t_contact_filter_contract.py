@@ -1,0 +1,65 @@
+"""Exact robot rigid-body filters for the S2-03T forbidden-contact activity gate."""
+
+FORBIDDEN_FILTER_SOURCE_AUDIT = (
+    "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/"
+    "s2_01_formal_20260728_051400/contact_sensor_audit.json"
+)
+FORBIDDEN_FILTER_SOURCE_SHA256 = "f6749f3c6fb1eb6a7dfbbccdc7a9b5ef944eb0f0f6a4baef01131997776ee0fe"
+S2_03_RUNTIME_GEOMETRY_AUDIT = (
+    "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/"
+    "s2_03_preflight_20260728_071358/runtime_geometry_audit.json"
+)
+S2_03_RUNTIME_GEOMETRY_SHA256 = "f0432b96b1a09a408acd08f04da4f0977bd7b13930a5dc62ae3003cae1a61793"
+
+FORBIDDEN_ROBOT_RELATIVE_PATHS = (
+    "left_hand/left_hand_index_0_link",
+    "left_hand/left_hand_index_1_link",
+    "left_hand/left_hand_middle_0_link",
+    "left_hand/left_hand_middle_1_link",
+    "left_hand/left_hand_thumb_0_link",
+    "left_hand/left_hand_thumb_1_link",
+    "left_hand/left_hand_thumb_2_link",
+    "left_hand/left_hand_palm_link",
+    "pelvis",
+    "left_hip_pitch_link",
+    "left_hip_roll_link",
+    "left_hip_yaw_link",
+    "left_knee_link",
+    "left_ankle_pitch_link",
+    "left_ankle_roll_link",
+    "right_hip_pitch_link",
+    "right_hip_roll_link",
+    "right_hip_yaw_link",
+    "right_knee_link",
+    "right_ankle_pitch_link",
+    "right_ankle_roll_link",
+    "waist_yaw_link",
+    "waist_roll_link",
+    "torso_link",
+    "left_shoulder_pitch_link",
+    "left_shoulder_roll_link",
+    "left_shoulder_yaw_link",
+    "left_elbow_link",
+    "left_wrist_roll_link",
+    "left_wrist_pitch_link",
+    "left_wrist_yaw_link",
+    "right_shoulder_pitch_link",
+    "right_shoulder_roll_link",
+    "right_shoulder_yaw_link",
+    "right_elbow_link",
+    "right_wrist_roll_link",
+    "right_wrist_pitch_link",
+    "right_wrist_yaw_link",
+    "right_hand/right_hand_index_0_link",
+    "right_hand/right_hand_index_1_link",
+    "right_hand/right_hand_middle_0_link",
+    "right_hand/right_hand_middle_1_link",
+    "right_hand/right_hand_thumb_0_link",
+    "right_hand/right_hand_thumb_1_link",
+    "right_hand/right_hand_thumb_2_link",
+    "right_hand/right_hand_palm_link",
+)
+
+FORBIDDEN_FILTER_EXPRESSIONS = tuple(
+    f"{{ENV_REGEX_NS}}/Robot/{relative_path}" for relative_path in FORBIDDEN_ROBOT_RELATIVE_PATHS
+)

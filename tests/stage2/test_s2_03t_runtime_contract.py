@@ -11,6 +11,12 @@ import pytest
 import torch
 import yaml
 
+from g1_access_push.stage2.s2_03t_contact_filter_contract import (
+    FORBIDDEN_FILTER_EXPRESSIONS,
+    FORBIDDEN_FILTER_SOURCE_SHA256,
+    FORBIDDEN_ROBOT_RELATIVE_PATHS,
+    S2_03_RUNTIME_GEOMETRY_SHA256,
+)
 from g1_access_push.stage2.s2_03t_tensor_contract import filtered_contact_activity
 from g1_access_push.stage2.s2_03t_contract import ACTION_JOINT_NAMES, REWARD_SPECS
 
@@ -25,6 +31,7 @@ BOOTSTRAP = ROOT / "src/g1_access_push/sim/stage2/s2_03t_bootstrap.py"
 TRAIN = ROOT / "scripts/stage2_isaac/train_s2_03t.py"
 CAPACITY = ROOT / "scripts/stage2_isaac/run_s2_03t_capacity_smoke.py"
 TENSOR_CONTRACT = ROOT / "src/g1_access_push/stage2/s2_03t_tensor_contract.py"
+FILTER_PROVENANCE = ROOT / "reports/stage2/s2_03t_forbidden_filter_provenance.json"
 EVALUATE = ROOT / "scripts/stage2_isaac/evaluate_s2_03t_checkpoint.py"
 EVAL_WRAPPER = ROOT / "scripts/stage2_isaac/run_s2_03t_evaluation_once.sh"
 CHECKPOINT = Path(
@@ -86,6 +93,25 @@ def test_arm_action_is_exact_14d_rate_limited_reference_mapping() -> None:
         assert token in source
 
 
+def test_forbidden_filter_expands_the_authoritative_46_body_collision_set_exactly() -> None:
+    provenance = json.loads(FILTER_PROVENANCE.read_text(encoding="utf-8"))
+    assert provenance["status"] == "PASS"
+    assert provenance["filter_semantics"] == "EXACT_ONE_BODY_PER_FILTER_EXPRESSION"
+    assert provenance["source_contact_sensor_audit_sha256"] == FORBIDDEN_FILTER_SOURCE_SHA256
+    assert provenance["s2_03_runtime_geometry_sha256"] == S2_03_RUNTIME_GEOMETRY_SHA256
+    assert provenance["sets_equal_by_rigid_body_name"] is True
+    assert provenance["filter_count"] == provenance["s2_03_runtime_body_count"] == 46
+    assert provenance["relative_robot_rigid_body_paths"] == list(FORBIDDEN_ROBOT_RELATIVE_PATHS)
+    assert len(FORBIDDEN_ROBOT_RELATIVE_PATHS) == len(set(FORBIDDEN_ROBOT_RELATIVE_PATHS)) == 46
+    assert "left_hand/left_hand_palm_link" in FORBIDDEN_ROBOT_RELATIVE_PATHS
+    assert "right_hand/right_hand_palm_link" in FORBIDDEN_ROBOT_RELATIVE_PATHS
+    assert FORBIDDEN_FILTER_EXPRESSIONS == tuple(
+        f"{{ENV_REGEX_NS}}/Robot/{relative_path}"
+        for relative_path in FORBIDDEN_ROBOT_RELATIVE_PATHS
+    )
+    assert all(".*" not in expression for expression in FORBIDDEN_FILTER_EXPRESSIONS)
+
+
 def test_manager_based_task_has_exact_dimensions_and_no_training_camera() -> None:
     source = ENV_CFG.read_text(encoding="utf-8")
     assert "ManagerBasedRLEnvCfg" in source
@@ -97,7 +123,7 @@ def test_manager_based_task_has_exact_dimensions_and_no_training_camera() -> Non
     assert "self.scene.num_envs" not in source
     assert "filter_prim_paths_expr=list(BOX_FILTER_EXPRESSIONS)" in source
     assert 'FORBIDDEN_SENSOR_PRIM_PATH = "{ENV_REGEX_NS}/Box"' in source
-    assert 'FORBIDDEN_FILTER_EXPRESSIONS = ("{ENV_REGEX_NS}/Robot/.*",)' in source
+    assert "from g1_access_push.stage2.s2_03t_contact_filter_contract import FORBIDDEN_FILTER_EXPRESSIONS" in source
     assert "prim_path=FORBIDDEN_SENSOR_PRIM_PATH" in source
     assert "filter_prim_paths_expr=list(FORBIDDEN_FILTER_EXPRESSIONS)" in source
 
@@ -193,6 +219,9 @@ def test_formal_capacity_smoke_allocates_clean_runner_storage_without_training()
     assert 'agent_cfg.load_checkpoint = None' in source
     assert '"training_started": False' in source
     assert '"checkpoint_created": False' in source
+    assert '"forbidden_configured_filter_count_46"' in source
+    assert '"forbidden_filters_exact_no_wildcard"' in source
+    assert '"forbidden_filter_count_matches_config"' in source
     assert "runner.learn(" not in source
 
 

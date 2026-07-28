@@ -104,6 +104,7 @@ try:
     left_matrix = left_sensor.data.force_matrix_w
     right_matrix = right_sensor.data.force_matrix_w
     forbidden_matrix = forbidden_sensor.data.force_matrix_w
+    configured_forbidden_filters = list(forbidden_sensor.cfg.filter_prim_paths_expr)
     forbidden_filter_count = int(forbidden_sensor.contact_physx_view.filter_count)
     checks = {
         "formal_candidate": args.num_envs in (256, 128, 64),
@@ -130,7 +131,11 @@ try:
         and list(right_matrix.shape) == [args.num_envs, 1, 1, 3],
         "forbidden_sensor_single_body": int(forbidden_sensor.num_bodies) == 1,
         "forbidden_sensor_body_name": list(forbidden_sensor.body_names) == ["Box"],
-        "forbidden_filter_count_positive": forbidden_filter_count >= 1,
+        "forbidden_configured_filter_count_46": len(configured_forbidden_filters) == 46,
+        "forbidden_filters_exact_no_wildcard": all(".*" not in item for item in configured_forbidden_filters),
+        "forbidden_filter_count_matches_config": (
+            forbidden_filter_count == len(configured_forbidden_filters)
+        ),
         "forbidden_force_matrix_shape": forbidden_matrix is not None
         and list(forbidden_matrix.shape) == [args.num_envs, 1, forbidden_filter_count, 3],
         "contact_force_matrices_finite": all(
@@ -168,6 +173,7 @@ try:
             "right_force_matrix_shape": list(right_matrix.shape) if right_matrix is not None else None,
             "forbidden_force_matrix_shape": list(forbidden_matrix.shape) if forbidden_matrix is not None else None,
             "forbidden_filter_count": forbidden_filter_count,
+            "configured_forbidden_filter_count": len(configured_forbidden_filters),
         },
         "reference_path": str(reference_path),
         "reference_sha256": args.reference_sha256,

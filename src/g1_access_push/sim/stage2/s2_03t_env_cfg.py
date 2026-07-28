@@ -35,10 +35,10 @@ from g1_access_push.sim.stage2.s2_03t_actions import (
     ArmResidualActionCfg,
     FrozenRecurrentLowerBodyActionCfg,
 )
+from g1_access_push.stage2.s2_03t_contact_filter_contract import FORBIDDEN_FILTER_EXPRESSIONS
 
 
 FORBIDDEN_SENSOR_PRIM_PATH = "{ENV_REGEX_NS}/Box"
-FORBIDDEN_FILTER_EXPRESSIONS = ("{ENV_REGEX_NS}/Robot/.*",)
 
 CERTIFIED_STUDENT = Path(
     "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/data/policy/"
