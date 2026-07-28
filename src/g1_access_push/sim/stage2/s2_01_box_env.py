@@ -48,14 +48,14 @@ def build_s2_01_env_cfg() -> G1Stage1NoBoxRecurrentEnvCfg:
         terrain_cfg=base_scene_cfg.terrain.replace(physics_material=S2_01_MATERIAL),
         additions={
             "box": _box_cfg(),
-            "box_ground_contact": ContactSensorCfg(
-                prim_path="{ENV_REGEX_NS}/Box/geometry/mesh",
-                filter_prim_paths_expr=["/World/ground/.*"],
+            "box_net_contact": ContactSensorCfg(
+                prim_path="{ENV_REGEX_NS}/Box",
+                filter_prim_paths_expr=[],
                 history_length=1,
                 track_air_time=False,
             ),
             "box_robot_contact": ContactSensorCfg(
-                prim_path="{ENV_REGEX_NS}/Box/geometry/mesh",
+                prim_path="{ENV_REGEX_NS}/Box",
                 filter_prim_paths_expr=["{ENV_REGEX_NS}/Robot/.*"],
                 history_length=1,
                 track_air_time=False,
@@ -76,7 +76,7 @@ def build_s2_01_env_cfg() -> G1Stage1NoBoxRecurrentEnvCfg:
         },
     )
     scene_cfg.num_envs = 1
-    scene_cfg.box_ground_contact.update_period = env_cfg.sim.dt
+    scene_cfg.box_net_contact.update_period = env_cfg.sim.dt
     scene_cfg.box_robot_contact.update_period = env_cfg.sim.dt
     scene_cfg.audit_camera.update_period = env_cfg.decimation * env_cfg.sim.dt
     env_cfg.scene = scene_cfg

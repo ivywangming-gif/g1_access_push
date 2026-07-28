@@ -1,5 +1,5 @@
 {
-  "contract_digest_sha256": "750dbfffd9a153b06eda09d3ea46e1cc79687c4551c16532b14728f49b16d633",
+  "contract_digest_sha256": "9d35d7289a2b8f766bf098aa8faf9fa67d417c721ee081f409d6a821d2168ba6",
   "qualification_state": "READY_FOR_SINGLE_FORMAL_RUN",
   "resolved": {
     "baseline": {
@@ -147,7 +147,12 @@
       "controller_env": "g1_access_push.sim.stage1.recurrent_no_box_env_cfg.G1Stage1NoBoxRecurrentEnvCfg",
       "fall_root_height_threshold_m": 0.5,
       "fixed_seed": 42,
-      "forbidden_checkpoint_substring": "model_1999",
+      "forbidden_checkpoint_basenames": [
+        "model_1999.pt"
+      ],
+      "forbidden_checkpoint_sha256s": [
+        "c3e147f90400598fdd97f61022acf599305254a2ccc3fdba1d3ace512ce133a0"
+      ],
       "lower_body_action_scale": "G1_W_HANDS_AGILE_ACTION_SCALE",
       "lower_body_command": [
         0.0,
@@ -190,5 +195,5 @@
   "runnable": true,
   "schema_version": 1,
   "source_config_path": "/root/autodl-tmp/robotics/projects/g1_access_push/configs/stage2/s2_01_box_stand_sanity.yaml",
-  "source_config_sha256": "dab53a3b856eb73291a4b45ef2a5e26de38f86f493a823e35599af8c32dc8783"
+  "source_config_sha256": "d8db9b1074a3b5dc60eade01e949bdd05f8cb16236c805306b233388a1030663"
 }

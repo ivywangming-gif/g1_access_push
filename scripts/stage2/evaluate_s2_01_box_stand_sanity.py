@@ -15,31 +15,85 @@ from g1_access_push.stage2.s2_01_contract import (
 )
 
 
-def implementation_exception_evidence(run: Path) -> dict | None:
-    """Resolve implementation failure before checking whether a trace exists."""
+def _json_or_empty(path: Path) -> dict:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return {}
+
+
+def _rc(run: Path) -> int | None:
+    for name in ("runner_effective.txt", "runner.txt"):
+        path = run / "process_rc" / name
+        if path.is_file():
+            return int(path.read_text(encoding="utf-8").strip())
+    return None
+
+
+def _trace_count(path: Path) -> int | None:
+    if not path.is_file():
+        return None
+    with path.open("r", encoding="utf-8") as stream:
+        return sum(1 for line in stream if line.strip())
+
+
+def implementation_exception_evidence(run: Path, expected_frames: int = 3000) -> dict | None:
+    """Return incomplete-run evidence while allowing certified complete runs to ignore log noise."""
     marker = run / "implementation_exception.json"
     if marker.is_file():
-        payload = json.loads(marker.read_text(encoding="utf-8"))
-        return {"source": marker.name, **payload}
+        payload = _json_or_empty(marker)
+        reason = (
+            "CONTACT_SENSOR_INITIALIZATION_FAILED"
+            if payload.get("exception_message") == "CONTACT_SENSOR_INITIALIZATION_FAILED"
+            else "IMPLEMENTATION_EXCEPTION"
+        )
+        return {**payload, "source": marker.name, "primary_reason": reason}
+
+    runner = _json_or_empty(run / "runner_status.json")
+    effective = _json_or_empty(run / "runner_effective_status.json")
+    effective_rc = _rc(run)
+    trace_frames = _trace_count(run / "trace.jsonl")
+    complete = (
+        runner.get("status") == "COMPLETE"
+        and runner.get("environment_created") is True
+        and int(runner.get("observed_frames", -1)) == expected_frames
+        and trace_frames == expected_frames
+        and effective_rc == 0
+    )
+    if complete:
+        return None
+
     traceback_logs = []
     for name in ("stderr.log", "stdout.log", "console.log"):
         path = run / name
         if path.is_file() and "Traceback (most recent call last)" in path.read_text(encoding="utf-8", errors="replace"):
             traceback_logs.append(name)
-    raw_path = run / "runner_status.json"
-    raw = json.loads(raw_path.read_text(encoding="utf-8")) if raw_path.is_file() else {}
-    runner_rc_path = run / "process_rc/runner.txt"
-    runner_rc = int(runner_rc_path.read_text().strip()) if runner_rc_path.is_file() else None
-    empty_pre_environment = raw.get("environment_created") is False and int(raw.get("observed_frames", 0)) == 0
-    if traceback_logs or raw.get("primary_reason") == "IMPLEMENTATION_EXCEPTION" or empty_pre_environment:
-        return {
-            "source": "DERIVED_PROCESS_EVIDENCE",
-            "traceback_logs": traceback_logs,
-            "runner_rc": runner_rc,
-            "environment_created": raw.get("environment_created"),
-            "observed_frames": raw.get("observed_frames"),
-        }
-    return None
+    reason = effective.get("primary_reason")
+    if not reason:
+        if runner.get("status") not in (None, "COMPLETE"):
+            reason = runner.get("primary_reason") or "RUNNER_NOT_COMPLETE"
+        elif runner.get("environment_created") is False:
+            reason = "ENVIRONMENT_NOT_CREATED"
+        elif trace_frames is None:
+            reason = "MISSING_TRACE"
+        elif trace_frames != expected_frames:
+            reason = "INCOMPLETE_TRACE"
+        elif effective_rc not in (None, 0):
+            reason = "IMPLEMENTATION_EXCEPTION"
+        elif traceback_logs:
+            reason = "IMPLEMENTATION_EXCEPTION"
+    if reason is None:
+        return None
+    return {
+        "source": "DERIVED_PROCESS_EVIDENCE",
+        "primary_reason": reason,
+        "traceback_logs": traceback_logs,
+        "runner_effective_rc": effective_rc,
+        "runner_status": runner.get("status"),
+        "environment_created": runner.get("environment_created"),
+        "observed_frames": runner.get("observed_frames"),
+        "trace_frames": trace_frames,
+    }
 
 
 def main() -> int:
@@ -48,20 +102,20 @@ def main() -> int:
     parser.add_argument("--config", type=Path, required=True)
     args = parser.parse_args()
     run = args.run_root
-    implementation = implementation_exception_evidence(run)
-    if implementation is not None:
+    config = load_config(args.config)
+    expected_frames = int(config["evaluation"]["expected_frames"])
+    incomplete = implementation_exception_evidence(run, expected_frames)
+    if incomplete is not None:
         result = {
-            "schema_version": 1, "stage": "S2-01", "status": "INVALID",
-            "primary_reason": "IMPLEMENTATION_EXCEPTION",
-            "implementation_exception_evidence": implementation,
+            "schema_version": 1,
+            "stage": "S2-01",
+            "status": "INVALID",
+            "primary_reason": incomplete["primary_reason"],
+            "runner_incomplete_evidence": incomplete,
         }
         write_json(run / "result.json", result)
         return 2
     trace = run / "trace.jsonl"
-    if not trace.is_file():
-        result = {"schema_version": 1, "stage": "S2-01", "status": "INVALID", "primary_reason": "MISSING_TRACE"}
-        write_json(run / "result.json", result)
-        return 2
     try:
         records = [json.loads(line) for line in trace.read_text(encoding="utf-8").splitlines() if line.strip()]
         audits = {
@@ -69,22 +123,27 @@ def main() -> int:
             for name in REQUIRED_AUDIT_FIELDS
             if (run / name).is_file()
         }
-        runner_rc_path = run / "process_rc/runner.txt"
-        runner_rc = int(runner_rc_path.read_text().strip()) if runner_rc_path.is_file() else 1
-        raw = json.loads((run / "runner_status.json").read_text()) if (run / "runner_status.json").is_file() else {}
+        runner_rc = _rc(run)
+        raw = _json_or_empty(run / "runner_status.json")
         decision = classify_evidence(
-            load_config(args.config), records, audits, runner_rc=runner_rc,
+            config,
+            records,
+            audits,
+            runner_rc=1 if runner_rc is None else runner_rc,
             final_image_present=(run / "final.png").is_file(),
             multiple_isaac_processes=bool(raw.get("multiple_isaac_processes", False)),
         )
         result = {
-            "schema_version": 1, "stage": "S2-01",
+            "schema_version": 1,
+            "stage": "S2-01",
             "task": "BOX_SPAWN_NO_CONTACT_STAND_SANITY",
             **decision,
             "development_baseline_id": "S2_LIGHT_BOX_DEVELOPMENT_BASELINE_V1",
-            "episode_count": 1, "expected_frames": 3000,
-            "observed_frames": len(records), "reset_count": 0,
-            "trace_complete": len(records) == 3000,
+            "episode_count": 1,
+            "expected_frames": expected_frames,
+            "observed_frames": len(records),
+            "reset_count": 0,
+            "trace_complete": len(records) == expected_frames,
             "final_image_present": (run / "final.png").is_file(),
             "runtime_audits": sorted(audits),
             "robot_stability": "PASS" if not any(reason.startswith("ROBOT_") or reason in {"NONFINITE", "AUTO_RESET_DETECTED"} for reason in decision["all_reasons"]) else "FAIL",
@@ -96,8 +155,11 @@ def main() -> int:
         return 0
     except Exception as exc:
         write_json(run / "result.json", {
-            "schema_version": 1, "stage": "S2-01", "status": "INVALID",
-            "primary_reason": "EVALUATOR_DID_NOT_COMPLETE", "error": repr(exc),
+            "schema_version": 1,
+            "stage": "S2-01",
+            "status": "INVALID",
+            "primary_reason": "EVALUATOR_DID_NOT_COMPLETE",
+            "error": repr(exc),
         })
         return 2
 

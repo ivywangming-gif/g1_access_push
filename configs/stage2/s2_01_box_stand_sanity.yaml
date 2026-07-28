@@ -97,7 +97,10 @@ robot:
   post_initial_reset_count_limit: 0
   fall_root_height_threshold_m: 0.5
   bad_tilt_threshold_rad: 0.6108652381980153
-  forbidden_checkpoint_substring: model_1999
+  forbidden_checkpoint_sha256s:
+    - c3e147f90400598fdd97f61022acf599305254a2ccc3fdba1d3ace512ce133a0
+  forbidden_checkpoint_basenames:
+    - model_1999.pt
 certification:
   standing_result_path: /root/autodl-tmp/robotics/runs/g1_access_push/stage1/s1_08t_corrected_scale_static_arm_60s_20260727_085249/result.json
   standing_result_sha256: 14dcdbb2b0e22e999e3b32e79450e9a38df205546531d788816082f62f1a4652

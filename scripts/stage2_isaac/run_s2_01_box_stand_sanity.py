@@ -7,12 +7,14 @@ import argparse
 import hashlib
 import json
 import math
-import os
 import sys
 import traceback
 from pathlib import Path
 
-from g1_access_push.stage2.s2_01_process import write_implementation_exception
+from g1_access_push.stage2.s2_01_process import (
+    validate_controller_checkpoint,
+    write_implementation_exception,
+)
 
 bootstrap_parser = argparse.ArgumentParser(add_help=False)
 bootstrap_parser.add_argument("--run-root", type=Path, required=True)
@@ -29,6 +31,18 @@ def bootstrap_exception_hook(exc_type, exc, tb) -> None:
             {**RUNTIME_STATE, "exception_phase": "MODULE_BOOTSTRAP"},
         )
     finally:
+        status = {
+            "status": "INVALID", "primary_reason": "IMPLEMENTATION_EXCEPTION",
+            "environment_created": RUNTIME_STATE["environment_created"],
+            "observed_frames": RUNTIME_STATE["observed_frames"],
+            "multiple_isaac_processes": False, "error": repr(exc),
+        }
+        RUN.mkdir(parents=True, exist_ok=True)
+        status_tmp = RUN / "runner_status.json.tmp"
+        status_tmp.write_text(json.dumps(status, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        status_tmp.replace(RUN / "runner_status.json")
+        sys.stdout.flush()
+        sys.stderr.flush()
         for resource_name in ("RUNTIME_ENV", "simulation_app"):
             resource = globals().get(resource_name)
             if resource is not None:
@@ -38,7 +52,6 @@ def bootstrap_exception_hook(exc_type, exc, tb) -> None:
                     traceback.print_exc(file=sys.stderr)
         sys.stdout.flush()
         sys.stderr.flush()
-        os._exit(1)
 
 sys.excepthook = bootstrap_exception_hook
 
@@ -86,6 +99,12 @@ def process_count() -> int:
 
 def config_instance_preflight(cfg, config: dict) -> dict:
     """Persist the resolved scene-instance contract before environment creation."""
+    checkpoint = Path(cfg.actions.lower_body_joint_pos.policy_path).resolve()
+    checkpoint_validation = validate_controller_checkpoint(
+        checkpoint, None, config["robot"]["controller_checkpoint_sha256"],
+        config["robot"]["forbidden_checkpoint_sha256s"],
+        config["robot"]["forbidden_checkpoint_basenames"],
+    )
     result = {
         "schema_version": 1,
         "status": "FAIL",
@@ -101,7 +120,7 @@ def config_instance_preflight(cfg, config: dict) -> dict:
         "stage1_contract_sha": config["certification"]["standing_result_sha256"],
         "resolved_config_sha": sha256_file(args.resolved_config),
         "resolved_config_matches_pre_run_commit": sha256_file(args.resolved_config) == sha256_file(Path(__file__).resolve().parents[2] / "reports/stage2/s2_01_resolved_config.json"),
-        "controller_checkpoint_sha256": config["robot"]["controller_checkpoint_sha256"],
+        **checkpoint_validation,
         "failure_reason": None,
     }
     failed = [name for name in ("config_is_instance", "terrain_present", "robot_present", "box_present") if not result[name]]
@@ -113,8 +132,10 @@ def config_instance_preflight(cfg, config: dict) -> dict:
         failed.append("doorway_enabled")
     if result["nearby_obstacles_enabled"]:
         failed.append("nearby_obstacles_enabled")
-    if "model_1999" in json.dumps(config):
+    if checkpoint_validation["reason"] == "FORBIDDEN_CHECKPOINT_SELECTED":
         failed.append("forbidden_checkpoint")
+    elif checkpoint_validation["status"] != "PASS":
+        failed.append("checkpoint_validation_failed")
     result["failure_reason"] = ",".join(failed) if failed else None
     result["status"] = "PASS" if not failed else "FAIL"
     write_json(RUN / "config_instance_preflight.json", result)
@@ -270,13 +291,38 @@ def main() -> None:
         robot = env.scene["robot"]
         lower = env.action_manager.get_term("lower_body_joint_pos")
         camera = env.scene["audit_camera"]
-        box_ground = env.scene["box_ground_contact"]
+        box_net = env.scene["box_net_contact"]
         box_robot = env.scene["box_robot_contact"]
+        contact_sensor_audit = {
+            "box_net_sensor_prim_path": box_net.cfg.prim_path,
+            "box_robot_sensor_prim_path": box_robot.cfg.prim_path,
+            "box_net_body_names": list(box_net.body_names),
+            "box_robot_body_names": list(box_robot.body_names),
+            "box_robot_filter_paths": list(box_robot.cfg.filter_prim_paths_expr),
+            "net_forces_available": hasattr(box_net.data, "net_forces_w"),
+            "robot_force_matrix_available": hasattr(box_robot.data, "force_matrix_w"),
+            "contact_reporter_initialized": bool(box_net.is_initialized and box_robot.is_initialized),
+        }
+        contact_sensor_audit["sensor_audit_pass"] = bool(
+            contact_sensor_audit["box_net_sensor_prim_path"] == "{ENV_REGEX_NS}/Box"
+            and contact_sensor_audit["box_robot_sensor_prim_path"] == "{ENV_REGEX_NS}/Box"
+            and len(contact_sensor_audit["box_net_body_names"]) == 1
+            and len(contact_sensor_audit["box_robot_body_names"]) == 1
+            and contact_sensor_audit["net_forces_available"]
+            and contact_sensor_audit["robot_force_matrix_available"]
+            and contact_sensor_audit["contact_reporter_initialized"]
+        )
+        write_json(RUN / "contact_sensor_audit.json", contact_sensor_audit)
+        if not contact_sensor_audit["sensor_audit_pass"]:
+            raise RuntimeError("CONTACT_SENSOR_INITIALIZATION_FAILED")
 
         checkpoint = Path(lower.cfg.policy_path).resolve()
-        if sha256_file(checkpoint) != config["robot"]["controller_checkpoint_sha256"]:
-            raise RuntimeError("STANDING_ACTION_CONTRACT_UNCERTIFIED")
-        if "model_1999" in str(checkpoint):
+        runtime_checkpoint_validation = validate_controller_checkpoint(
+            checkpoint, sha256_file(checkpoint), config["robot"]["controller_checkpoint_sha256"],
+            config["robot"]["forbidden_checkpoint_sha256s"],
+            config["robot"]["forbidden_checkpoint_basenames"],
+        )
+        if runtime_checkpoint_validation["status"] != "PASS":
             raise RuntimeError("STANDING_ACTION_CONTRACT_UNCERTIFIED")
         recurrent_reset = {
             "hidden_state_all_zero": bool(torch.count_nonzero(lower._policy.hidden_state).item() == 0),
@@ -433,7 +479,7 @@ def main() -> None:
                 translation = float(torch.linalg.vector_norm(box_pos - reference_pos).item()) if reference_pos is not None else 0.0
                 yaw_change = wrapped_abs(yaw, reference_yaw) if reference_yaw is not None else 0.0
                 root_roll, root_pitch, _, root_tilt = quaternion_rpy(robot.data.root_quat_w[0])
-                ground_force = float(torch.linalg.vector_norm(box_ground.data.force_matrix_w[0]).item())
+                ground_force = float(torch.linalg.vector_norm(box_net.data.net_forces_w[0]).item())
                 robot_force = float(torch.linalg.vector_norm(box_robot.data.force_matrix_w[0]).item())
                 values = [
                     *[float(value) for value in box_pos], *[float(value) for value in box_quat],
@@ -513,4 +559,4 @@ if __name__ == "__main__":
             exit_code = 1
     sys.stdout.flush()
     sys.stderr.flush()
-    os._exit(exit_code)
+    raise SystemExit(exit_code)

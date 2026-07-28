@@ -115,7 +115,7 @@ def test_settle_stillness_and_frame_contract() -> None:
     }
 
 
-def test_stage1_controller_contract_and_no_model_1999() -> None:
+def test_stage1_controller_contract_and_structured_checkpoint_prohibition() -> None:
     robot = cfg()["robot"]
     assert robot["controller_checkpoint_sha256"] == "a0151975a757a33f0f5ed236d5616e2a98643abe2b36e50ac9ad01b6dd1f6d7e"
     assert robot["lower_body_command"] == [0.0, 0.0, 0.0, 0.7]
@@ -123,7 +123,9 @@ def test_stage1_controller_contract_and_no_model_1999() -> None:
     assert robot["upper_body_action"] == "ZERO_DELTA_DEFAULT_ARMS_AND_WAIST"
     text = RUNNER.read_text(encoding="utf-8") + ENV_SOURCE.read_text(encoding="utf-8")
     assert "G1Stage1NoBoxRecurrentEnvCfg" in text
-    assert "model_1999" in text
+    assert robot["forbidden_checkpoint_sha256s"] == ["c3e147f90400598fdd97f61022acf599305254a2ccc3fdba1d3ace512ce133a0"]
+    assert robot["forbidden_checkpoint_basenames"] == ["model_1999.pt"]
+    assert "forbidden_checkpoint_substring" not in text
     assert "OnPolicyRunner" not in text
     assert "train(" not in text
 
@@ -153,9 +155,21 @@ def test_fail_invalid_are_disjoint_and_valid_negative_is_fail() -> None:
     assert missing["status"] == "INVALID"
 
 
+def test_contact_sensor_initialization_failure_is_invalid() -> None:
+    config = cfg()
+    audits = valid_audits()
+    audits["contact_sensor_audit.json"]["sensor_audit_pass"] = False
+    result = classify_evidence(
+        config, valid_records(config), audits, runner_rc=0,
+        final_image_present=True, multiple_isaac_processes=False,
+    )
+    assert result["status"] == "INVALID"
+    assert result["primary_reason"] == "CONTACT_SENSOR_INITIALIZATION_FAILED"
+
+
 def test_required_runtime_audit_fields_are_frozen() -> None:
     assert set(REQUIRED_AUDIT_FIELDS) == {
-        "box_mass_properties_audit.json", "physics_material_audit.json", "scene_geometry_audit.json", "box_rigid_body_audit.json"
+        "box_mass_properties_audit.json", "physics_material_audit.json", "scene_geometry_audit.json", "box_rigid_body_audit.json", "contact_sensor_audit.json"
     }
     assert all(fields for fields in REQUIRED_AUDIT_FIELDS.values())
 
@@ -195,11 +209,14 @@ def valid_audits() -> dict[str, dict]:
     geometry.update({"overlap_count": 0, "scene_query_robot_hit": False, "measured_minimum_clearance_m": 0.5})
     rigid = {key: None for key in REQUIRED_AUDIT_FIELDS["box_rigid_body_audit.json"]}
     rigid.update({"runtime_size_xyz_m": [1.2, 0.6, 1.2], "rigid_body_enabled": True, "kinematic_enabled": False, "gravity_enabled": True})
+    sensor = {key: None for key in REQUIRED_AUDIT_FIELDS["contact_sensor_audit.json"]}
+    sensor.update({"sensor_audit_pass": True})
     return {
         "box_mass_properties_audit.json": mass,
         "physics_material_audit.json": material,
         "scene_geometry_audit.json": geometry,
         "box_rigid_body_audit.json": rigid,
+        "contact_sensor_audit.json": sensor,
     }
 
 

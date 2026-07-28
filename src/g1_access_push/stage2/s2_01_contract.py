@@ -33,6 +33,12 @@ REQUIRED_AUDIT_FIELDS = {
         "body_prim_path", "cube_collider_prim_path", "runtime_size_xyz_m",
         "rigid_body_enabled", "kinematic_enabled", "gravity_enabled",
     },
+    "contact_sensor_audit.json": {
+        "box_net_sensor_prim_path", "box_robot_sensor_prim_path",
+        "box_net_body_names", "box_robot_body_names", "box_robot_filter_paths",
+        "net_forces_available", "robot_force_matrix_available",
+        "contact_reporter_initialized", "sensor_audit_pass",
+    },
 }
 
 VALID_FAIL_REASONS = (
@@ -55,7 +61,7 @@ INVALID_REASONS = (
     "STANDING_ACTION_CONTRACT_UNCERTIFIED", "COLLISION_BACKEND_UNCERTIFIED",
     "ROBOT_RUNTIME_ENVELOPE_QUERY_FAILED", "MASS_PROPERTY_QUERY_FAILED",
     "MATERIAL_BINDING_QUERY_FAILED", "MULTIPLE_ISAAC_PROCESSES",
-    "EVALUATOR_DID_NOT_COMPLETE",
+    "EVALUATOR_DID_NOT_COMPLETE", "CONTACT_SENSOR_INITIALIZATION_FAILED",
 )
 
 
@@ -183,6 +189,8 @@ def classify_evidence(
             invalid.append("MISSING_REQUIRED_FIELD")
         elif not required.issubset(audits[name]):
             invalid.append("MISSING_REQUIRED_FIELD")
+    if "contact_sensor_audit.json" in audits and not audits["contact_sensor_audit.json"].get("sensor_audit_pass", False):
+        invalid.append("CONTACT_SENSOR_INITIALIZATION_FAILED")
     if "physics_material_audit.json" in audits:
         material = audits["physics_material_audit.json"]
         if not material.get("box_binding_target") or not material.get("ground_binding_target"):
