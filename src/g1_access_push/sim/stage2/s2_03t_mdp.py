@@ -360,16 +360,18 @@ class S203TRuntimeState:
         for env_id in ids.tolist():
             reasons = [
                 name
-                for name, value in metrics.items()
-                if name.startswith("failure_")
-                and name.removeprefix("failure_") in TERMINATION_METRIC_NAMES
-                and bool(value[env_id])
+                for name in sorted(TERMINATION_METRIC_NAMES)
+                if bool(
+                    metrics[
+                        name if name in COUNTER_TERMINATION_METRIC_NAMES else f"failure_{name}"
+                    ][env_id]
+                )
             ]
             snapshots[env_id] = {
                 "episode_steps": int(self.env.episode_length_buf[env_id]),
                 "success": bool(metrics["success"][env_id]),
                 "time_out": bool(self.env.reset_time_outs[env_id]) if hasattr(self.env, "reset_time_outs") else False,
-                "termination_reasons": [name.removeprefix("failure_") for name in reasons],
+                "termination_reasons": reasons,
                 "verify_steps": int(self.verify_count[env_id]),
                 "attached_hold_steps": int(self.hold_count[env_id]),
                 "minimum_surface_gap_m": [float(value) for value in self.episode_min_gap[env_id]],
@@ -385,6 +387,9 @@ class S203TRuntimeState:
                 "finite": bool(metrics["finite"][env_id]),
             }
         return snapshots
+
+
+COUNTER_TERMINATION_METRIC_NAMES = {"contact_loss", "single_hand_timeout"}
 
 
 TERMINATION_METRIC_NAMES = {
@@ -538,7 +543,9 @@ def success(env: ManagerBasedRLEnv) -> torch.Tensor:
 def metric_termination(env: ManagerBasedRLEnv, metric_name: str) -> torch.Tensor:
     if getattr(env, "_s2_03t_bootstrap_mode", False):
         return torch.zeros(env.num_envs, dtype=torch.bool, device=env.device)
-    return runtime_state(env).ensure()[f"failure_{metric_name}"]
+    metrics = runtime_state(env).ensure()
+    key = metric_name if metric_name in COUNTER_TERMINATION_METRIC_NAMES else f"failure_{metric_name}"
+    return metrics[key]
 
 
 def time_out(env: ManagerBasedRLEnv) -> torch.Tensor:

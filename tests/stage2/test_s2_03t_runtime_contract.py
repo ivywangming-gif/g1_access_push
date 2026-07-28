@@ -200,8 +200,10 @@ def test_runtime_metric_values_and_failure_masks_have_disjoint_namespaces() -> N
     source = MDP.read_text(encoding="utf-8")
     assert "failure_arm_joint_margin" in source
     assert "failure_forbidden_non_palm_box_collision" in source
-    assert "runtime_state(env).ensure()[f\"failure_{metric_name}\"]" in source
-    assert "[name.removeprefix(\"failure_\") for name in reasons]" in source
+    assert "COUNTER_TERMINATION_METRIC_NAMES = {\"contact_loss\", \"single_hand_timeout\"}" in source
+    assert "name if name in COUNTER_TERMINATION_METRIC_NAMES" in source
+    assert "key = metric_name if metric_name in COUNTER_TERMINATION_METRIC_NAMES" in source
+    assert "\"termination_reasons\": reasons" in source
 
 
 def test_original_54_path_hash_snapshot_remains_unchanged() -> None:
