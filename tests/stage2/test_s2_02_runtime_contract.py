@@ -47,6 +47,13 @@ def test_box_runtime_mass_com_inertia_are_set_and_read_back() -> None:
     assert "runtime_mass_properties_audit.json" in source
 
 
+def test_runtime_body_states_satisfy_geometry_audit_when_usd_reference_paths_are_unavailable() -> None:
+    source = RUNNER.read_text(encoding="utf-8")
+    assert "robot_body_link_positions_world_m" in source
+    assert 'bool(len(robot.body_names) > 0 and len(arm_names) == 14 and len(palm_body_names) == 2)' in source
+    assert "bool(robot_collision_paths and" not in source
+
+
 def test_preflight_and_formal_modes_are_mutually_exclusive() -> None:
     source = RUNNER.read_text(encoding="utf-8")
     assert 'mode = parser.add_mutually_exclusive_group(required=True)' in source

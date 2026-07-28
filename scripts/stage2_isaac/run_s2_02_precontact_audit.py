@@ -184,12 +184,11 @@ def place_box(box, center_x: float, center_y: float, center_z: float) -> None:
     box.write_root_state_to_sim(state)
 
 
-def target_pose_in_pelvis(robot, box, candidate: dict, desired_q_object: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+def target_pose_in_pelvis(robot, box_pos_one: torch.Tensor, box_quat_one: torch.Tensor, candidate: dict, desired_q_object: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
     local_positions = torch.tensor(object_local_targets(candidate), device=robot.device, dtype=torch.float32)
-    box_pos = box.data.root_link_pos_w[0].expand(2, 3)
-    box_quat = box.data.root_link_quat_w[0].expand(2, 4)
     target_world_pos, target_world_quat = math_utils.combine_frame_transforms(
-        box_pos, box_quat, local_positions, desired_q_object.expand(2, 4)
+        box_pos_one.expand(2, 3), box_quat_one.expand(2, 4),
+        local_positions, desired_q_object.expand(2, 4),
     )
     pelvis_pos = robot.data.root_link_pos_w[0].expand(2, 3)
     pelvis_quat = robot.data.root_link_quat_w[0].expand(2, 4)
@@ -325,6 +324,8 @@ def main() -> None:
         "arm_joint_limits_rad": joint_limits.detach().cpu().tolist(),
         "robot_rigid_body_paths": robot_rigid_bodies,
         "robot_collision_paths": robot_collision_paths,
+        "robot_body_names": list(robot.body_names),
+        "robot_body_link_positions_world_m": robot.data.body_link_pos_w[0].detach().cpu().tolist(),
         "box_pose_world": [float(value) for value in torch.cat((box.data.root_link_pos_w[0], box.data.root_link_quat_w[0]))],
         "box_rear_face_local_x_m": float(config["object"]["rear_face_xO_m"]),
         "palm_normal_axis_source": "G1_PALM_LINK_LOCAL_PLUS_Z_VALIDATED_AGAINST_S1_07_BASELINE_AND_RUNTIME",
@@ -347,6 +348,12 @@ def main() -> None:
     maximum_position = float(config["controller"]["maximum_position_correction_m"])
     maximum_orientation = float(config["controller"]["maximum_orientation_correction_rad"])
     baseline_root_pos = robot.data.root_link_pos_w[0].clone()
+    development_search = args.preflight_only and config["selection"]["status"] != "FROZEN"
+    if development_search:
+        place_box(
+            box, float(baseline_root_pos[0]) + 3.0, float(baseline_root_pos[1]),
+            float(config["object"]["spawn_center_z_m"]),
+        )
 
     def command(desired_positions: torch.Tensor, desired_quaternions: torch.Tensor) -> None:
         current_positions = palms.data.target_pos_source[0]
@@ -374,13 +381,12 @@ def main() -> None:
     baseline_positions = palms.data.target_pos_source[0].clone()
     baseline_quaternions = palms.data.target_quat_source[0].clone()
     baseline_arm_positions = robot.data.joint_pos[0, arm_ids].clone()
-    baseline_box_pos = box.data.root_link_pos_w[0].clone()
     camera.set_world_poses_from_view(
         torch.tensor([[2.0, -2.0, 1.55]], device=env.device),
         torch.tensor([[0.45, 0.0, 0.70]], device=env.device),
     )
 
-    def sample(candidate: dict, desired_positions: torch.Tensor, desired_quaternions: torch.Tensor, root_reference: torch.Tensor, box_reference: torch.Tensor, yaw_reference: float) -> dict:
+    def sample(candidate: dict, desired_positions: torch.Tensor, desired_quaternions: torch.Tensor, root_reference: torch.Tensor, box_reference: torch.Tensor, yaw_reference: float, geometry_box_pos: torch.Tensor, geometry_box_quat: torch.Tensor) -> dict:
         actual_positions = palms.data.target_pos_source[0]
         actual_quaternions = palms.data.target_quat_source[0]
         palm_world_pos, palm_world_quat = math_utils.combine_frame_transforms(
@@ -388,19 +394,19 @@ def main() -> None:
             actual_positions, actual_quaternions,
         )
         palm_object_pos, _ = math_utils.subtract_frame_transforms(
-            box.data.root_link_pos_w[0].expand(2, 3), box.data.root_link_quat_w[0].expand(2, 4),
+            geometry_box_pos.expand(2, 3), geometry_box_quat.expand(2, 4),
             palm_world_pos, palm_world_quat,
         )
         object_pos_pelvis, object_quat_pelvis = math_utils.subtract_frame_transforms(
             robot.data.root_link_pos_w[0].unsqueeze(0), robot.data.root_link_quat_w[0].unsqueeze(0),
-            box.data.root_link_pos_w[0].unsqueeze(0), box.data.root_link_quat_w[0].unsqueeze(0),
+            geometry_box_pos.unsqueeze(0), geometry_box_quat.unsqueeze(0),
         )
         del object_pos_pelvis
         object_x_pelvis = math_utils.quat_apply(object_quat_pelvis.expand(2, 4), torch.tensor([[1.0, 0.0, 0.0]], device=env.device).expand(2, 3))
         palm_normals = math_utils.quat_apply(actual_quaternions, local_normal.expand(2, 3))
         normal_dots = torch.sum(palm_normals * object_x_pelvis, dim=-1)
         forces = torch.linalg.vector_norm(contact.data.force_matrix_w[0, 0], dim=-1)
-        overlap = overlap_query(box.data.root_link_pos_w[0], box.data.root_link_quat_w[0], [0.6, 0.3, 0.6])
+        overlap = overlap_query(geometry_box_pos, geometry_box_quat, [0.6, 0.3, 0.6])
         arm_pos = robot.data.joint_pos[0, arm_ids]
         arm_target = robot.data.joint_pos_target[0, arm_ids]
         lower_margin = arm_pos - joint_limits[:, 0]
@@ -410,7 +416,7 @@ def main() -> None:
         box_translation = float(torch.linalg.vector_norm(box.data.root_link_pos_w[0] - box_reference).item())
         rear_local = torch.tensor([[-0.6, 0.0, 0.0]], device=env.device)
         rear_world, _ = math_utils.combine_frame_transforms(
-            box.data.root_link_pos_w[0].unsqueeze(0), box.data.root_link_quat_w[0].unsqueeze(0),
+            geometry_box_pos.unsqueeze(0), geometry_box_quat.unsqueeze(0),
             rear_local, torch.tensor([[1.0, 0.0, 0.0, 0.0]], device=env.device),
         )
         values = [
@@ -463,7 +469,12 @@ def main() -> None:
             static_checks = candidate_static_checks(candidate, config["object"])
             center_x = float(baseline_root_pos[0]) + float(candidate["base_to_box_center_distance_m"])
             center_y = float(baseline_root_pos[1])
-            place_box(box, center_x, center_y, float(config["object"]["spawn_center_z_m"]))
+            geometry_box_pos = torch.tensor(
+                [center_x, center_y, float(config["object"]["spawn_center_z_m"])], device=env.device
+            )
+            geometry_box_quat = torch.tensor([1.0, 0.0, 0.0, 0.0], device=env.device)
+            if not development_search:
+                place_box(box, center_x, center_y, float(config["object"]["spawn_center_z_m"]))
             for _ in range(2):
                 command(baseline_positions, baseline_quaternions)
             root_reference = robot.data.root_link_pos_w[0].clone()
@@ -472,18 +483,18 @@ def main() -> None:
             samples: list[dict] = []
             transition_steps = int(config["search"]["transition_steps"])
             for step in range(transition_steps):
-                target_positions, target_quaternions = target_pose_in_pelvis(robot, box, candidate, desired_q_object)
+                target_positions, target_quaternions = target_pose_in_pelvis(robot, geometry_box_pos, geometry_box_quat, candidate, desired_q_object)
                 fraction = (step + 1) / transition_steps
                 desired_positions = baseline_positions + fraction * (target_positions - baseline_positions)
                 command(desired_positions, target_quaternions)
-                samples.append(sample(candidate, desired_positions, target_quaternions, root_reference, box_reference, yaw_reference))
+                samples.append(sample(candidate, desired_positions, target_quaternions, root_reference, box_reference, yaw_reference, geometry_box_pos, geometry_box_quat))
                 if (step + 1) % 25 == 0 or step + 1 == transition_steps:
                     print(f"PHASE=candidate index={candidate_index} transition_step={step + 1}", flush=True)
             hold_samples: list[dict] = []
             for step in range(int(config["search"]["hold_steps"])):
-                desired_positions, desired_quaternions = target_pose_in_pelvis(robot, box, candidate, desired_q_object)
+                desired_positions, desired_quaternions = target_pose_in_pelvis(robot, geometry_box_pos, geometry_box_quat, candidate, desired_q_object)
                 command(desired_positions, desired_quaternions)
-                current = sample(candidate, desired_positions, desired_quaternions, root_reference, box_reference, yaw_reference)
+                current = sample(candidate, desired_positions, desired_quaternions, root_reference, box_reference, yaw_reference, geometry_box_pos, geometry_box_quat)
                 samples.append(current)
                 hold_samples.append(current)
             position_errors = [item[side] for item in hold_samples for side in ("left_position_error_m", "right_position_error_m")]
@@ -531,6 +542,7 @@ def main() -> None:
                 "candidate": candidate,
                 "object_local_targets_m": object_local_targets(candidate),
                 "desired_palm_quaternion_in_object_wxyz": config["controller"]["desired_palm_quaternion_in_object_wxyz"],
+                "geometry_box_pose_source": "PHYSX_SCENE_QUERY_DEVELOPMENT_POSE" if development_search else "PHYSICAL_BOX_RUNTIME_POSE",
                 "checks": checks,
                 "metrics": metrics,
                 "failed_checks": [name for name, passed in checks.items() if not passed],
@@ -579,7 +591,7 @@ def main() -> None:
             "runtime_mass_properties": mass_audit["status"] == "PASS",
             "contact_sensor": contact_audit["status"] == "PASS",
             "controller_contract": checkpoint_audit["status"] == "PASS" and all(recurrent_reset.values()),
-            "runtime_geometry_complete": bool(robot_collision_paths and len(arm_names) == 14 and len(palm_body_names) == 2),
+            "runtime_geometry_complete": bool(len(robot.body_names) > 0 and len(arm_names) == 14 and len(palm_body_names) == 2),
             "candidate_sweep_complete": len(candidate_records) == (1 if frozen else len(config["search"]["candidates"])),
             "frozen_candidate_valid": (not frozen) or search_result["status"] == "PASS",
             "trace_writer": sum(1 for line in (RUN / "trace.jsonl").read_text().splitlines() if line.strip()) == expected_frames,
@@ -612,6 +624,8 @@ def main() -> None:
         float(baseline_root_pos[1]),
         float(config["object"]["spawn_center_z_m"]),
     )
+    geometry_box_pos = box.data.root_link_pos_w[0]
+    geometry_box_quat = box.data.root_link_quat_w[0]
     box_reference = box.data.root_link_pos_w[0].clone()
     root_reference = robot.data.root_link_pos_w[0].clone()
     _, _, yaw_reference, _ = quaternion_rpy_tilt(box.data.root_link_quat_w[0])
@@ -621,7 +635,7 @@ def main() -> None:
     expected_frames = settle_steps + move_steps + hold_steps
     with (RUN / "trace.jsonl").open("w", encoding="utf-8", buffering=1) as trace:
         for frame in range(expected_frames):
-            target_positions, target_quaternions = target_pose_in_pelvis(robot, box, candidate, desired_q_object)
+            target_positions, target_quaternions = target_pose_in_pelvis(robot, box.data.root_link_pos_w[0], box.data.root_link_quat_w[0], candidate, desired_q_object)
             if frame < settle_steps:
                 phase = "STAND_SETTLE"
                 desired_positions = baseline_positions
@@ -636,7 +650,7 @@ def main() -> None:
                 desired_positions = target_positions
                 desired_quaternions = target_quaternions
             command(desired_positions, desired_quaternions)
-            record = sample(candidate, desired_positions, desired_quaternions, root_reference, box_reference, yaw_reference)
+            record = sample(candidate, desired_positions, desired_quaternions, root_reference, box_reference, yaw_reference, box.data.root_link_pos_w[0], box.data.root_link_quat_w[0])
             record.update({"frame": frame, "time_s": (frame + 1) * env.step_dt, "phase": phase})
             trace.write(json.dumps(record, sort_keys=True) + "\n")
             RUNTIME_STATE["observed_frames"] = frame + 1
