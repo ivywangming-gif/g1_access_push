@@ -381,3 +381,49 @@ def test_pure_helpers_and_evaluator_do_not_import_isaac_or_kit() -> None:
         imports = {alias.name for node in ast.walk(tree) if isinstance(node, ast.Import) for alias in node.names}
         imports |= {node.module or "" for node in ast.walk(tree) if isinstance(node, ast.ImportFrom)}
         assert not any(name.startswith(("isaaclab", "isaacsim", "omni", "pxr", "carb")) for name in imports)
+
+
+def test_preflight_and_runtime_property_source_contract() -> None:
+    runner = RUNNER.read_text(encoding="utf-8")
+    launcher = LAUNCHER.read_text(encoding="utf-8")
+    assert 'mode.add_argument("--preflight-only"' in runner
+    assert 'mode.add_argument("--formal"' in runner
+    assert '2 <= args.preflight_steps <= 5' in runner
+    assert 'preflight_result.json' in runner
+    assert '"scientific_result_created": False' in runner
+    for api in (
+        "root_physx_view", "get_masses", "set_masses", "get_coms", "set_coms",
+        "get_inertias", "set_inertias",
+    ):
+        assert api in runner
+    assert 'runtime_quaternion_storage_order' in runner
+    assert 'property_query_is_authoritative": False' in runner
+    assert 'S2_01_RUN_MODE' in launcher
+    assert 'S2_01_PREFLIGHT_RUN_ROOT' in launcher
+    assert 'S2_01_PREFLIGHT_CONFIG_SHA_MISMATCH' in launcher
+
+
+def test_material_binding_uses_valid_prims_and_discovered_collision_children() -> None:
+    source = RUNNER.read_text(encoding="utf-8")
+    for forbidden in (
+        "/World/ground/terrain/CollisionPlane",
+        "/World/ground/terrain/physicsMaterial",
+        "GroundPlane",
+    ):
+        assert forbidden not in source
+    assert 'str(cfg.scene.terrain.prim_path).rstrip("/")' in source
+    assert 'ground_material_path = terrain_root_path + "/physicsMaterial"' in source
+    assert "prim.IsValid()" in source
+    assert "Usd.PrimRange(root)" in source
+    assert "prim.HasAPI(UsdPhysics.CollisionAPI)" in source
+    assert 'ComputeBoundMaterial("physics")' in source
+    assert "collision_binding_records(stage, terrain_root_path)" in source
+
+
+def test_three_step_preflight_effective_status_is_complete(tmp_path: Path) -> None:
+    run = tmp_path / "preflight"
+    write_complete_runner(run, 3)
+    result = derive_effective_runner_status(run, 0, 3)
+    assert result["status"] == "COMPLETE"
+    assert result["runner_effective_rc"] == 0
+    assert result["trace_frames"] == 3

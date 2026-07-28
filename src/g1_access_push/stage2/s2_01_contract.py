@@ -17,11 +17,16 @@ REQUIRED_AUDIT_FIELDS = {
         "runtime_com_world_xyz_m", "authored_diagonal_inertia_kg_m2",
         "runtime_diagonal_inertia_kg_m2", "authored_principal_axes_wxyz",
         "runtime_principal_axes_wxyz", "tolerance_checks", "low_com_pass",
+        "runtime_authority", "runtime_view_type", "runtime_getter_shapes",
+        "runtime_quaternion_storage_order", "runtime_inertia_matrix_column_major",
+        "property_query", "property_query_disagreement",
+        "property_query_is_authoritative",
     },
     "physics_material_audit.json": {
         "box_material_prim_path", "ground_material_prim_path",
         "box_binding_target", "ground_binding_target", "box", "ground",
-        "effective_pair", "pair_pass",
+        "effective_pair", "pair_pass", "terrain_root_prim_path",
+        "box_collision_bindings", "ground_collision_bindings",
     },
     "scene_geometry_audit.json": {
         "box_rear_face_x_world_m", "box_center_xyz_world_m",

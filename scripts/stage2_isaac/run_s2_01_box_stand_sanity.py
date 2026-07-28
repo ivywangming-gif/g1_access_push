@@ -62,6 +62,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--run-root", type=Path, required=True)
 parser.add_argument("--config", type=Path, required=True)
 parser.add_argument("--resolved-config", type=Path, required=True)
+mode = parser.add_mutually_exclusive_group(required=True)
+mode.add_argument("--preflight-only", action="store_true")
+mode.add_argument("--formal", action="store_true")
+parser.add_argument("--preflight-steps", type=int, default=3)
 from isaaclab.app import AppLauncher
 
 AppLauncher.add_app_launcher_args(parser)
@@ -73,7 +77,7 @@ import torch
 from PIL import Image
 from omni.physx import get_physx_property_query_interface, get_physx_scene_query_interface
 from omni.physx.bindings._physx import PhysxPropertyQueryMode, PhysxPropertyQueryResult
-from pxr import Gf, PhysicsSchemaTools, PhysxSchema, Usd, UsdGeom, UsdPhysics, UsdUtils
+from pxr import Gf, PhysicsSchemaTools, PhysxSchema, Usd, UsdGeom, UsdPhysics, UsdShade, UsdUtils
 from isaaclab.envs import ManagerBasedEnv
 from isaacsim.core.utils.stage import get_current_stage
 from agile.rl_env.assets.robots.unitree_g1 import G1_W_HANDS_AGILE_ACTION_SCALE
@@ -88,7 +92,6 @@ from g1_access_push.stage2.s2_01_contract import load_config, sha256_file, write
 BOX_PRIM_PATH = "/World/envs/env_0/Box"
 BOX_COLLIDER_PATH = BOX_PRIM_PATH + "/geometry/mesh"
 BOX_MATERIAL_PATH = BOX_PRIM_PATH + "/geometry/material"
-GROUND_MATERIAL_PATH = "/World/ground/terrain/physicsMaterial"
 
 
 def process_count() -> int:
@@ -165,17 +168,61 @@ def wrapped_abs(value: float, reference: float) -> float:
     return abs(math.atan2(math.sin(value - reference), math.cos(value - reference)))
 
 
-def relationship_targets(stage: Usd.Stage, prim_path: str) -> list[str]:
+def physics_binding_record(stage: Usd.Stage, prim_path: str) -> dict:
+    """Resolve a physics material without assuming a collider child name."""
     prim = stage.GetPrimAtPath(prim_path)
-    relationship = prim.GetRelationship("material:binding:physics")
-    return [str(path) for path in relationship.GetTargets()] if relationship else []
+    if not prim.IsValid():
+        return {
+            "prim_path": prim_path,
+            "prim_valid": False,
+            "direct_targets": [],
+            "resolved_target": None,
+            "relationship_path": None,
+            "error": "INVALID_PRIM",
+        }
+    direct = prim.GetRelationship("material:binding:physics")
+    direct_targets = [str(path) for path in direct.GetTargets()] if direct and direct.IsValid() else []
+    resolved_target = direct_targets[0] if direct_targets else None
+    relationship_path = str(direct.GetPath()) if direct and direct.IsValid() else None
+    error = None
+    try:
+        material, relationship = UsdShade.MaterialBindingAPI(prim).ComputeBoundMaterial("physics")
+        if material and material.GetPrim().IsValid():
+            resolved_target = str(material.GetPath())
+        if relationship and relationship.IsValid():
+            relationship_path = str(relationship.GetPath())
+    except Exception as exc:
+        error = f"{type(exc).__name__}:{exc}"
+    return {
+        "prim_path": prim_path,
+        "prim_valid": True,
+        "direct_targets": direct_targets,
+        "resolved_target": resolved_target,
+        "relationship_path": relationship_path,
+        "error": error,
+    }
+
+
+def collision_binding_records(stage: Usd.Stage, root_path: str) -> list[dict]:
+    root = stage.GetPrimAtPath(root_path)
+    if not root.IsValid():
+        return [physics_binding_record(stage, root_path)]
+    return [
+        physics_binding_record(stage, str(prim.GetPath()))
+        for prim in Usd.PrimRange(root)
+        if prim.HasAPI(UsdPhysics.CollisionAPI)
+    ]
 
 
 def material_record(stage: Usd.Stage, path: str) -> dict:
     prim = stage.GetPrimAtPath(path)
+    if not prim.IsValid():
+        return {"prim_valid": False, "prim_path": path}
     usd = UsdPhysics.MaterialAPI(prim)
     physx = PhysxSchema.PhysxMaterialAPI(prim)
     return {
+        "prim_valid": True,
+        "prim_path": path,
         "static_friction": float(usd.GetStaticFrictionAttr().Get()),
         "dynamic_friction": float(usd.GetDynamicFrictionAttr().Get()),
         "restitution": float(usd.GetRestitutionAttr().Get()),
@@ -237,6 +284,67 @@ def author_mass_properties(stage: Usd.Stage, config: dict) -> dict:
     }
 
 
+def set_and_read_runtime_mass_properties(box, config: dict) -> dict:
+    """Set PhysX runtime values using getter-derived tensor shapes and read them back."""
+    view = getattr(box, "root_physx_view", None)
+    view_name = "root_physx_view"
+    if view is None:
+        view = getattr(box, "root_view", None)
+        view_name = "root_view"
+    if view is None:
+        raise RuntimeError("RUNTIME_MASS_VIEW_UNAVAILABLE")
+    required = ("get_masses", "set_masses", "get_coms", "set_coms", "get_inertias", "set_inertias")
+    missing = [name for name in required if not callable(getattr(view, name, None))]
+    if missing:
+        raise RuntimeError(f"RUNTIME_MASS_VIEW_API_MISSING:{','.join(missing)}")
+
+    masses = view.get_masses().clone()
+    coms = view.get_coms().clone()
+    inertias = view.get_inertias().clone()
+    before = {
+        "masses": masses.detach().cpu().tolist(),
+        "coms_xyzw": coms.detach().cpu().tolist(),
+        "inertias_column_major": inertias.detach().cpu().tolist(),
+    }
+    expected_mass = float(config["mass_properties"]["mass_kg"])
+    expected_com = [float(value) for value in config["mass_properties"]["center_of_mass_local_xyz_m"]]
+    expected_inertia = [float(value) for value in config["mass_properties"]["diagonal_inertia_kg_m2"]]
+    masses[...] = expected_mass
+    coms[..., :3] = torch.tensor(expected_com, dtype=coms.dtype, device=coms.device)
+    coms[..., 3:7] = torch.tensor([0.0, 0.0, 0.0, 1.0], dtype=coms.dtype, device=coms.device)
+    inertias.zero_()
+    inertias[..., 0] = expected_inertia[0]
+    inertias[..., 4] = expected_inertia[1]
+    inertias[..., 8] = expected_inertia[2]
+    indices = torch.arange(int(view.count), dtype=torch.int32, device="cpu")
+    view.set_masses(masses, indices)
+    view.set_inertias(inertias, indices)
+    view.set_coms(coms, indices)
+
+    read_masses = view.get_masses().clone()
+    read_coms = view.get_coms().clone()
+    read_inertias = view.get_inertias().clone()
+    first_com = read_coms.reshape(-1, read_coms.shape[-1])[0]
+    first_inertia = read_inertias.reshape(-1, read_inertias.shape[-1])[0]
+    first_mass = read_masses.reshape(-1)[0]
+    return {
+        "runtime_view_attribute": view_name,
+        "runtime_view_type": f"{type(view).__module__}.{type(view).__qualname__}",
+        "getter_shapes": {
+            "masses": list(read_masses.shape),
+            "coms": list(read_coms.shape),
+            "inertias": list(read_inertias.shape),
+        },
+        "quaternion_storage_order": "xyzw",
+        "before": before,
+        "mass": float(first_mass),
+        "center_of_mass": [float(value) for value in first_com[:3]],
+        "principal_axes_wxyz": [float(first_com[6]), *[float(value) for value in first_com[3:6]]],
+        "inertia_matrix_column_major": [float(value) for value in first_inertia],
+        "inertia": [float(first_inertia[index]) for index in (0, 4, 8)],
+    }
+
+
 def initial_robot_overlap_query(center_xyz: list[float], half_extent_xyz: list[float]) -> dict:
     hits: list[dict[str, str]] = []
 
@@ -268,8 +376,12 @@ def main() -> None:
     global RUNTIME_ENV
     RUN.mkdir(parents=True, exist_ok=True)
     env = None
+    run_mode = "preflight" if args.preflight_only else "formal"
+    if args.preflight_only and not 2 <= args.preflight_steps <= 5:
+        raise ValueError("preflight steps must be within [2, 5]")
+    RUNTIME_STATE["mode"] = run_mode
     raw_status = {
-        "status": "RUNNING", "primary_reason": None,
+        "status": "RUNNING", "primary_reason": None, "mode": run_mode,
         "multiple_isaac_processes": process_count() > 1,
         "observed_frames": 0,
         "environment_created": False,
@@ -414,6 +526,7 @@ def main() -> None:
             raise RuntimeError("CONTACT_SENSOR_INITIALIZATION_FAILED")
 
         authored = author_mass_properties(stage, config)
+        runtime = set_and_read_runtime_mass_properties(box, config)
 
         center = [float(value) for value in config["placement"]["box_spawn_center_xyz_m"]]
         rear = float(config["placement"]["box_rear_face_x_world_m"])
@@ -432,14 +545,44 @@ def main() -> None:
         }
         write_json(RUN / "box_rigid_body_audit.json", rigid_audit)
 
-        runtime = query_mass_properties(stage, BOX_PRIM_PATH)
+        property_query = None
+        property_query_error = None
+        try:
+            property_query = query_mass_properties(stage, BOX_PRIM_PATH)
+        except Exception as exc:
+            property_query_error = f"{type(exc).__name__}:{exc}"
         tolerance = float(config["mass_properties"]["mass_tolerance"])
         inertia_tol = 1.0e-5
         com_tol = 1.0e-5
         expected_inertia = config["mass_properties"]["diagonal_inertia_kg_m2"]
         expected_com = config["mass_properties"]["center_of_mass_local_xyz_m"]
+        tolerance_checks = {
+            "mass": abs(runtime["mass"] - float(config["mass_properties"]["mass_kg"])) <= tolerance,
+            "com": max(abs(runtime["center_of_mass"][i] - expected_com[i]) for i in range(3)) <= com_tol,
+            "inertia": max(abs(runtime["inertia"][i] - expected_inertia[i]) for i in range(3)) <= inertia_tol,
+            "principal_axes": max(abs(runtime["principal_axes_wxyz"][i] - [1.0, 0.0, 0.0, 0.0][i]) for i in range(4)) <= com_tol,
+        }
+        property_query_disagreement = None
+        if property_query is not None:
+            property_query_disagreement = {
+                "mass_abs_diff": abs(property_query["mass"] - runtime["mass"]),
+                "com_max_abs_diff": max(
+                    abs(property_query["center_of_mass"][i] - runtime["center_of_mass"][i])
+                    for i in range(3)
+                ),
+                "inertia_max_abs_diff": max(
+                    abs(property_query["inertia"][i] - runtime["inertia"][i])
+                    for i in range(3)
+                ),
+            }
         mass_audit = {
             "body_prim_path": BOX_PRIM_PATH,
+            "authoring_api": "UsdPhysics.MassAPI",
+            "runtime_authority": runtime["runtime_view_attribute"],
+            "runtime_view_type": runtime["runtime_view_type"],
+            "runtime_getter_shapes": runtime["getter_shapes"],
+            "runtime_quaternion_storage_order": runtime["quaternion_storage_order"],
+            "runtime_values_before_set": runtime["before"],
             "authored_mass_kg": authored["mass"],
             "runtime_mass_kg": runtime["mass"],
             "authored_com_local_xyz_m": authored["com"],
@@ -447,43 +590,63 @@ def main() -> None:
             "runtime_com_world_xyz_m": "PENDING_POST_SETTLE",
             "authored_diagonal_inertia_kg_m2": authored["inertia"],
             "runtime_diagonal_inertia_kg_m2": runtime["inertia"],
+            "runtime_inertia_matrix_column_major": runtime["inertia_matrix_column_major"],
             "authored_principal_axes_wxyz": authored["axes"],
             "runtime_principal_axes_wxyz": runtime["principal_axes_wxyz"],
-            "tolerance_checks": {
-                "mass": abs(runtime["mass"] - 5.0) <= tolerance,
-                "com": max(abs(runtime["center_of_mass"][i] - expected_com[i]) for i in range(3)) <= com_tol,
-                "inertia": max(abs(runtime["inertia"][i] - expected_inertia[i]) for i in range(3)) <= inertia_tol,
-                "principal_axes": max(abs(runtime["principal_axes_wxyz"][i] - [1.0, 0.0, 0.0, 0.0][i]) for i in range(4)) <= com_tol,
-            },
-            "low_com_pass": runtime["center_of_mass"][2] < 0.0 and abs(runtime["center_of_mass"][2] + 0.4) <= com_tol,
+            "property_query": property_query,
+            "property_query_error": property_query_error,
+            "property_query_disagreement": property_query_disagreement,
+            "property_query_is_authoritative": False,
+            "tolerance_checks": tolerance_checks,
+            "low_com_pass": tolerance_checks["com"],
         }
         write_json(RUN / "box_mass_properties_audit.json", mass_audit)
 
+        terrain_root_path = str(cfg.scene.terrain.prim_path).rstrip("/")
+        ground_material_path = terrain_root_path + "/physicsMaterial"
         box_material = material_record(stage, BOX_MATERIAL_PATH)
-        ground_material = material_record(stage, GROUND_MATERIAL_PATH)
+        ground_material = material_record(stage, ground_material_path)
         expected_material = config["materials"]["effective_pair"]
-        pair_pass = box_material == expected_material and ground_material == expected_material
+        material_keys = (
+            "static_friction", "dynamic_friction", "restitution",
+            "friction_combine_mode", "restitution_combine_mode",
+        )
+        box_material_values = {key: box_material.get(key) for key in material_keys}
+        ground_material_values = {key: ground_material.get(key) for key in material_keys}
+        pair_values_pass = (
+            box_material.get("prim_valid") is True
+            and ground_material.get("prim_valid") is True
+            and box_material_values == expected_material
+            and ground_material_values == expected_material
+        )
+        box_collision_bindings = collision_binding_records(stage, BOX_PRIM_PATH)
+        ground_collision_bindings = collision_binding_records(stage, terrain_root_path)
+        box_binding_targets = sorted({
+            record["resolved_target"] for record in box_collision_bindings
+            if record.get("resolved_target")
+        })
+        ground_binding_targets = sorted({
+            record["resolved_target"] for record in ground_collision_bindings
+            if record.get("resolved_target")
+        })
         material_audit = {
             "box_material_prim_path": BOX_MATERIAL_PATH,
-            "ground_material_prim_path": GROUND_MATERIAL_PATH,
-            "box_binding_target": relationship_targets(stage, BOX_COLLIDER_PATH),
-            "ground_binding_target": relationship_targets(stage, "/World/ground/terrain/CollisionPlane"),
-            "box": box_material,
-            "ground": ground_material,
+            "ground_material_prim_path": ground_material_path,
+            "terrain_root_prim_path": terrain_root_path,
+            "box_binding_target": box_binding_targets,
+            "ground_binding_target": ground_binding_targets,
+            "box_collision_bindings": box_collision_bindings,
+            "ground_collision_bindings": ground_collision_bindings,
+            "box": box_material_values,
+            "ground": ground_material_values,
             "effective_pair": expected_material,
-            "pair_pass": pair_pass,
+            "pair_pass": bool(
+                pair_values_pass
+                and BOX_MATERIAL_PATH in box_binding_targets
+                and ground_material_path in ground_binding_targets
+            ),
             "palm_box_material": {"status": "UNRESOLVED", "blocking_s2_01": False},
         }
-        if not material_audit["ground_binding_target"]:
-            for prim in Usd.PrimRange(stage.GetPrimAtPath("/World/ground/terrain")):
-                targets = relationship_targets(stage, str(prim.GetPath()))
-                if targets:
-                    material_audit["ground_binding_target"] = targets
-                    material_audit["ground_binding_prim_path"] = str(prim.GetPath())
-                    break
-        material_audit["pair_pass"] = bool(
-            pair_pass and material_audit["box_binding_target"] and material_audit["ground_binding_target"]
-        )
         write_json(RUN / "physics_material_audit.json", material_audit)
         simulation_app.update()
         initial_overlap = initial_robot_overlap_query(
@@ -539,8 +702,14 @@ def main() -> None:
         if not bool(torch.isfinite(actions).all()):
             raise RuntimeError("NONFINITE")
 
-        expected_frames = int(config["evaluation"]["expected_frames"])
-        reference_frame = int(config["settling"]["reference_trace_frame"])
+        expected_frames = (
+            int(args.preflight_steps)
+            if args.preflight_only
+            else int(config["evaluation"]["expected_frames"])
+        )
+        reference_frame = (
+            0 if args.preflight_only else int(config["settling"]["reference_trace_frame"])
+        )
         reference_pos = None
         reference_yaw = None
         last_image = None
@@ -582,8 +751,16 @@ def main() -> None:
                     float(robot.data.root_pos_w[0, 2]), root_roll, root_pitch, root_tilt,
                     ground_force, robot_force,
                 ]
+                controller_action_finite = bool(
+                    torch.isfinite(lower._policy_actions).all()
+                    and torch.isfinite(lower._processed_actions).all()
+                )
+                controller_observation_finite = bool(torch.isfinite(lower.last_policy_input).all())
                 record = {
                     "frame": frame, "time_s": (frame + 1) * cfg.sim.dt * cfg.decimation,
+                    "run_mode": run_mode,
+                    "controller_action_finite": controller_action_finite,
+                    "controller_observation_finite": controller_observation_finite,
                     "box_position_xyz_m": [float(value) for value in box_pos],
                     "box_quaternion_wxyz": [float(value) for value in box_quat],
                     "box_linear_speed_mps": values[7],
@@ -606,13 +783,17 @@ def main() -> None:
                     "robot_fall": values[9] < config["robot"]["fall_root_height_threshold_m"],
                     "robot_bad_tilt": root_tilt > config["robot"]["bad_tilt_threshold_rad"],
                     "post_initial_reset_count": 0,
-                    "finite": all(math.isfinite(value) for value in values),
+                    "finite": bool(
+                        all(math.isfinite(value) for value in values)
+                        and controller_action_finite
+                        and controller_observation_finite
+                    ),
                 }
                 trace.write(json.dumps(record, sort_keys=True) + "\n")
                 RUNTIME_STATE["observed_frames"] = frame + 1
                 raw_status["observed_frames"] = frame + 1
-                if frame % 100 == 99:
-                    print(f"PHASE=qualification frame={frame + 1}/{expected_frames}", flush=True)
+                if args.preflight_only or frame % 100 == 99:
+                    print(f"PHASE={run_mode} frame={frame + 1}/{expected_frames}", flush=True)
                 rgb = camera.data.output["rgb"][0].detach().cpu().numpy()
                 last_image = Image.fromarray(rgb.astype("uint8"))
         contact_sensor_audit.update({
@@ -625,7 +806,8 @@ def main() -> None:
         write_json(RUN / "contact_sensor_audit.json", contact_sensor_audit)
         if last_image is None:
             raise RuntimeError("MISSING_FINAL_IMAGE")
-        last_image.save(RUN / "final.png")
+        image_path = RUN / ("preflight.png" if args.preflight_only else "final.png")
+        last_image.save(image_path)
         mass_audit["runtime_com_world_xyz_m"] = [float(value) for value in box.data.root_com_pos_w[0]]
         mass_audit["com_height_above_ground_m"] = float(box.data.root_com_pos_w[0, 2])
         mass_audit["low_com_pass"] = bool(
@@ -634,7 +816,76 @@ def main() -> None:
             and abs(mass_audit["com_height_above_ground_m"] - 0.2) <= config["evaluation"]["stillness_thresholds"]["max_box_vertical_drift_m"]
         )
         write_json(RUN / "box_mass_properties_audit.json", mass_audit)
-        raw_status.update({"status": "COMPLETE", "primary_reason": None, "observed_frames": expected_frames})
+        if args.preflight_only:
+            trace_lines = sum(
+                1 for line in (RUN / "trace.jsonl").read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            )
+            preflight_checks = {
+                "box_rigid_body": bool(
+                    rigid_audit["rigid_body_enabled"]
+                    and not rigid_audit["kinematic_enabled"]
+                    and rigid_audit["gravity_enabled"]
+                ),
+                "runtime_mass_com_inertia": bool(
+                    all(mass_audit["tolerance_checks"].values())
+                    and mass_audit["low_com_pass"]
+                ),
+                "physics_material_binding": bool(material_audit["pair_pass"]),
+                "contact_sensor": bool(contact_sensor_audit["sensor_audit_pass"]),
+                "initial_robot_box_contact": bool(
+                    contact_sensor_audit["initial_robot_contact_pass"]
+                ),
+                "initial_robot_box_overlap": bool(
+                    geometry_audit["overlap_count"] == 0
+                    and not geometry_audit["scene_query_robot_hit"]
+                ),
+                "controller_action_finite": bool(
+                    torch.isfinite(lower._policy_actions).all()
+                    and torch.isfinite(lower._processed_actions).all()
+                ),
+                "controller_observation_finite": bool(
+                    torch.isfinite(lower.last_policy_input).all()
+                ),
+                "trace_writer": trace_lines == expected_frames,
+                "camera_output": image_path.is_file() and image_path.stat().st_size > 0,
+                "no_second_isaac": not raw_status["multiple_isaac_processes"],
+            }
+            failed_checks = [
+                name for name, passed in preflight_checks.items() if not passed
+            ]
+            preflight_result = {
+                "schema_version": 1,
+                "stage": "S2-01",
+                "mode": "PREFLIGHT_ONLY",
+                "status": "PASS" if not failed_checks else "FAIL",
+                "primary_reason": (
+                    "ALL_PREFLIGHT_GATES_PASSED"
+                    if not failed_checks
+                    else "PREFLIGHT_GATES_FAILED"
+                ),
+                "failed_checks": failed_checks,
+                "checks": preflight_checks,
+                "steps": expected_frames,
+                "config_sha256": sha256_file(args.config),
+                "resolved_config_sha256": sha256_file(args.resolved_config),
+                "scientific_result_created": False,
+            }
+            write_json(RUN / "preflight_result.json", preflight_result)
+            if failed_checks:
+                raw_status.update({
+                    "status": "PREFLIGHT_FAILED",
+                    "primary_reason": "PREFLIGHT_GATES_FAILED",
+                    "failed_checks": failed_checks,
+                    "observed_frames": expected_frames,
+                })
+                write_json(RUN / "runner_status.json", raw_status)
+                return
+        raw_status.update({
+            "status": "COMPLETE",
+            "primary_reason": None,
+            "observed_frames": expected_frames,
+        })
         write_json(RUN / "runner_status.json", raw_status)
     except Exception as exc:
         raw_status.update({"status": "INVALID", "primary_reason": "IMPLEMENTATION_EXCEPTION", "error": repr(exc)})
