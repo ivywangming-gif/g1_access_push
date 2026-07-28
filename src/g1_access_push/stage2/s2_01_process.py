@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import math
 import sys
 import traceback
 from pathlib import Path
@@ -50,6 +51,85 @@ def validate_controller_checkpoint(
         "controller_checkpoint_sha_match": sha_match,
         "controller_checkpoint_forbidden_sha_match": forbidden_sha_match,
         "controller_checkpoint_forbidden_path_match": forbidden_path_match,
+    }
+
+
+def validate_resolved_sensor_body(
+    configured_path: str,
+    resolved_expression: str,
+    body_names: list[str],
+    num_bodies: int,
+    *,
+    initialized: bool,
+    contact_reporter_enabled: bool,
+    rigid_body_bound: bool,
+    data_available: bool,
+    expected_leaf_name: str = "Box",
+) -> dict[str, Any]:
+    """Validate configured and resolved paths semantically, never by literal equality."""
+    expected_resolved = configured_path.replace("{ENV_REGEX_NS}", "/World/envs/env_.*")
+    configured_path_pass = configured_path == f"{{ENV_REGEX_NS}}/{expected_leaf_name}"
+    resolved_expression_pass = resolved_expression == expected_resolved
+    body_binding_pass = num_bodies == 1 and body_names == [expected_leaf_name]
+    initialization_pass = bool(
+        initialized and contact_reporter_enabled and rigid_body_bound and data_available and body_binding_pass
+    )
+    return {
+        "configured_prim_path": configured_path,
+        "resolved_prim_expression": resolved_expression,
+        "resolved_body_names": list(body_names),
+        "num_bodies": int(num_bodies),
+        "configured_path_pass": configured_path_pass,
+        "resolved_expression_pass": resolved_expression_pass,
+        "body_binding_pass": body_binding_pass,
+        "sensor_initialized": bool(initialized),
+        "contact_reporter_enabled": bool(contact_reporter_enabled),
+        "rigid_body_bound": bool(rigid_body_bound),
+        "data_available": bool(data_available),
+        "path_audit_pass": configured_path_pass and resolved_expression_pass,
+        "initialization_pass": initialization_pass,
+        "sensor_body_audit_pass": configured_path_pass and resolved_expression_pass and initialization_pass,
+    }
+
+
+def validate_robot_filter_tensor(
+    configured_expressions: list[str],
+    resolved_filter_body_paths: list[str],
+    force_matrix_shape: list[int] | tuple[int, ...] | None,
+    *,
+    num_envs: int,
+    box_body_count: int,
+    robot_root_prefix: str,
+) -> dict[str, Any]:
+    resolved_count = len(resolved_filter_body_paths)
+    shape = list(force_matrix_shape) if force_matrix_shape is not None else None
+    resolved_paths_pass = resolved_count >= 1 and all(
+        path.startswith(robot_root_prefix + "/") for path in resolved_filter_body_paths
+    )
+    expected_shape = [num_envs, box_body_count, resolved_count, 3]
+    shape_pass = shape == expected_shape
+    return {
+        "filter_expression_count": len(configured_expressions),
+        "configured_filter_expressions": list(configured_expressions),
+        "resolved_filter_body_count": resolved_count,
+        "resolved_filter_body_paths": list(resolved_filter_body_paths),
+        "resolved_filter_body_names": [path.rsplit("/", 1)[-1] for path in resolved_filter_body_paths],
+        "force_matrix_shape": shape,
+        "expected_force_matrix_shape": expected_shape,
+        "resolved_filter_paths_pass": resolved_paths_pass,
+        "force_matrix_shape_pass": shape_pass,
+        "filter_one_to_many_valid": resolved_paths_pass and shape_pass,
+    }
+
+
+def summarize_partner_forces(force_vectors_xyz: list[list[float]], threshold_n: float = 0.0) -> dict[str, Any]:
+    norms = [math.sqrt(sum(float(value) ** 2 for value in vector)) for vector in force_vectors_xyz]
+    return {
+        "robot_filter_body_count": len(norms),
+        "robot_partner_force_norms_n": norms,
+        "robot_contact_force_max_n": max(norms, default=0.0),
+        "robot_contact_force_sum_of_norms_n": sum(norms),
+        "robot_contact_nonzero_body_count": sum(value > threshold_n for value in norms),
     }
 
 

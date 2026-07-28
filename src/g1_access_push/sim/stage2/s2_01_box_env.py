@@ -10,6 +10,9 @@ from g1_access_push.sim.stage1.recurrent_no_box_env_cfg import G1Stage1NoBoxRecu
 from g1_access_push.stage2.s2_01_process import build_scene_config_instance
 
 
+S2_01_BOX_SENSOR_CONFIGURED_PRIM_PATH = "{ENV_REGEX_NS}/Box"
+S2_01_ROBOT_FILTER_CONFIGURED_EXPRESSIONS = ("{ENV_REGEX_NS}/Robot/.*",)
+
 S2_01_MATERIAL = sim_utils.RigidBodyMaterialCfg(
     static_friction=0.5,
     dynamic_friction=0.5,
@@ -49,14 +52,14 @@ def build_s2_01_env_cfg() -> G1Stage1NoBoxRecurrentEnvCfg:
         additions={
             "box": _box_cfg(),
             "box_net_contact": ContactSensorCfg(
-                prim_path="{ENV_REGEX_NS}/Box",
+                prim_path=S2_01_BOX_SENSOR_CONFIGURED_PRIM_PATH,
                 filter_prim_paths_expr=[],
                 history_length=1,
                 track_air_time=False,
             ),
             "box_robot_contact": ContactSensorCfg(
-                prim_path="{ENV_REGEX_NS}/Box",
-                filter_prim_paths_expr=["{ENV_REGEX_NS}/Robot/.*"],
+                prim_path=S2_01_BOX_SENSOR_CONFIGURED_PRIM_PATH,
+                filter_prim_paths_expr=list(S2_01_ROBOT_FILTER_CONFIGURED_EXPRESSIONS),
                 history_length=1,
                 track_air_time=False,
             ),

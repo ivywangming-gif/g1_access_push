@@ -17,6 +17,9 @@ from g1_access_push.stage2.s2_01_process import (
     build_scene_config_instance,
     derive_effective_runner_status,
     persist_effective_runner_status,
+    summarize_partner_forces,
+    validate_resolved_sensor_body,
+    validate_robot_filter_tensor,
     validate_controller_checkpoint,
 )
 
@@ -207,18 +210,84 @@ def test_pipefail_preserves_deliberate_python_rc_7(tmp_path: Path) -> None:
 def test_contact_sensor_source_contract_uses_box_rigid_body() -> None:
     source = ENV_SOURCE.read_text(encoding="utf-8")
     tree = ast.parse(source)
-    sensor_paths = []
+    assignments = {
+        node.targets[0].id: ast.literal_eval(node.value)
+        for node in tree.body
+        if isinstance(node, ast.Assign)
+        and len(node.targets) == 1
+        and isinstance(node.targets[0], ast.Name)
+        and node.targets[0].id in {
+            "S2_01_BOX_SENSOR_CONFIGURED_PRIM_PATH",
+            "S2_01_ROBOT_FILTER_CONFIGURED_EXPRESSIONS",
+        }
+    }
+    assert assignments["S2_01_BOX_SENSOR_CONFIGURED_PRIM_PATH"] == "{ENV_REGEX_NS}/Box"
+    assert assignments["S2_01_ROBOT_FILTER_CONFIGURED_EXPRESSIONS"] == ("{ENV_REGEX_NS}/Robot/.*",)
+    sensor_path_names = []
     for node in ast.walk(tree):
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "ContactSensorCfg":
             keyword = next(item for item in node.keywords if item.arg == "prim_path")
-            assert isinstance(keyword.value, ast.Constant)
-            sensor_paths.append(keyword.value.value)
-    assert sensor_paths == ["{ENV_REGEX_NS}/Box", "{ENV_REGEX_NS}/Box"]
-    assert not any("/geometry/mesh" in path for path in sensor_paths)
+            assert isinstance(keyword.value, ast.Name)
+            sensor_path_names.append(keyword.value.id)
+    assert sensor_path_names == [
+        "S2_01_BOX_SENSOR_CONFIGURED_PRIM_PATH",
+        "S2_01_BOX_SENSOR_CONFIGURED_PRIM_PATH",
+    ]
+    assert "/geometry/mesh" not in source
     runner = RUNNER.read_text(encoding="utf-8")
-    assert "box_net.data.net_forces_w" in runner
-    assert "box_robot.data.force_matrix_w" in runner
+    assert "box_net.data.net_forces_w[0, 0]" in runner
+    assert "box_robot.data.force_matrix_w[0, 0]" in runner
+    assert "robot_contact_force_max_n" in runner
     assert "contact_sensor_audit.json" in runner
+
+
+def test_sensor_body_template_and_resolved_expression_are_separate() -> None:
+    audit = validate_resolved_sensor_body(
+        "{ENV_REGEX_NS}/Box", "/World/envs/env_.*/Box", ["Box"], 1,
+        initialized=True, contact_reporter_enabled=True, rigid_body_bound=True, data_available=True,
+    )
+    assert audit["configured_prim_path"] != audit["resolved_prim_expression"]
+    assert audit["path_audit_pass"] is True
+    assert audit["sensor_body_audit_pass"] is True
+
+
+def test_robot_filter_one_expression_can_resolve_34_bodies() -> None:
+    paths = [f"/World/envs/env_0/Robot/body_{index}" for index in range(34)]
+    audit = validate_robot_filter_tensor(
+        ["{ENV_REGEX_NS}/Robot/.*"], paths, (1, 1, 34, 3),
+        num_envs=1, box_body_count=1, robot_root_prefix="/World/envs/env_0/Robot",
+    )
+    assert audit["filter_expression_count"] == 1
+    assert audit["resolved_filter_body_count"] == 34
+    assert audit["filter_one_to_many_valid"] is True
+
+
+def test_robot_filter_rejects_force_matrix_shape_mismatch() -> None:
+    paths = [f"/World/envs/env_0/Robot/body_{index}" for index in range(34)]
+    audit = validate_robot_filter_tensor(
+        ["{ENV_REGEX_NS}/Robot/.*"], paths, (1, 1, 1, 3),
+        num_envs=1, box_body_count=1, robot_root_prefix="/World/envs/env_0/Robot",
+    )
+    assert audit["force_matrix_shape_pass"] is False
+    assert audit["filter_one_to_many_valid"] is False
+
+
+def test_partner_force_norms_do_not_cancel_opposite_forces() -> None:
+    summary = summarize_partner_forces([[3.0, 0.0, 0.0], [-3.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
+    assert summary["robot_partner_force_norms_n"] == [3.0, 3.0, 0.0]
+    assert summary["robot_contact_force_max_n"] == 3.0
+    assert summary["robot_contact_force_sum_of_norms_n"] == 6.0
+    assert summary["robot_contact_nonzero_body_count"] == 2
+
+
+def test_contact_audit_forbidden_false_negative_patterns_are_absent() -> None:
+    source = RUNNER.read_text(encoding="utf-8") + PROCESS_SOURCE.read_text(encoding="utf-8")
+    for forbidden in (
+        "resolved_path == \"{ENV_REGEX_NS}/Box\"",
+        "resolved_filter_count == len(filter_prim_paths_expr)",
+        "force_matrix_w.shape[2] == 1",
+    ):
+        assert forbidden not in source
 
 
 def test_evaluator_complete_run_ignores_unrelated_traceback_log(tmp_path: Path) -> None:

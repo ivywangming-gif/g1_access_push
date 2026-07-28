@@ -13,6 +13,8 @@ from pathlib import Path
 
 from g1_access_push.stage2.s2_01_process import (
     validate_controller_checkpoint,
+    validate_resolved_sensor_body,
+    validate_robot_filter_tensor,
     write_implementation_exception,
 )
 
@@ -74,7 +76,11 @@ from isaaclab.envs import ManagerBasedEnv
 from isaacsim.core.utils.stage import get_current_stage
 from agile.rl_env.assets.robots.unitree_g1 import G1_W_HANDS_AGILE_ACTION_SCALE
 
-from g1_access_push.sim.stage2.s2_01_box_env import build_s2_01_env_cfg
+from g1_access_push.sim.stage2.s2_01_box_env import (
+    S2_01_BOX_SENSOR_CONFIGURED_PRIM_PATH,
+    S2_01_ROBOT_FILTER_CONFIGURED_EXPRESSIONS,
+    build_s2_01_env_cfg,
+)
 from g1_access_push.stage2.s2_01_contract import load_config, sha256_file, write_json
 
 BOX_PRIM_PATH = "/World/envs/env_0/Box"
@@ -293,26 +299,60 @@ def main() -> None:
         camera = env.scene["audit_camera"]
         box_net = env.scene["box_net_contact"]
         box_robot = env.scene["box_robot_contact"]
+        net_forces = box_net.data.net_forces_w
+        robot_force_matrix = box_robot.data.force_matrix_w
+        box_prim = stage.GetPrimAtPath(BOX_PRIM_PATH)
+        contact_reporter_enabled = bool(box_prim.HasAPI(PhysxSchema.PhysxContactReportAPI))
+        robot_root_path = "/World/envs/env_0/Robot"
+        robot_root = stage.GetPrimAtPath(robot_root_path)
+        resolved_robot_body_paths = [
+            str(prim.GetPath()) for prim in Usd.PrimRange(robot_root)
+            if prim.HasAPI(UsdPhysics.RigidBodyAPI)
+        ]
+        net_body_audit = validate_resolved_sensor_body(
+            S2_01_BOX_SENSOR_CONFIGURED_PRIM_PATH, box_net.cfg.prim_path,
+            list(box_net.body_names), box_net.num_bodies,
+            initialized=box_net.is_initialized,
+            contact_reporter_enabled=contact_reporter_enabled,
+            rigid_body_bound=bool(box_prim.HasAPI(UsdPhysics.RigidBodyAPI)),
+            data_available=net_forces is not None,
+        )
+        robot_body_audit = validate_resolved_sensor_body(
+            S2_01_BOX_SENSOR_CONFIGURED_PRIM_PATH, box_robot.cfg.prim_path,
+            list(box_robot.body_names), box_robot.num_bodies,
+            initialized=box_robot.is_initialized,
+            contact_reporter_enabled=contact_reporter_enabled,
+            rigid_body_bound=bool(box_prim.HasAPI(UsdPhysics.RigidBodyAPI)),
+            data_available=robot_force_matrix is not None,
+        )
+        filter_audit = validate_robot_filter_tensor(
+            list(S2_01_ROBOT_FILTER_CONFIGURED_EXPRESSIONS),
+            resolved_robot_body_paths,
+            None if robot_force_matrix is None else list(robot_force_matrix.shape),
+            num_envs=cfg.scene.num_envs, box_body_count=box_robot.num_bodies,
+            robot_root_prefix=robot_root_path,
+        )
         contact_sensor_audit = {
             "box_net_sensor_prim_path": box_net.cfg.prim_path,
             "box_robot_sensor_prim_path": box_robot.cfg.prim_path,
             "box_net_body_names": list(box_net.body_names),
             "box_robot_body_names": list(box_robot.body_names),
             "box_robot_filter_paths": list(box_robot.cfg.filter_prim_paths_expr),
-            "net_forces_available": hasattr(box_net.data, "net_forces_w"),
-            "robot_force_matrix_available": hasattr(box_robot.data, "force_matrix_w"),
+            "net_forces_available": net_forces is not None,
+            "robot_force_matrix_available": robot_force_matrix is not None,
             "contact_reporter_initialized": bool(box_net.is_initialized and box_robot.is_initialized),
+            **net_body_audit,
+            "robot_sensor_body_audit": robot_body_audit,
+            **filter_audit,
         }
         contact_sensor_audit["sensor_audit_pass"] = bool(
-            contact_sensor_audit["box_net_sensor_prim_path"] == "{ENV_REGEX_NS}/Box"
-            and contact_sensor_audit["box_robot_sensor_prim_path"] == "{ENV_REGEX_NS}/Box"
-            and len(contact_sensor_audit["box_net_body_names"]) == 1
-            and len(contact_sensor_audit["box_robot_body_names"]) == 1
-            and contact_sensor_audit["net_forces_available"]
-            and contact_sensor_audit["robot_force_matrix_available"]
-            and contact_sensor_audit["contact_reporter_initialized"]
+            net_body_audit["sensor_body_audit_pass"]
+            and robot_body_audit["sensor_body_audit_pass"]
+            and filter_audit["filter_one_to_many_valid"]
         )
         write_json(RUN / "contact_sensor_audit.json", contact_sensor_audit)
+        if not net_body_audit["path_audit_pass"] or not robot_body_audit["path_audit_pass"]:
+            raise RuntimeError("CONTACT_SENSOR_AUDIT_IMPLEMENTATION_ERROR")
         if not contact_sensor_audit["sensor_audit_pass"]:
             raise RuntimeError("CONTACT_SENSOR_INITIALIZATION_FAILED")
 
@@ -467,6 +507,9 @@ def main() -> None:
         reference_pos = None
         reference_yaw = None
         last_image = None
+        episode_robot_contact_force_max_n = 0.0
+        episode_robot_contact_force_sum_of_norms_max_n = 0.0
+        episode_robot_contact_nonzero_body_count_max = 0
         with (RUN / "trace.jsonl").open("w", encoding="utf-8", buffering=1) as trace:
             for frame in range(expected_frames):
                 env.step(actions)
@@ -479,8 +522,22 @@ def main() -> None:
                 translation = float(torch.linalg.vector_norm(box_pos - reference_pos).item()) if reference_pos is not None else 0.0
                 yaw_change = wrapped_abs(yaw, reference_yaw) if reference_yaw is not None else 0.0
                 root_roll, root_pitch, _, root_tilt = quaternion_rpy(robot.data.root_quat_w[0])
-                ground_force = float(torch.linalg.vector_norm(box_net.data.net_forces_w[0]).item())
-                robot_force = float(torch.linalg.vector_norm(box_robot.data.force_matrix_w[0]).item())
+                net_force_xyz = box_net.data.net_forces_w[0, 0]
+                ground_force = float(torch.linalg.vector_norm(net_force_xyz).item())
+                partner_force_norms = torch.linalg.vector_norm(
+                    box_robot.data.force_matrix_w[0, 0], dim=-1
+                )
+                partner_force_norms_n = [float(value) for value in partner_force_norms]
+                robot_force = max(partner_force_norms_n, default=0.0)
+                robot_force_sum = sum(partner_force_norms_n)
+                robot_nonzero_count = sum(value > 0.0 for value in partner_force_norms_n)
+                episode_robot_contact_force_max_n = max(episode_robot_contact_force_max_n, robot_force)
+                episode_robot_contact_force_sum_of_norms_max_n = max(
+                    episode_robot_contact_force_sum_of_norms_max_n, robot_force_sum
+                )
+                episode_robot_contact_nonzero_body_count_max = max(
+                    episode_robot_contact_nonzero_body_count_max, robot_nonzero_count
+                )
                 values = [
                     *[float(value) for value in box_pos], *[float(value) for value in box_quat],
                     float(torch.linalg.vector_norm(box.data.root_com_lin_vel_w[0]).item()),
@@ -500,6 +557,13 @@ def main() -> None:
                     "box_abs_vertical_drift_m": abs(float(box_pos[2] - reference_pos[2])) if reference_pos is not None else 0.0,
                     "box_ground_contact_force_n": ground_force,
                     "box_robot_contact_force_n": robot_force,
+                    "box_net_normal_force_xyz_n": [float(value) for value in net_force_xyz],
+                    "box_net_normal_force_norm_n": ground_force,
+                    "robot_filter_body_count": len(partner_force_norms_n),
+                    "robot_partner_force_norms_n": partner_force_norms_n,
+                    "robot_contact_force_max_n": robot_force,
+                    "robot_contact_force_sum_of_norms_n": robot_force_sum,
+                    "robot_contact_nonzero_body_count": robot_nonzero_count,
                     "robot_box_contact": robot_force > 0.0,
                     "root_height_m": values[9], "root_roll_rad": root_roll,
                     "root_pitch_rad": root_pitch, "root_tilt_rad": root_tilt,
@@ -515,6 +579,12 @@ def main() -> None:
                     print(f"PHASE=qualification frame={frame + 1}/{expected_frames}", flush=True)
                 rgb = camera.data.output["rgb"][0].detach().cpu().numpy()
                 last_image = Image.fromarray(rgb.astype("uint8"))
+        contact_sensor_audit.update({
+            "episode_robot_contact_force_max_n": episode_robot_contact_force_max_n,
+            "episode_robot_contact_force_sum_of_norms_max_n": episode_robot_contact_force_sum_of_norms_max_n,
+            "episode_robot_contact_nonzero_body_count_max": episode_robot_contact_nonzero_body_count_max,
+        })
+        write_json(RUN / "contact_sensor_audit.json", contact_sensor_audit)
         if last_image is None:
             raise RuntimeError("MISSING_FINAL_IMAGE")
         last_image.save(RUN / "final.png")

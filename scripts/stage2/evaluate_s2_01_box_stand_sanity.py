@@ -42,11 +42,11 @@ def implementation_exception_evidence(run: Path, expected_frames: int = 3000) ->
     marker = run / "implementation_exception.json"
     if marker.is_file():
         payload = _json_or_empty(marker)
-        reason = (
-            "CONTACT_SENSOR_INITIALIZATION_FAILED"
-            if payload.get("exception_message") == "CONTACT_SENSOR_INITIALIZATION_FAILED"
-            else "IMPLEMENTATION_EXCEPTION"
-        )
+        message = payload.get("exception_message")
+        reason = message if message in {
+            "CONTACT_SENSOR_INITIALIZATION_FAILED",
+            "CONTACT_SENSOR_AUDIT_IMPLEMENTATION_ERROR",
+        } else "IMPLEMENTATION_EXCEPTION"
         return {**payload, "source": marker.name, "primary_reason": reason}
 
     runner = _json_or_empty(run / "runner_status.json")

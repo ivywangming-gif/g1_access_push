@@ -38,6 +38,11 @@ REQUIRED_AUDIT_FIELDS = {
         "box_net_body_names", "box_robot_body_names", "box_robot_filter_paths",
         "net_forces_available", "robot_force_matrix_available",
         "contact_reporter_initialized", "sensor_audit_pass",
+        "configured_prim_path", "resolved_prim_expression",
+        "resolved_body_names", "num_bodies", "filter_expression_count",
+        "resolved_filter_body_count", "resolved_filter_body_names",
+        "resolved_filter_body_paths", "force_matrix_shape", "rigid_body_bound",
+        "filter_one_to_many_valid",
     },
 }
 
@@ -62,6 +67,7 @@ INVALID_REASONS = (
     "ROBOT_RUNTIME_ENVELOPE_QUERY_FAILED", "MASS_PROPERTY_QUERY_FAILED",
     "MATERIAL_BINDING_QUERY_FAILED", "MULTIPLE_ISAAC_PROCESSES",
     "EVALUATOR_DID_NOT_COMPLETE", "CONTACT_SENSOR_INITIALIZATION_FAILED",
+    "CONTACT_SENSOR_AUDIT_IMPLEMENTATION_ERROR",
 )
 
 

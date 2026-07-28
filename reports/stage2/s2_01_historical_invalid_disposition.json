@@ -4,5 +4,11 @@
   "historical_root_cause": "IMPLEMENTATION_EXCEPTION_STAGE1_SCENE_CFG_TERRAIN_CLASS_ACCESS",
   "historical_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_01_box_stand_20260727_133024",
   "historical_status": "INVALID",
-  "schema_version": 1
+  "latest_historical_physical_result": "NOT_RUN",
+  "latest_historical_primary_reason": "CONTACT_SENSOR_RUNTIME_AUDIT_FALSE_NEGATIVE",
+  "latest_historical_result_preserved": true,
+  "latest_historical_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_01_box_stand_final_evidence_20260728_014353",
+  "latest_historical_sensor_initialization": "PASS",
+  "latest_historical_status": "INVALID",
+  "schema_version": 2
 }
