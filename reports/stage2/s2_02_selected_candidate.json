@@ -1,0 +1,121 @@
+{
+  "candidate_count": 16,
+  "primary_reason": "FEASIBLE_PRECONTACT_GEOMETRY_FOUND",
+  "schema_version": 1,
+  "selected_candidate": {
+    "candidate": {
+      "base_to_box_center_distance_m": 1.06,
+      "contact_height_m": 0.62,
+      "palm_collision_support_offset_m": 0.44023889869451527,
+      "precontact_gap_m": 0.06,
+      "tangential_separation_m": 0.3
+    },
+    "candidate_index": 9,
+    "checks": {
+      "arm_torque": true,
+      "arm_tracking": true,
+      "box_still": true,
+      "equal_height": true,
+      "finite": true,
+      "gap_clear": true,
+      "inside_face_height_extent": true,
+      "inside_face_tangent_extent": true,
+      "joint_margin": true,
+      "mirrored_y": true,
+      "no_contact": true,
+      "no_overlap": true,
+      "normal_alignment": true,
+      "outside_rear_face": true,
+      "positive_base_distance": true,
+      "positive_gap": true,
+      "reachable": true,
+      "robot_stable": true,
+      "symmetric_tracking": true
+    },
+    "desired_palm_quaternion_in_object_wxyz": [
+      0.7071067811865476,
+      0.0,
+      0.7071067811865476,
+      0.0
+    ],
+    "failed_checks": [],
+    "geometry_box_pose_source": "PHYSX_SCENE_QUERY_DEVELOPMENT_POSE",
+    "hold_final_sample": {
+      "arm_joint_target_error_max_rad": 0.01001065969467163,
+      "arm_torque_ratio_max": 0.14107085764408112,
+      "base_xy_excursion_m": 0.0007950012804940343,
+      "box_angular_speed_radps": 0.0014749341644346714,
+      "box_linear_speed_mps": 0.0006615708698518574,
+      "box_rear_face_position_world_m": [
+        0.4599999189376831,
+        0.0,
+        0.6019999980926514
+      ],
+      "box_translation_m": 9.358071224596642e-07,
+      "box_yaw_change_rad": 3.2993697605427077e-07,
+      "commanded_precontact_gap_m": 0.06,
+      "finite": true,
+      "left_actual_gap_m": 0.0625494122505188,
+      "left_orientation_error_deg": 0.7538098096847534,
+      "left_palm_normal_alignment_dot": 0.9999507665634155,
+      "left_position_error_m": 0.003945136908441782,
+      "minimum_arm_joint_limit_margin_rad": 1.0999319553375244,
+      "post_initial_reset_count": 0,
+      "right_actual_gap_m": 0.06382018327713013,
+      "right_orientation_error_deg": 0.9634658694267273,
+      "right_palm_normal_alignment_dot": 0.9998505115509033,
+      "right_position_error_m": 0.0036844394635409117,
+      "robot_box_contact_force_n": 0.0,
+      "robot_box_overlap_count": 0,
+      "robot_box_overlap_paths": [],
+      "root_height_m": 0.7257036566734314,
+      "root_pitch_rad": -0.06193738932639344,
+      "root_roll_rad": -0.007075609071272003,
+      "root_tilt_deg": 3.5718027390423917
+    },
+    "metrics": {
+      "arm_displacement_norm_rad": 1.0536531209945679,
+      "arm_joint_target_p95_error_rad": 0.03252867981791496,
+      "left_right_position_error_asymmetry_m": 0.001512441405793652,
+      "maximum_actual_gap_error_m": 0.003820183277130129,
+      "maximum_arm_torque_ratio": 0.7332457304000854,
+      "maximum_base_xy_excursion_m": 0.0027297958731651306,
+      "maximum_box_angular_speed_radps": 0.0017830479191616178,
+      "maximum_box_linear_speed_mps": 0.0009239078499376774,
+      "maximum_box_translation_m": 1.0461802730787895e-06,
+      "maximum_box_yaw_change_rad": 4.86932782056371e-07,
+      "maximum_hand_position_error_m": 0.004393479786813259,
+      "maximum_robot_box_contact_force_n": 0.0,
+      "maximum_robot_box_overlap_count": 0,
+      "maximum_root_height_m": 0.7257036566734314,
+      "maximum_root_tilt_deg": 3.7011394932029025,
+      "minimum_actual_gap_m": 0.05648308992385864,
+      "minimum_arm_joint_limit_margin_rad": 1.0287425518035889,
+      "minimum_palm_normal_alignment_dot": 0.9998505115509033,
+      "minimum_root_height_m": 0.7243281602859497
+    },
+    "object_local_targets_m": [
+      [
+        -1.1002388986945153,
+        0.15,
+        0.020000000000000018
+      ],
+      [
+        -1.1002388986945153,
+        -0.15,
+        0.020000000000000018
+      ]
+    ],
+    "passed": true,
+    "score": [
+      1.0,
+      1.0287425518035889,
+      -0.001512441405793652,
+      -0.004393479786813259,
+      -1.0536531209945679,
+      -9.0
+    ]
+  },
+  "stage": "S2-02",
+  "status": "PASS"
+}

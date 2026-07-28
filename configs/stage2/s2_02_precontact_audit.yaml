@@ -57,14 +57,14 @@ search:
     - {contact_height_m: 0.66, tangential_separation_m: 0.34, base_to_box_center_distance_m: 1.10, precontact_gap_m: 0.08}
 
 selection:
-  status: UNRESOLVED
-  candidate_index: null
-  contact_height_m: null
-  tangential_separation_m: null
-  base_to_box_center_distance_m: null
-  precontact_gap_m: null
-  desired_palm_quaternion_in_object_wxyz: null
-  palm_collision_support_offset_m: null
+  status: FROZEN
+  candidate_index: 9
+  contact_height_m: 0.62
+  tangential_separation_m: 0.30
+  base_to_box_center_distance_m: 1.06
+  precontact_gap_m: 0.06
+  desired_palm_quaternion_in_object_wxyz: [0.7071067811865476, 0.0, 0.7071067811865476, 0.0]
+  palm_collision_support_offset_m: 0.44023889869451527
 
 formal:
   stand_settle_steps: 100

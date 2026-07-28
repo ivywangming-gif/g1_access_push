@@ -1,8 +1,8 @@
 {
-  "config_sha256": "2b22f7a38a2bc33852029d7e5d3a504e9634b976ff0454e1906ceb946b566b03",
-  "contract_digest_sha256": "8b1f16bb8a167ba68e66c3f8bcbf79f2310b72e3c708c10a68ebf16b2296823d",
-  "git_head": "6b43b360d33a837f71938e7e3077be5aaf0f9679",
-  "qualification_state": "READY_FOR_DEVELOPMENT_SEARCH",
+  "config_sha256": "7392cfdd98781a5699f3db4dc766ba0a6d6f5eaf5a40cf07e94d7f3518a8ae36",
+  "contract_digest_sha256": "282b21df27b3b8a6507507ef8fc3cbd738e91bbacbead948ea289283562fee4e",
+  "git_head": "722098e6679dbb42982eb33b55b5dbb03f5506df",
+  "qualification_state": "READY_FOR_PREFLIGHT_AND_FORMAL",
   "resolved": {
     "acceptance": {
       "maximum_actual_gap_error_m": 0.04,
@@ -214,19 +214,24 @@
       "warmup_steps": 100
     },
     "selection": {
-      "base_to_box_center_distance_m": null,
-      "candidate_index": null,
-      "contact_height_m": null,
-      "desired_palm_quaternion_in_object_wxyz": null,
-      "palm_collision_support_offset_m": null,
-      "precontact_gap_m": null,
-      "status": "UNRESOLVED",
-      "tangential_separation_m": null
+      "base_to_box_center_distance_m": 1.06,
+      "candidate_index": 9,
+      "contact_height_m": 0.62,
+      "desired_palm_quaternion_in_object_wxyz": [
+        0.7071067811865476,
+        0.0,
+        0.7071067811865476,
+        0.0
+      ],
+      "palm_collision_support_offset_m": 0.44023889869451527,
+      "precontact_gap_m": 0.06,
+      "status": "FROZEN",
+      "tangential_separation_m": 0.3
     },
     "stage": "S2-02",
     "task": "PRECONTACT_GEOMETRY_AND_BIMANUAL_TARGET_AUDIT"
   },
-  "runnable": false,
+  "runnable": true,
   "schema_version": 1,
   "stage": "S2-02"
 }

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import math
 from pathlib import Path
 
@@ -19,6 +20,7 @@ from g1_access_push.stage2.s2_02_contract import (
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = ROOT / "configs/stage2/s2_02_precontact_audit.yaml"
+SELECTION_REPORT = ROOT / "reports/stage2/s2_02_selected_candidate.json"
 
 
 def cfg() -> dict:
@@ -78,18 +80,33 @@ def test_palm_local_plus_z_quaternion_maps_to_object_plus_x() -> None:
     assert [mapped_x, mapped_y, mapped_z] == [1.0000000000000002, 0.0, -2.220446049250313e-16]
 
 
-def test_initial_config_is_search_only_not_formal_runnable() -> None:
+def test_development_search_candidate_is_frozen_and_formal_runnable() -> None:
     config = cfg()
-    assert config["selection"] == {
-        "status": "UNRESOLVED", "candidate_index": None,
-        "contact_height_m": None, "tangential_separation_m": None,
-        "base_to_box_center_distance_m": None, "precontact_gap_m": None,
-        "desired_palm_quaternion_in_object_wxyz": None,
-        "palm_collision_support_offset_m": None,
+    selection = config["selection"]
+    assert selection == {
+        "status": "FROZEN", "candidate_index": 9,
+        "contact_height_m": 0.62, "tangential_separation_m": 0.30,
+        "base_to_box_center_distance_m": 1.06, "precontact_gap_m": 0.06,
+        "desired_palm_quaternion_in_object_wxyz": [
+            0.7071067811865476, 0.0, 0.7071067811865476, 0.0,
+        ],
+        "palm_collision_support_offset_m": 0.44023889869451527,
     }
+    evidence = json.loads(SELECTION_REPORT.read_text(encoding="utf-8"))
+    selected = evidence["selected_candidate"]
+    assert evidence["status"] == "PASS"
+    assert selected["passed"] is True
+    assert selected["candidate_index"] == selection["candidate_index"]
+    for key in (
+        "contact_height_m", "tangential_separation_m",
+        "base_to_box_center_distance_m", "precontact_gap_m",
+        "palm_collision_support_offset_m",
+    ):
+        assert selected["candidate"][key] == selection[key]
+    assert selected["desired_palm_quaternion_in_object_wxyz"] == selection["desired_palm_quaternion_in_object_wxyz"]
     resolved = resolved_config(CONFIG)
-    assert resolved["runnable"] is False
-    assert resolved["qualification_state"] == "READY_FOR_DEVELOPMENT_SEARCH"
+    assert resolved["runnable"] is True
+    assert resolved["qualification_state"] == "READY_FOR_PREFLIGHT_AND_FORMAL"
 
 
 def test_candidate_scoring_rejects_any_hard_gate_and_prefers_margin() -> None:
