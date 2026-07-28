@@ -1,0 +1,115 @@
+{
+  "attempt_count": 4,
+  "attempts": [
+    {"attempt": 1, "status": "INVALID", "primary_reason": "IMPLEMENTATION_EXCEPTION", "diagnosed_infrastructure_reason": "RUNTIME_METRIC_VALUE_MASK_NAMESPACE_COLLISION", "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_085727"},
+    {"attempt": 2, "status": "INVALID", "primary_reason": "IMPLEMENTATION_EXCEPTION", "diagnosed_infrastructure_reason": "ARM_REFERENCE_BATCH_SHAPE_MISMATCH", "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_091025"},
+    {"attempt": 3, "status": "INVALID", "primary_reason": "IMPLEMENTATION_EXCEPTION", "diagnosed_infrastructure_reason": "COUNTED_TERMINATION_ROUTE_MISMATCH", "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_091329"},
+    {"attempt": 4, "status": "PASS", "primary_reason": "ALL_RUNTIME_CONTRACT_CHECKS_PASSED", "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_091813"}
+  ],
+  "code_commit": "f4ecfb5121625ed6c726b081771325deb15eefbb",
+  "training_contract_sha256": "221f27d2a22d3e07f9bd9a05680d61d57f3b2af59a2cf0ed4f5bd8af424e6316",
+  "authoritative_result_sha256": "13dad891893e4663434d73fcc2c2f8e5395f9387e68d8c6ee48d0acaa93c43ce",
+  "action_shape": [
+    1,
+    14
+  ],
+  "box_mass_audit": {
+    "com_local_xyz_m": [
+      0.0,
+      0.0,
+      -0.4
+    ],
+    "diagonal_inertia_kg_m2": [
+      0.12083333333333333,
+      0.43333333333333335,
+      0.5208333333333334
+    ],
+    "instance_count": 1,
+    "mass_kg": 5.0,
+    "status": "PASS"
+  },
+  "certified_checkpoint_sha256": "a0151975a757a33f0f5ed236d5616e2a98643abe2b36e50ac9ad01b6dd1f6d7e",
+  "checks": {
+    "action_contract_14_plus_0": true,
+    "arm_previous_action_zero": true,
+    "certified_checkpoint_sha": true,
+    "contact_counters_zero": true,
+    "impulse_history_zero": true,
+    "joint_order": true,
+    "left_filter_count_one": true,
+    "left_sensor_initialized": true,
+    "manager_based_rl_env": true,
+    "no_actor_checkpoint_loaded": true,
+    "observation_finite_after_reset": true,
+    "observation_shape_1x77": true,
+    "one_environment": true,
+    "reference_installed": true,
+    "reset_arm_history_zero": true,
+    "reset_contact_counters_zero": true,
+    "reset_impulse_history_zero": true,
+    "reset_lower_cell_restored": true,
+    "reset_lower_hidden_restored": true,
+    "reset_previous_lower_action_restored": true,
+    "right_filter_count_one": true,
+    "right_sensor_initialized": true,
+    "separate_sensor_instances": true,
+    "termination_fields_complete": true,
+    "zero_action_exact_reference": true,
+    "zero_action_no_contact": true,
+    "zero_action_no_done": true,
+    "zero_action_no_forbidden_collision": true,
+    "zero_step_observation_finite": true,
+    "zero_step_reward_finite": true
+  },
+  "failed_checks": [],
+  "mode": "CONTRACT_SMOKE",
+  "observation_shape": [
+    1,
+    77
+  ],
+  "primary_reason": "ALL_RUNTIME_CONTRACT_CHECKS_PASSED",
+  "reference_path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_091813/precontact_reference.pt",
+  "reference_sha256": "1e537e075af7f888fb95a63501d3976d0d7740eff51c6bd9000f574b00cd0e6c",
+  "schema_version": 1,
+  "scientific_result_created": false,
+  "stage": "S2-03T",
+  "status": "PASS",
+  "steps": [
+    {
+      "forbidden_collision": false,
+      "left_force_n": 0.0,
+      "left_gap_m": 0.05930572748184204,
+      "observation_finite": true,
+      "reward": -0.012755714356899261,
+      "right_force_n": 0.0,
+      "right_gap_m": 0.060125768184661865,
+      "step": 1,
+      "terminated": false,
+      "truncated": false
+    },
+    {
+      "forbidden_collision": false,
+      "left_force_n": 0.0,
+      "left_gap_m": 0.0593222975730896,
+      "observation_finite": true,
+      "reward": -0.01275252178311348,
+      "right_force_n": 0.0,
+      "right_gap_m": 0.06007605791091919,
+      "step": 2,
+      "terminated": false,
+      "truncated": false
+    },
+    {
+      "forbidden_collision": false,
+      "left_force_n": 0.0,
+      "left_gap_m": 0.05934208631515503,
+      "observation_finite": true,
+      "reward": -0.01274991687387228,
+      "right_force_n": 0.0,
+      "right_gap_m": 0.060024797916412354,
+      "step": 3,
+      "terminated": false,
+      "truncated": false
+    }
+  ]
+}
