@@ -26,6 +26,7 @@ REQUIRED_AUDIT_FIELDS = {
         "box_material_prim_path", "ground_material_prim_path",
         "box_binding_target", "ground_binding_target", "box", "ground",
         "effective_pair", "pair_pass", "terrain_root_prim_path",
+        "configured_ground_material_prim_path", "ground_material_path_resolution",
         "box_collision_bindings", "ground_collision_bindings",
     },
     "scene_geometry_audit.json": {

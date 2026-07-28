@@ -603,7 +603,22 @@ def main() -> None:
         write_json(RUN / "box_mass_properties_audit.json", mass_audit)
 
         terrain_root_path = str(cfg.scene.terrain.prim_path).rstrip("/")
-        ground_material_path = terrain_root_path + "/physicsMaterial"
+        configured_ground_material_path = terrain_root_path + "/physicsMaterial"
+        box_collision_bindings = collision_binding_records(stage, BOX_PRIM_PATH)
+        ground_collision_bindings = collision_binding_records(stage, terrain_root_path)
+        box_binding_targets = sorted({
+            record["resolved_target"] for record in box_collision_bindings
+            if record.get("resolved_target")
+        })
+        ground_binding_targets = sorted({
+            record["resolved_target"] for record in ground_collision_bindings
+            if record.get("resolved_target")
+        })
+        ground_material_path = (
+            ground_binding_targets[0]
+            if len(ground_binding_targets) == 1
+            else configured_ground_material_path
+        )
         box_material = material_record(stage, BOX_MATERIAL_PATH)
         ground_material = material_record(stage, ground_material_path)
         expected_material = config["materials"]["effective_pair"]
@@ -619,19 +634,15 @@ def main() -> None:
             and box_material_values == expected_material
             and ground_material_values == expected_material
         )
-        box_collision_bindings = collision_binding_records(stage, BOX_PRIM_PATH)
-        ground_collision_bindings = collision_binding_records(stage, terrain_root_path)
-        box_binding_targets = sorted({
-            record["resolved_target"] for record in box_collision_bindings
-            if record.get("resolved_target")
-        })
-        ground_binding_targets = sorted({
-            record["resolved_target"] for record in ground_collision_bindings
-            if record.get("resolved_target")
-        })
         material_audit = {
             "box_material_prim_path": BOX_MATERIAL_PATH,
             "ground_material_prim_path": ground_material_path,
+            "configured_ground_material_prim_path": configured_ground_material_path,
+            "ground_material_path_resolution": (
+                "UNIQUE_COLLISION_BINDING"
+                if len(ground_binding_targets) == 1
+                else "CONFIGURED_TERRAIN_ROOT_FALLBACK"
+            ),
             "terrain_root_prim_path": terrain_root_path,
             "box_binding_target": box_binding_targets,
             "ground_binding_target": ground_binding_targets,

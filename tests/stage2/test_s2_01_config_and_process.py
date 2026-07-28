@@ -412,7 +412,9 @@ def test_material_binding_uses_valid_prims_and_discovered_collision_children() -
     ):
         assert forbidden not in source
     assert 'str(cfg.scene.terrain.prim_path).rstrip("/")' in source
-    assert 'ground_material_path = terrain_root_path + "/physicsMaterial"' in source
+    assert 'configured_ground_material_path = terrain_root_path + "/physicsMaterial"' in source
+    assert '"UNIQUE_COLLISION_BINDING"' in source
+    assert "ground_binding_targets[0]" in source
     assert "prim.IsValid()" in source
     assert "Usd.PrimRange(root)" in source
     assert "prim.HasAPI(UsdPhysics.CollisionAPI)" in source
