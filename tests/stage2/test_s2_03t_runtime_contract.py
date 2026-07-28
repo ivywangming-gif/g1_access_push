@@ -21,6 +21,7 @@ ENV = ROOT / "src/g1_access_push/sim/stage2/s2_03t_env.py"
 AGENT = ROOT / "src/g1_access_push/sim/stage2/s2_03t_agent_cfg.py"
 BOOTSTRAP = ROOT / "src/g1_access_push/sim/stage2/s2_03t_bootstrap.py"
 TRAIN = ROOT / "scripts/stage2_isaac/train_s2_03t.py"
+CAPACITY = ROOT / "scripts/stage2_isaac/run_s2_03t_capacity_smoke.py"
 EVALUATE = ROOT / "scripts/stage2_isaac/evaluate_s2_03t_checkpoint.py"
 EVAL_WRAPPER = ROOT / "scripts/stage2_isaac/run_s2_03t_evaluation_once.sh"
 CHECKPOINT = Path(
@@ -175,6 +176,20 @@ def test_agent_and_training_entry_are_clean_no_resume_current_api() -> None:
     assert '"model_1999_used": False' in train
 
 
+def test_formal_capacity_smoke_allocates_clean_runner_storage_without_training() -> None:
+    source = CAPACITY.read_text(encoding="utf-8")
+    assert 'choices=(256, 128, 64)' in source
+    assert 'runner = OnPolicyRunner(' in source
+    assert 'storage = runner.alg.storage' in source
+    assert '"rollout_storage_allocated": storage is not None' in source
+    assert 'agent_cfg.max_iterations = 1000' in source
+    assert 'agent_cfg.resume = False' in source
+    assert 'agent_cfg.load_checkpoint = None' in source
+    assert '"training_started": False' in source
+    assert '"checkpoint_created": False' in source
+    assert "runner.learn(" not in source
+
+
 def test_actor_evaluation_stops_on_first_done_and_calls_unchanged_evaluator() -> None:
     evaluator = EVALUATE.read_text(encoding="utf-8")
     wrapper = EVAL_WRAPPER.read_text(encoding="utf-8")
@@ -195,13 +210,15 @@ def test_actor_evaluation_stops_on_first_done_and_calls_unchanged_evaluator() ->
 
 def test_launchers_derive_effective_rc_from_authoritative_json() -> None:
     smoke = (ROOT / "scripts/stage2_isaac/run_s2_03t_smoke_once.sh").read_text(encoding="utf-8")
+    capacity = (ROOT / "scripts/stage2_isaac/run_s2_03t_capacity_smoke_once.sh").read_text(encoding="utf-8")
     train = (ROOT / "scripts/stage2_isaac/run_s2_03t_training_once.sh").read_text(encoding="utf-8")
     evaluate = EVAL_WRAPPER.read_text(encoding="utf-8")
     assert "contract_smoke_result.json\" PASS" in smoke
+    assert "capacity_smoke_result.json\" PASS" in capacity
     assert "training_result.json\" PASS" in train
     assert "runner_status.json\" COMPLETE" in evaluate
     assert "result.json\" PASS FAIL" in evaluate
-    for wrapper in (smoke, train, evaluate):
+    for wrapper in (smoke, capacity, train, evaluate):
         assert "AUTHORITATIVE_STATUS={status}" in wrapper
         assert "STATUS_RC=${PIPESTATUS[0]}" in wrapper
 
