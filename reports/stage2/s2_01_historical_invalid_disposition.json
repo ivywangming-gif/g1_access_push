@@ -18,5 +18,11 @@
   "most_recent_historical_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_01_box_stand_final_evidence_20260728_022223",
   "most_recent_historical_sensor_initialized": true,
   "most_recent_historical_status": "INVALID",
-  "schema_version": 3
+  "latest_envelope_gate_run_environment_created": true,
+  "latest_envelope_gate_run_observed_frames": 0,
+  "latest_envelope_gate_run_primary_reason": "IMPLEMENTATION_EXCEPTION",
+  "latest_envelope_gate_run_detail": "ROBOT_RUNTIME_ENVELOPE_QUERY_FAILED",
+  "latest_envelope_gate_run_preserved": true,
+  "latest_envelope_gate_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_01_box_stand_filter_count_final_20260728_024418",
+  "schema_version": 4
 }

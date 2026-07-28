@@ -60,13 +60,24 @@ simulation:
   actor_override: NOT_AUTHORED
   effective_source: PHYSX_SCENE_OR_ENGINE_DEFAULT
 placement:
-  isolation_clearance_m: 0.5
-  purpose: S2_01_DELIBERATE_NO_CONTACT_SAFETY_GAP
-  minimum_allowed_clearance_m: 0.499
+  source: RESEARCH_LEAD_S2_01_ISOLATION_PLACEMENT
+  purpose: S2_01_DEVELOPMENT_ONLY_NO_CONTACT_ISOLATION
+  box_spawn_center_xyz_m: [3.0, 0.0, 0.602]
+  box_rear_face_x_world_m: 2.4
+  initial_yaw_rad: 0.0
   ground_z_m: 0.0
   box_spawn_bottom_gap_m: 0.002
-  box_spawn_center_z_m: 0.602
-  temporary_nonexperimental_spawn_x_m: 25.0
+  robot_collider_envelope:
+    status: DEFERRED_TO_S2_02
+    blocking_s2_01: false
+  nominal_base_to_box_distance:
+    status: UNRESOLVED
+    blocking_s2_01: false
+    resolution_stage: S2_02
+  precontact_gap:
+    status: UNRESOLVED
+    blocking_s2_01: false
+    resolution_stage: S2_02
 settling:
   duration_s: 1.0
   control_frames: 50

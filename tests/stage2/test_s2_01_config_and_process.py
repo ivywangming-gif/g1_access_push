@@ -208,6 +208,19 @@ def test_pipefail_preserves_deliberate_python_rc_7(tmp_path: Path) -> None:
     assert subprocess.run(["bash", "-c", command]).returncode == 7
 
 
+def test_envelope_is_not_a_gate_and_required_audits_precede_trace() -> None:
+    source = RUNNER.read_text(encoding="utf-8")
+    assert "robot_collider_bounds" not in source
+    assert "ROBOT_RUNTIME_ENVELOPE_QUERY_FAILED" not in source
+    assert "initial_robot_overlap_query" in source
+    trace_index = source.index("trace.jsonl")
+    for audit_name in (
+        "box_rigid_body_audit.json", "box_mass_properties_audit.json",
+        "physics_material_audit.json", "scene_geometry_audit.json", "contact_sensor_audit.json",
+    ):
+        assert source.index(audit_name) < trace_index
+
+
 def test_contact_sensor_source_contract_uses_box_rigid_body() -> None:
     source = ENV_SOURCE.read_text(encoding="utf-8")
     tree = ast.parse(source)

@@ -24,10 +24,11 @@ REQUIRED_AUDIT_FIELDS = {
         "effective_pair", "pair_pass",
     },
     "scene_geometry_audit.json": {
-        "robot_max_x_world_m", "box_rear_face_x_world_m",
-        "box_center_xyz_world_m", "expected_clearance_m",
-        "measured_minimum_clearance_m", "overlap_count",
-        "scene_query_robot_hit", "doorway_count", "obstacle_count",
+        "box_rear_face_x_world_m", "box_center_xyz_world_m",
+        "overlap_count", "scene_query_robot_hit", "query_backend",
+        "robot_collider_envelope", "nominal_base_to_box_distance",
+        "precontact_gap", "robot_root_subtree_aabb",
+        "doorway_count", "obstacle_count",
     },
     "box_rigid_body_audit.json": {
         "body_prim_path", "cube_collider_prim_path", "runtime_size_xyz_m",
@@ -46,6 +47,7 @@ REQUIRED_AUDIT_FIELDS = {
         "usd_candidate_robot_rigid_body_count", "usd_body_count_used_as_shape_contract",
         "net_force_shape", "net_force_finite", "net_force_xyz_n",
         "net_force_norm_n", "filter_tensor_initialization_pass",
+        "initial_robot_contact_force_max_n", "initial_robot_contact_pass",
     },
 }
 
@@ -53,8 +55,7 @@ VALID_FAIL_REASONS = (
     "BOX_GEOMETRY_MISMATCH", "BOX_NOT_DYNAMIC", "BOX_GRAVITY_DISABLED",
     "BOX_MASS_MISMATCH", "BOX_LOW_COM_CONTRACT_NOT_SATISFIED",
     "BOX_INERTIA_AUDIT_FAILED", "PHYSICS_MATERIAL_MISMATCH",
-    "INITIAL_ROBOT_BOX_OVERLAP", "INITIAL_CLEARANCE_MISMATCH",
-    "UNEXPECTED_ROBOT_BOX_CONTACT", "FORBIDDEN_BODY_BOX_COLLISION",
+    "INITIAL_ROBOT_BOX_OVERLAP", "UNEXPECTED_ROBOT_BOX_CONTACT",
     "OBJECT_TRANSLATION_WITHOUT_CONTACT", "OBJECT_YAW_DRIFT",
     "OBJECT_ROLL_PITCH_DRIFT", "OBJECT_VERTICAL_DRIFT",
     "OBJECT_LINEAR_SPEED_EXCEEDED", "OBJECT_ANGULAR_SPEED_EXCEEDED",
@@ -67,7 +68,7 @@ INVALID_REASONS = (
     "IMPLEMENTATION_EXCEPTION", "MISSING_RESULT_JSON", "MISSING_TRACE",
     "MISSING_FINAL_IMAGE", "MISSING_REQUIRED_FIELD",
     "STANDING_ACTION_CONTRACT_UNCERTIFIED", "COLLISION_BACKEND_UNCERTIFIED",
-    "ROBOT_RUNTIME_ENVELOPE_QUERY_FAILED", "MASS_PROPERTY_QUERY_FAILED",
+    "MASS_PROPERTY_QUERY_FAILED",
     "MATERIAL_BINDING_QUERY_FAILED", "MULTIPLE_ISAAC_PROCESSES",
     "EVALUATOR_DID_NOT_COMPLETE", "CONTACT_SENSOR_INITIALIZATION_FAILED",
     "CONTACT_SENSOR_AUDIT_IMPLEMENTATION_ERROR",
@@ -122,6 +123,11 @@ def validate_config(config: dict[str, Any]) -> None:
         raise ValueError("ballast inertia formula mismatch")
     if config["evaluation"]["expected_frames"] != 3000:
         raise ValueError("S2-01 requires 3000 frames")
+    placement = config["placement"]
+    if placement["box_spawn_center_xyz_m"] != [3.0, 0.0, 0.602]:
+        raise ValueError("unexpected S2-01 isolation placement")
+    if placement["robot_collider_envelope"] != {"status": "DEFERRED_TO_S2_02", "blocking_s2_01": False}:
+        raise ValueError("robot collider envelope must be deferred")
     if any(config["prohibitions"].values()):
         raise ValueError("forbidden S2-01 capability enabled")
 
@@ -227,8 +233,9 @@ def classify_evidence(
         failures.append("PHYSICS_MATERIAL_MISMATCH")
     if int(geometry_audit["overlap_count"]) != 0 or geometry_audit["scene_query_robot_hit"]:
         failures.append("INITIAL_ROBOT_BOX_OVERLAP")
-    if float(geometry_audit["measured_minimum_clearance_m"]) < float(config["placement"]["minimum_allowed_clearance_m"]):
-        failures.append("INITIAL_CLEARANCE_MISMATCH")
+    contact_audit = audits["contact_sensor_audit.json"]
+    if float(contact_audit["initial_robot_contact_force_max_n"]) > 0.0:
+        failures.append("UNEXPECTED_ROBOT_BOX_CONTACT")
 
     if records:
         finite = all(bool(record["finite"]) for record in records)
@@ -236,8 +243,6 @@ def classify_evidence(
             failures.append("NONFINITE")
         if any(bool(record["robot_box_contact"]) for record in records):
             failures.append("UNEXPECTED_ROBOT_BOX_CONTACT")
-        if any(int(record.get("runtime_forbidden_overlap_count", 0)) > 0 for record in records):
-            failures.append("FORBIDDEN_BODY_BOX_COLLISION")
         if any(bool(record["robot_fall"]) for record in records):
             failures.append("ROBOT_FALL")
         if any(bool(record["robot_bad_tilt"]) for record in records):

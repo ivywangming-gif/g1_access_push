@@ -68,9 +68,10 @@ AppLauncher.add_app_launcher_args(parser)
 args = parser.parse_args()
 simulation_app = AppLauncher(args).app
 
+import carb
 import torch
 from PIL import Image
-from omni.physx import get_physx_property_query_interface
+from omni.physx import get_physx_property_query_interface, get_physx_scene_query_interface
 from omni.physx.bindings._physx import PhysxPropertyQueryMode, PhysxPropertyQueryResult
 from pxr import Gf, PhysicsSchemaTools, PhysxSchema, Usd, UsdGeom, UsdPhysics, UsdUtils
 from isaaclab.envs import ManagerBasedEnv
@@ -236,30 +237,31 @@ def author_mass_properties(stage: Usd.Stage, config: dict) -> dict:
     }
 
 
-def robot_collider_bounds(stage: Usd.Stage) -> tuple[float, list[dict]]:
-    root = stage.GetPrimAtPath("/World/envs/env_0/Robot")
-    cache = UsdGeom.BBoxCache(Usd.TimeCode.Default(), [UsdGeom.Tokens.default_], useExtentsHint=True)
-    records: list[dict] = []
-    for prim in Usd.PrimRange(root):
-        if not prim.HasAPI(UsdPhysics.CollisionAPI):
-            continue
-        aligned = cache.ComputeWorldBound(prim).ComputeAlignedRange()
-        minimum = [float(value) for value in aligned.GetMin()]
-        maximum = [float(value) for value in aligned.GetMax()]
-        if all(math.isfinite(value) for value in minimum + maximum):
-            records.append({"prim_path": str(prim.GetPath()), "minimum": minimum, "maximum": maximum})
-    if not records:
-        raise RuntimeError("ROBOT_RUNTIME_ENVELOPE_QUERY_FAILED")
-    return max(record["maximum"][0] for record in records), records
+def initial_robot_overlap_query(center_xyz: list[float], half_extent_xyz: list[float]) -> dict:
+    hits: list[dict[str, str]] = []
 
+    def callback(hit) -> bool:
+        collision = str(getattr(hit, "collision", ""))
+        rigid_body = str(getattr(hit, "rigid_body", ""))
+        if collision.startswith("/World/envs/env_0/Robot") or rigid_body.startswith(
+            "/World/envs/env_0/Robot"
+        ):
+            hits.append({"collision": collision, "rigid_body": rigid_body})
+        return True
 
-def aabb_overlap_count(records: list[dict], center: list[float], half: list[float]) -> int:
-    box_min = [center[i] - half[i] for i in range(3)]
-    box_max = [center[i] + half[i] for i in range(3)]
-    return sum(
-        all(record["maximum"][axis] >= box_min[axis] and record["minimum"][axis] <= box_max[axis] for axis in range(3))
-        for record in records
+    total_hit_count = get_physx_scene_query_interface().overlap_box(
+        carb.Float3(*half_extent_xyz),
+        carb.Float3(*center_xyz),
+        carb.Float4(0.0, 0.0, 0.0, 1.0),
+        callback,
+        False,
     )
+    return {
+        "query_backend": "CERTIFIED_PHYSX_SCENE_QUERY_OVERLAP_BOX",
+        "all_scene_query_hit_count": int(total_hit_count),
+        "robot_hit_count": len(hits),
+        "robot_hits": hits,
+    }
 
 
 def main() -> None:
@@ -300,6 +302,36 @@ def main() -> None:
         camera = env.scene["audit_camera"]
         box_net = env.scene["box_net_contact"]
         box_robot = env.scene["box_robot_contact"]
+        checkpoint = Path(lower.cfg.policy_path).resolve()
+        runtime_checkpoint_validation = validate_controller_checkpoint(
+            checkpoint, sha256_file(checkpoint), config["robot"]["controller_checkpoint_sha256"],
+            config["robot"]["forbidden_checkpoint_sha256s"],
+            config["robot"]["forbidden_checkpoint_basenames"],
+        )
+        if runtime_checkpoint_validation["status"] != "PASS":
+            raise RuntimeError("STANDING_ACTION_CONTRACT_UNCERTIFIED")
+        recurrent_reset = {
+            "hidden_state_all_zero": bool(torch.count_nonzero(lower._policy.hidden_state).item() == 0),
+            "cell_state_all_zero": bool(torch.count_nonzero(lower._policy.cell_state).item() == 0),
+            "previous_policy_action_all_zero": bool(torch.count_nonzero(lower._previous_policy_actions).item() == 0),
+            "last_policy_input_all_zero": bool(torch.count_nonzero(lower.last_policy_input).item() == 0),
+        }
+        if not all(recurrent_reset.values()):
+            raise RuntimeError("STANDING_ACTION_CONTRACT_UNCERTIFIED")
+        controller_audit = {
+            "checkpoint_path": str(checkpoint),
+            "checkpoint_sha256": sha256_file(checkpoint),
+            "lower_body_joint_names": list(lower._joint_names),
+            "lower_body_scale_source": "G1_W_HANDS_AGILE_ACTION_SCALE",
+            "lower_body_scale_source_entry_count": len(G1_W_HANDS_AGILE_ACTION_SCALE),
+            "resolved_lower_body_scale": [float(value) for value in lower._policy_output_scale[0]],
+            "resolved_lower_body_offset": [float(value) for value in lower._policy_output_offset[0]],
+            "lower_body_command": config["robot"]["lower_body_command"],
+            "upper_body_action": "ZERO_DELTA_DEFAULT_ARMS_AND_WAIST",
+            "recurrent_reset": recurrent_reset,
+            "num_envs": cfg.scene.num_envs,
+        }
+        write_json(RUN / "controller_contract_audit.json", controller_audit)
         net_forces = box_net.data.net_forces_w
         robot_force_matrix = box_robot.data.force_matrix_w
         box_prim = stage.GetPrimAtPath(BOX_PRIM_PATH)
@@ -381,44 +413,10 @@ def main() -> None:
         if not contact_sensor_audit["sensor_audit_pass"]:
             raise RuntimeError("CONTACT_SENSOR_INITIALIZATION_FAILED")
 
-        checkpoint = Path(lower.cfg.policy_path).resolve()
-        runtime_checkpoint_validation = validate_controller_checkpoint(
-            checkpoint, sha256_file(checkpoint), config["robot"]["controller_checkpoint_sha256"],
-            config["robot"]["forbidden_checkpoint_sha256s"],
-            config["robot"]["forbidden_checkpoint_basenames"],
-        )
-        if runtime_checkpoint_validation["status"] != "PASS":
-            raise RuntimeError("STANDING_ACTION_CONTRACT_UNCERTIFIED")
-        recurrent_reset = {
-            "hidden_state_all_zero": bool(torch.count_nonzero(lower._policy.hidden_state).item() == 0),
-            "cell_state_all_zero": bool(torch.count_nonzero(lower._policy.cell_state).item() == 0),
-            "previous_policy_action_all_zero": bool(torch.count_nonzero(lower._previous_policy_actions).item() == 0),
-            "last_policy_input_all_zero": bool(torch.count_nonzero(lower.last_policy_input).item() == 0),
-        }
-        if not all(recurrent_reset.values()):
-            raise RuntimeError("STANDING_ACTION_CONTRACT_UNCERTIFIED")
-        controller_audit = {
-            "checkpoint_path": str(checkpoint),
-            "checkpoint_sha256": sha256_file(checkpoint),
-            "lower_body_joint_names": list(lower._joint_names),
-            "lower_body_scale_source": "G1_W_HANDS_AGILE_ACTION_SCALE",
-            "lower_body_scale_source_entry_count": len(G1_W_HANDS_AGILE_ACTION_SCALE),
-            "resolved_lower_body_scale": [float(value) for value in lower._policy_output_scale[0]],
-            "resolved_lower_body_offset": [float(value) for value in lower._policy_output_offset[0]],
-            "lower_body_command": config["robot"]["lower_body_command"],
-            "upper_body_action": "ZERO_DELTA_DEFAULT_ARMS_AND_WAIST",
-            "recurrent_reset": recurrent_reset,
-            "num_envs": cfg.scene.num_envs,
-        }
-        write_json(RUN / "controller_contract_audit.json", controller_audit)
         authored = author_mass_properties(stage, config)
 
-        robot_max_x, collider_records = robot_collider_bounds(stage)
-        clearance = float(config["placement"]["isolation_clearance_m"])
-        rear = robot_max_x + clearance
-        center = [rear + 0.6, float(robot.data.root_pos_w[0, 1]), float(config["placement"]["box_spawn_center_z_m"])]
-        state = torch.tensor([[*center, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]], device=env.device)
-        box.write_root_state_to_sim(state)
+        center = [float(value) for value in config["placement"]["box_spawn_center_xyz_m"]]
+        rear = float(config["placement"]["box_rear_face_x_world_m"])
         cube = UsdGeom.Cube(stage.GetPrimAtPath(BOX_COLLIDER_PATH))
         cube_size = float(cube.GetSizeAttr().Get())
         cube_scale = cube.GetPrim().GetAttribute("xformOp:scale").Get() or Gf.Vec3d(1.0, 1.0, 1.0)
@@ -433,22 +431,6 @@ def main() -> None:
             "gravity_enabled": not bool(physx_rigid_api.GetDisableGravityAttr().Get()),
         }
         write_json(RUN / "box_rigid_body_audit.json", rigid_audit)
-        overlap_count = aabb_overlap_count(collider_records, center, config["geometry"]["half_extent_xyz_m"])
-        geometry_audit = {
-            "query_backend": "USD_RUNTIME_COLLIDER_UNION_AABB",
-            "collision_backend_calibration_sha256": config["certification"]["collision_backend_sha256"],
-            "robot_collider_count": len(collider_records),
-            "robot_max_x_world_m": robot_max_x,
-            "box_rear_face_x_world_m": rear,
-            "box_center_xyz_world_m": center,
-            "expected_clearance_m": clearance,
-            "measured_minimum_clearance_m": rear - robot_max_x,
-            "overlap_count": overlap_count,
-            "scene_query_robot_hit": overlap_count != 0,
-            "doorway_count": 0,
-            "obstacle_count": 0,
-        }
-        write_json(RUN / "scene_geometry_audit.json", geometry_audit)
 
         runtime = query_mass_properties(stage, BOX_PRIM_PATH)
         tolerance = float(config["mass_properties"]["mass_tolerance"])
@@ -475,6 +457,7 @@ def main() -> None:
             },
             "low_com_pass": runtime["center_of_mass"][2] < 0.0 and abs(runtime["center_of_mass"][2] + 0.4) <= com_tol,
         }
+        write_json(RUN / "box_mass_properties_audit.json", mass_audit)
 
         box_material = material_record(stage, BOX_MATERIAL_PATH)
         ground_material = material_record(stage, GROUND_MATERIAL_PATH)
@@ -502,6 +485,35 @@ def main() -> None:
             pair_pass and material_audit["box_binding_target"] and material_audit["ground_binding_target"]
         )
         write_json(RUN / "physics_material_audit.json", material_audit)
+        simulation_app.update()
+        initial_overlap = initial_robot_overlap_query(
+            center, [float(value) for value in config["geometry"]["half_extent_xyz_m"]]
+        )
+        initial_filter_norms = torch.linalg.vector_norm(robot_force_matrix[0, 0], dim=-1)
+        initial_robot_contact_force_n = float(initial_filter_norms.amax().item())
+        contact_sensor_audit.update({
+            "initial_robot_filter_force_norms_n": [float(value) for value in initial_filter_norms],
+            "initial_robot_contact_force_max_n": initial_robot_contact_force_n,
+            "initial_robot_contact_pass": initial_robot_contact_force_n <= 0.0,
+        })
+        write_json(RUN / "contact_sensor_audit.json", contact_sensor_audit)
+        geometry_audit = {
+            "query_backend": initial_overlap["query_backend"],
+            "collision_backend_calibration_sha256": config["certification"]["collision_backend_sha256"],
+            "box_center_xyz_world_m": center,
+            "box_rear_face_x_world_m": rear,
+            "overlap_count": initial_overlap["robot_hit_count"],
+            "scene_query_robot_hit": initial_overlap["robot_hit_count"] != 0,
+            "scene_query_all_hit_count": initial_overlap["all_scene_query_hit_count"],
+            "scene_query_robot_hits": initial_overlap["robot_hits"],
+            "robot_collider_envelope": config["placement"]["robot_collider_envelope"],
+            "nominal_base_to_box_distance": config["placement"]["nominal_base_to_box_distance"],
+            "precontact_gap": config["placement"]["precontact_gap"],
+            "robot_root_subtree_aabb": "OPTIONAL_METRIC_NOT_RUN",
+            "doorway_count": 0,
+            "obstacle_count": 0,
+        }
+        write_json(RUN / "scene_geometry_audit.json", geometry_audit)
         sim_dump = cfg.sim.to_dict()
         sim_text = json.dumps(sim_dump, sort_keys=True, default=str)
         write_json(RUN / "stage1_simulation_config_audit.json", {
@@ -535,26 +547,11 @@ def main() -> None:
         episode_robot_contact_force_max_n = 0.0
         episode_robot_contact_force_sum_n_max = 0.0
         episode_robot_contact_nonzero_filter_count_max = 0
-        runtime_forbidden_overlap_count_max = 0
-        runtime_minimum_clearance_m = math.inf
         with (RUN / "trace.jsonl").open("w", encoding="utf-8", buffering=1) as trace:
             for frame in range(expected_frames):
                 env.step(actions)
                 box_pos = box.data.root_link_pos_w[0].clone()
                 box_quat = box.data.root_link_quat_w[0].clone()
-                runtime_robot_max_x, runtime_collider_records = robot_collider_bounds(stage)
-                runtime_box_center = [float(value) for value in box_pos]
-                runtime_overlap_count = aabb_overlap_count(
-                    runtime_collider_records, runtime_box_center, config["geometry"]["half_extent_xyz_m"]
-                )
-                runtime_clearance_m = (
-                    runtime_box_center[0] - float(config["geometry"]["half_extent_xyz_m"][0])
-                    - runtime_robot_max_x
-                )
-                runtime_forbidden_overlap_count_max = max(
-                    runtime_forbidden_overlap_count_max, runtime_overlap_count
-                )
-                runtime_minimum_clearance_m = min(runtime_minimum_clearance_m, runtime_clearance_m)
                 roll, pitch, yaw, _ = quaternion_rpy(box_quat)
                 if frame == reference_frame:
                     reference_pos = box_pos.clone()
@@ -604,8 +601,6 @@ def main() -> None:
                     "robot_contact_force_sum_n": robot_force_sum,
                     "robot_contact_nonzero_filter_count": robot_nonzero_count,
                     "robot_box_contact": robot_force > 0.0,
-                    "runtime_forbidden_overlap_count": runtime_overlap_count,
-                    "runtime_minimum_clearance_m": runtime_clearance_m,
                     "root_height_m": values[9], "root_roll_rad": root_roll,
                     "root_pitch_rad": root_pitch, "root_tilt_rad": root_tilt,
                     "robot_fall": values[9] < config["robot"]["fall_root_height_threshold_m"],
@@ -620,12 +615,6 @@ def main() -> None:
                     print(f"PHASE=qualification frame={frame + 1}/{expected_frames}", flush=True)
                 rgb = camera.data.output["rgb"][0].detach().cpu().numpy()
                 last_image = Image.fromarray(rgb.astype("uint8"))
-        geometry_audit.update({
-            "runtime_forbidden_overlap_count_max": runtime_forbidden_overlap_count_max,
-            "runtime_minimum_clearance_m": runtime_minimum_clearance_m,
-            "runtime_collision_backend_pass": runtime_forbidden_overlap_count_max == 0,
-        })
-        write_json(RUN / "scene_geometry_audit.json", geometry_audit)
         contact_sensor_audit.update({
             "net_force_xyz_n": [float(value) for value in box_net.data.net_forces_w[0, 0]],
             "net_force_norm_n": float(torch.linalg.vector_norm(box_net.data.net_forces_w[0, 0]).item()),

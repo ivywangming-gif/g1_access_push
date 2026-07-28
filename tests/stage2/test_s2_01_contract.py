@@ -46,6 +46,8 @@ def test_development_scope_and_prior_invalid_are_not_reused_as_current_reason() 
     current_reasons = set(VALID_FAIL_REASONS) | set(INVALID_REASONS)
     assert "BOX_PHYSICS_PARAMETER_SOURCE_AMBIGUOUS" not in current_reasons
     assert "INITIAL_CLEARANCE_CONTRACT_UNRESOLVED" not in current_reasons
+    assert "ROBOT_RUNTIME_ENVELOPE_QUERY_FAILED" not in current_reasons
+    assert "INITIAL_CLEARANCE_MISMATCH" not in current_reasons
 
 
 def test_geometry_mass_and_explicit_low_com_contract() -> None:
@@ -86,15 +88,21 @@ def test_box_ground_material_pair_and_rigid_contact() -> None:
     assert config["contact_model"]["damping"]["status"] == "NOT_APPLICABLE"
 
 
-def test_geometry_placement_formula_clearance_and_spawn_height() -> None:
-    config = cfg()
-    placed = placement_from_robot_max_x(0.31, 0.5, 0.6, 0.0, 0.602)
-    assert placed["rear_face_x_world_m"] == 0.81
-    assert math.isclose(placed["center_xyz_world_m"][0], 1.41)
-    assert placed["measured_minimum_clearance_m"] == 0.5
-    assert config["placement"]["isolation_clearance_m"] == 0.5
-    assert config["placement"]["minimum_allowed_clearance_m"] == 0.499
-    assert config["placement"]["box_spawn_center_z_m"] == 0.602
+def test_fixed_isolation_placement_and_s2_02_deferrals() -> None:
+    placement = cfg()["placement"]
+    assert placement["source"] == "RESEARCH_LEAD_S2_01_ISOLATION_PLACEMENT"
+    assert placement["box_spawn_center_xyz_m"] == [3.0, 0.0, 0.602]
+    assert placement["box_rear_face_x_world_m"] == 2.4
+    assert placement["initial_yaw_rad"] == 0.0
+    assert placement["robot_collider_envelope"] == {
+        "status": "DEFERRED_TO_S2_02", "blocking_s2_01": False,
+    }
+    for name in ("nominal_base_to_box_distance", "precontact_gap"):
+        assert placement[name] == {
+            "status": "UNRESOLVED", "blocking_s2_01": False, "resolution_stage": "S2_02",
+        }
+    source = ENV_SOURCE.read_text(encoding="utf-8")
+    assert "pos=(3.0, 0.0, 0.602)" in source
 
 
 def test_settle_stillness_and_frame_contract() -> None:
@@ -167,16 +175,52 @@ def test_contact_sensor_initialization_failure_is_invalid() -> None:
     assert result["primary_reason"] == "CONTACT_SENSOR_INITIALIZATION_FAILED"
 
 
-def test_runtime_collision_backend_overlap_is_a_valid_physical_failure() -> None:
+def test_initial_overlap_and_initial_contact_are_valid_physical_failures() -> None:
     config = cfg()
-    records = valid_records(config)
-    records[100]["runtime_forbidden_overlap_count"] = 1
-    result = classify_evidence(
-        config, records, valid_audits(), runner_rc=0,
+    overlap_audits = valid_audits()
+    overlap_audits["scene_geometry_audit.json"]["overlap_count"] = 1
+    overlap_audits["scene_geometry_audit.json"]["scene_query_robot_hit"] = True
+    overlap = classify_evidence(
+        config, valid_records(config), overlap_audits, runner_rc=0,
         final_image_present=True, multiple_isaac_processes=False,
     )
-    assert result["status"] == "FAIL"
-    assert result["primary_reason"] == "FORBIDDEN_BODY_BOX_COLLISION"
+    assert overlap["status"] == "FAIL"
+    assert overlap["primary_reason"] == "INITIAL_ROBOT_BOX_OVERLAP"
+    contact_audits = valid_audits()
+    contact_audits["contact_sensor_audit.json"]["initial_robot_contact_force_max_n"] = 1.0
+    contact = classify_evidence(
+        config, valid_records(config), contact_audits, runner_rc=0,
+        final_image_present=True, multiple_isaac_processes=False,
+    )
+    assert contact["status"] == "FAIL"
+    assert contact["primary_reason"] == "UNEXPECTED_ROBOT_BOX_CONTACT"
+
+
+@pytest.mark.parametrize(
+    "missing_audit",
+    ["box_mass_properties_audit.json", "physics_material_audit.json"],
+)
+def test_missing_required_mass_or_material_audit_is_invalid(missing_audit: str) -> None:
+    config = cfg()
+    audits = valid_audits()
+    del audits[missing_audit]
+    result = classify_evidence(
+        config, valid_records(config), audits, runner_rc=0,
+        final_image_present=True, multiple_isaac_processes=False,
+    )
+    assert result["status"] == "INVALID"
+    assert result["primary_reason"] == "MISSING_REQUIRED_FIELD"
+
+
+def test_optional_aabb_unavailable_does_not_block_s2_01() -> None:
+    config = cfg()
+    audits = valid_audits()
+    audits["scene_geometry_audit.json"]["robot_root_subtree_aabb"] = "OPTIONAL_METRIC_UNAVAILABLE"
+    result = classify_evidence(
+        config, valid_records(config), audits, runner_rc=0,
+        final_image_present=True, multiple_isaac_processes=False,
+    )
+    assert result["status"] == "PASS"
 
 
 def test_required_runtime_audit_fields_are_frozen() -> None:
@@ -218,11 +262,11 @@ def valid_audits() -> dict[str, dict]:
     material = {key: None for key in REQUIRED_AUDIT_FIELDS["physics_material_audit.json"]}
     material.update({"pair_pass": True, "box_binding_target": ["box_material"], "ground_binding_target": ["ground_material"]})
     geometry = {key: None for key in REQUIRED_AUDIT_FIELDS["scene_geometry_audit.json"]}
-    geometry.update({"overlap_count": 0, "scene_query_robot_hit": False, "measured_minimum_clearance_m": 0.5})
+    geometry.update({"overlap_count": 0, "scene_query_robot_hit": False})
     rigid = {key: None for key in REQUIRED_AUDIT_FIELDS["box_rigid_body_audit.json"]}
     rigid.update({"runtime_size_xyz_m": [1.2, 0.6, 1.2], "rigid_body_enabled": True, "kinematic_enabled": False, "gravity_enabled": True})
     sensor = {key: None for key in REQUIRED_AUDIT_FIELDS["contact_sensor_audit.json"]}
-    sensor.update({"sensor_audit_pass": True})
+    sensor.update({"sensor_audit_pass": True, "initial_robot_contact_force_max_n": 0.0})
     return {
         "box_mass_properties_audit.json": mass,
         "physics_material_audit.json": material,

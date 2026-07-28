@@ -38,13 +38,14 @@ def _box_cfg() -> RigidObjectCfg:
             visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.72, 0.45, 0.18)),
             activate_contact_sensors=True,
         ),
-        init_state=RigidObjectCfg.InitialStateCfg(pos=(25.0, 0.0, 0.602)),
+        init_state=RigidObjectCfg.InitialStateCfg(pos=(3.0, 0.0, 0.602)),
     )
 
 
 def build_s2_01_env_cfg() -> G1Stage1NoBoxRecurrentEnvCfg:
     """Build from a real Stage-1 config instance, never from configclass class attributes."""
     env_cfg = G1Stage1NoBoxRecurrentEnvCfg()
+    env_cfg.sim.enable_scene_query_support = True
     base_scene_cfg = env_cfg.scene
     scene_cfg = build_scene_config_instance(
         base_scene_cfg,

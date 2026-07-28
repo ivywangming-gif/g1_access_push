@@ -1,5 +1,5 @@
 {
-  "contract_digest_sha256": "9d35d7289a2b8f766bf098aa8faf9fa67d417c721ee081f409d6a821d2168ba6",
+  "contract_digest_sha256": "d518f4b1ed5dab2a25c20b7f16b945f969d3ff48d2a2a48c001df52d2e95a99d",
   "qualification_state": "READY_FOR_SINGLE_FORMAL_RUN",
   "resolved": {
     "baseline": {
@@ -124,13 +124,31 @@
       "source": "ISAAC_LAB_RIGID_BODY_MATERIAL_DEFAULT_BASELINE"
     },
     "placement": {
+      "box_rear_face_x_world_m": 2.4,
       "box_spawn_bottom_gap_m": 0.002,
-      "box_spawn_center_z_m": 0.602,
+      "box_spawn_center_xyz_m": [
+        3.0,
+        0.0,
+        0.602
+      ],
       "ground_z_m": 0.0,
-      "isolation_clearance_m": 0.5,
-      "minimum_allowed_clearance_m": 0.499,
-      "purpose": "S2_01_DELIBERATE_NO_CONTACT_SAFETY_GAP",
-      "temporary_nonexperimental_spawn_x_m": 25.0
+      "initial_yaw_rad": 0.0,
+      "nominal_base_to_box_distance": {
+        "blocking_s2_01": false,
+        "resolution_stage": "S2_02",
+        "status": "UNRESOLVED"
+      },
+      "precontact_gap": {
+        "blocking_s2_01": false,
+        "resolution_stage": "S2_02",
+        "status": "UNRESOLVED"
+      },
+      "purpose": "S2_01_DEVELOPMENT_ONLY_NO_CONTACT_ISOLATION",
+      "robot_collider_envelope": {
+        "blocking_s2_01": false,
+        "status": "DEFERRED_TO_S2_02"
+      },
+      "source": "RESEARCH_LEAD_S2_01_ISOLATION_PLACEMENT"
     },
     "prohibitions": {
       "attach": false,
@@ -195,5 +213,5 @@
   "runnable": true,
   "schema_version": 1,
   "source_config_path": "/root/autodl-tmp/robotics/projects/g1_access_push/configs/stage2/s2_01_box_stand_sanity.yaml",
-  "source_config_sha256": "d8db9b1074a3b5dc60eade01e949bdd05f8cb16236c805306b233388a1030663"
+  "source_config_sha256": "1f75cea857fb17717d853da5a2bc9a035ab4095df5e135771eb36798a56f7c2b"
 }
