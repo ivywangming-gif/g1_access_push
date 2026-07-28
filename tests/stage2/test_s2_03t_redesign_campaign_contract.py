@@ -92,6 +92,152 @@ def test_shell_exit_preserves_terminal_invalid_reason(tmp_path: Path) -> None:
     assert status["shell_exit"]["reason"] == "SHELL_EXIT_AFTER_TERMINAL_STATUS"
 
 
+def _stub_scientific_fail(instance: campaign.Campaign) -> None:
+    instance.initialize = lambda: None
+    instance.reachability = lambda: campaign.StageResult(
+        "REACHABILITY_SMOKE",
+        0,
+        instance.run_root / "reachability_result.json",
+        {"status": "FAIL", "primary_reason": "NEW_ACTION_REACHABILITY_SMOKE_FAILED"},
+        True,
+        "NEW_ACTION_REACHABILITY_SMOKE_FAILED",
+    )
+    instance._reachability_valid = lambda _result: True
+
+
+def test_finalizer_launch_exception_writes_atomic_terminal_invalid(tmp_path: Path) -> None:
+    instance = campaign.Campaign(
+        SimpleNamespace(
+            run_root=tmp_path,
+            repository_root=ROOT,
+            implementation_commit="a" * 40,
+            tmux_session="test",
+        )
+    )
+    _stub_scientific_fail(instance)
+
+    def raise_finalizer() -> campaign.StageResult:
+        raise campaign.CampaignError("IMPLEMENTATION_HEAD_CHANGED_DURING_CAMPAIGN")
+
+    instance.finalize = raise_finalizer
+    assert instance.execute() == 2
+    status = json.loads((tmp_path / "status.json").read_text(encoding="utf-8"))
+    finalizer_result = json.loads(
+        (tmp_path / "finalizer_result.json").read_text(encoding="utf-8")
+    )
+    assert status["stage"] == "DONE"
+    assert status["campaign_status"] == "INVALID"
+    assert status["primary_reason"] == "IMPLEMENTATION_HEAD_CHANGED_DURING_CAMPAIGN"
+    assert status["scientific_status_before_finalizer"] == "FAIL"
+    assert finalizer_result["status"] == "INVALID"
+    assert finalizer_result["primary_reason"] == status["primary_reason"]
+    assert not list(tmp_path.rglob("*.tmp*"))
+    assert (
+        campaign.record_shell_exit(
+            SimpleNamespace(run_root=tmp_path, exit_code=2, command="CAMPAIGN_DRIVER")
+        )
+        == 0
+    )
+    status = json.loads((tmp_path / "status.json").read_text(encoding="utf-8"))
+    assert status["primary_reason"] == "IMPLEMENTATION_HEAD_CHANGED_DURING_CAMPAIGN"
+
+
+def test_finalizer_failure_propagates_exact_reason_and_preserves_artifact(
+    tmp_path: Path,
+) -> None:
+    instance = campaign.Campaign(
+        SimpleNamespace(
+            run_root=tmp_path,
+            repository_root=ROOT,
+            implementation_commit="a" * 40,
+            tmux_session="test",
+        )
+    )
+    _stub_scientific_fail(instance)
+    artifact = tmp_path / "finalizer_result.json"
+    payload = {
+        "status": "FAIL",
+        "primary_reason": "PUSH_FAILED_REMOTE_MOVED",
+        "result_commit": "a" * 40,
+    }
+    campaign.atomic_write_json(artifact, payload)
+    original_sha = campaign.sha256_file(artifact)
+    instance.finalize = lambda: campaign.StageResult(
+        "FINALIZER", 2, artifact, payload, True, "FINALIZER_PROCESS_RC_2"
+    )
+    assert instance.execute() == 2
+    status = json.loads((tmp_path / "status.json").read_text(encoding="utf-8"))
+    assert status["primary_reason"] == "PUSH_FAILED_REMOTE_MOVED"
+    assert status["finalizer_primary_reason"] == "PUSH_FAILED_REMOTE_MOVED"
+    assert status["result_commit"] == "a" * 40
+    assert campaign.sha256_file(artifact) == original_sha
+    assert not list(tmp_path.rglob("*.tmp*"))
+
+    for payload_reason in ("FINALIZER_EXCEPTION", None):
+        result = campaign.StageResult(
+            "FINALIZER",
+            2,
+            artifact,
+            None if payload_reason is None else {"primary_reason": payload_reason},
+            False,
+            "FINALIZER_PROCESS_RC_2",
+        )
+        expected = payload_reason or "FINALIZER_PROCESS_RC_2"
+        assert campaign.Campaign._finalizer_failure_reason(result) == expected
+
+
+def test_existing_finalizer_failure_reason_survives_late_orchestration_exception(
+    tmp_path: Path,
+) -> None:
+    instance = campaign.Campaign(
+        SimpleNamespace(
+            run_root=tmp_path,
+            repository_root=ROOT,
+            implementation_commit="a" * 40,
+            tmux_session="test",
+        )
+    )
+    _stub_scientific_fail(instance)
+    artifact = tmp_path / "finalizer_result.json"
+    payload = {
+        "status": "FAIL",
+        "primary_reason": "PUSH_FAILED_REMOTE_MOVED",
+        "result_commit": "b" * 40,
+    }
+    expected_artifact = tmp_path / "expected_finalizer.json"
+    campaign.atomic_write_json(expected_artifact, payload)
+    expected_sha = campaign.sha256_file(expected_artifact)
+
+    def write_then_raise() -> campaign.StageResult:
+        campaign.atomic_write_json(artifact, payload)
+        raise campaign.CampaignError("MANIFEST_STAGE_RECORDS_MALFORMED")
+
+    instance.finalize = write_then_raise
+    assert instance.execute() == 2
+    status = json.loads((tmp_path / "status.json").read_text(encoding="utf-8"))
+    assert status["stage"] == "DONE"
+    assert status["campaign_status"] == "INVALID"
+    assert status["primary_reason"] == "PUSH_FAILED_REMOTE_MOVED"
+    assert status["scientific_status_before_finalizer"] == "FAIL"
+    assert status["scientific_reason_before_finalizer"] == (
+        "NEW_ACTION_REACHABILITY_SMOKE_FAILED"
+    )
+    assert campaign.sha256_file(artifact) == expected_sha
+    assert json.loads(artifact.read_text(encoding="utf-8")) == payload
+    sidecar = tmp_path / "finalizer_orchestration_exception.json"
+    assert sidecar.is_file()
+    assert json.loads(sidecar.read_text(encoding="utf-8"))["error"]
+    assert not list(tmp_path.rglob("*.tmp*"))
+    assert (
+        campaign.record_shell_exit(
+            SimpleNamespace(run_root=tmp_path, exit_code=2, command="CAMPAIGN_DRIVER")
+        )
+        == 0
+    )
+    status = json.loads((tmp_path / "status.json").read_text(encoding="utf-8"))
+    assert status["primary_reason"] == "PUSH_FAILED_REMOTE_MOVED"
+
+
 def test_pilot_gate_is_one_shot_strict_and_finite() -> None:
     passed = campaign.evaluate_pilot_gate(pilot_result())
     assert passed["status"] == "PASS"

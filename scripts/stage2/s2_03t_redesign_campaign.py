@@ -665,7 +665,10 @@ class Campaign:
                 "FINALIZER",
             ],
             "frozen_execution": {
-                "action_name": "HYBRID_NOMINAL_NORMAL_APPROACH_PLUS_LEARNED_BILATERAL_NORMAL_CORRECTION",
+                "action_name": (
+                    "HYBRID_NOMINAL_NORMAL_APPROACH_PLUS_"
+                    "LEARNED_BILATERAL_NORMAL_CORRECTION"
+                ),
                 "action_dim": 2,
                 "reachability_gaps_m": list(REACHABILITY_GAPS_M),
                 "pilot_env_count": PILOT_ENV_COUNT,
@@ -1017,6 +1020,15 @@ class Campaign:
         return self.run_child("FINALIZER", command, self.run_root / "finalizer_result.json")
 
     @staticmethod
+    def _finalizer_failure_reason(result: StageResult) -> str:
+        payload_reason = (result.payload or {}).get("primary_reason")
+        if isinstance(payload_reason, str) and payload_reason:
+            return payload_reason
+        if result.reason:
+            return str(result.reason)
+        return "FINALIZER_ARTIFACT_INVALID"
+
+    @staticmethod
     def _reachability_valid(result: StageResult) -> bool:
         payload = result.payload or {}
         cases = payload.get("cases")
@@ -1209,19 +1221,79 @@ class Campaign:
             policy_status = "INVALID"
 
         self.write_outcome(campaign_status, primary_reason, policy_status)
-        finalizer = self.finalize()
+        scientific_status = campaign_status
+        scientific_reason = primary_reason
+        try:
+            finalizer = self.finalize()
+        except BaseException as finalizer_exc:
+            finalizer_artifact = self.run_root / "finalizer_result.json"
+            existing_finalizer = (
+                read_json(finalizer_artifact) if finalizer_artifact.is_file() else None
+            )
+            existing_reason = (
+                existing_finalizer.get("primary_reason")
+                if isinstance(existing_finalizer, dict)
+                and existing_finalizer.get("status") in {"FAIL", "INVALID"}
+                else None
+            )
+            if isinstance(existing_reason, str) and existing_reason:
+                finalizer_reason = existing_reason
+            elif isinstance(finalizer_exc, KeyboardInterrupt):
+                finalizer_reason = "CAMPAIGN_INTERRUPTED_DURING_FINALIZER"
+            elif isinstance(finalizer_exc, CampaignError):
+                finalizer_reason = str(finalizer_exc)
+            else:
+                finalizer_reason = "FINALIZER_ORCHESTRATION_EXCEPTION"
+            exception_payload = {
+                "schema_version": SCHEMA_VERSION,
+                "status": "INVALID",
+                "primary_reason": finalizer_reason,
+                "error": repr(finalizer_exc),
+                "traceback": traceback.format_exc(),
+                "result_commit": None,
+                "all_code_commits_pushed": False,
+                "all_remote_sha_verified": False,
+                "authoritative_complete_before_teardown": False,
+                "timestamp_utc": utc_timestamp(),
+            }
+            if not finalizer_artifact.exists():
+                atomic_write_json(finalizer_artifact, exception_payload)
+            else:
+                atomic_write_json(
+                    self.run_root / "finalizer_orchestration_exception.json",
+                    exception_payload,
+                )
+            existing_finalizer = existing_finalizer or exception_payload
+            self.update_status(
+                campaign_status="INVALID",
+                stage="DONE",
+                primary_reason=finalizer_reason,
+                child_pid=None,
+                scientific_status_before_finalizer=scientific_status,
+                scientific_reason_before_finalizer=scientific_reason,
+                finalizer_status=existing_finalizer.get("status"),
+                finalizer_primary_reason=existing_finalizer.get("primary_reason"),
+                finalizer_rc=None,
+                result_commit=existing_finalizer.get("result_commit"),
+            )
+            self.record_history(
+                "CAMPAIGN_TERMINAL", raw_rc=None, reason=finalizer_reason, status="INVALID"
+            )
+            return 2
         if not finalizer.authoritative or (finalizer.payload or {}).get("status") != "PASS":
-            scientific_status = campaign_status
-            scientific_reason = primary_reason
             campaign_status = "INVALID"
-            primary_reason = "FINALIZER_FAILED"
+            primary_reason = self._finalizer_failure_reason(finalizer)
             self.update_status(
                 campaign_status=campaign_status,
                 stage="DONE",
                 primary_reason=primary_reason,
+                child_pid=None,
                 scientific_status_before_finalizer=scientific_status,
                 scientific_reason_before_finalizer=scientific_reason,
+                finalizer_status=(finalizer.payload or {}).get("status"),
+                finalizer_primary_reason=(finalizer.payload or {}).get("primary_reason"),
                 finalizer_rc=finalizer.raw_rc,
+                result_commit=(finalizer.payload or {}).get("result_commit"),
             )
             self.record_history("CAMPAIGN_TERMINAL", raw_rc=finalizer.raw_rc, reason=primary_reason)
             return 2
