@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "stage": "S2-03T",
+  "result_type": "checkpoint_screening",
+  "status": "FAIL",
+  "primary_reason": "NO_QUALIFIED_CONTACT_POLICY",
+  "training_contract_sha256": "221f27d2a22d3e07f9bd9a05680d61d57f3b2af59a2cf0ed4f5bd8af424e6316",
+  "source_s2_03_fail_commit": "e018fe2a3bb284bb51da6a7e245c6772c6e0a87e",
+  "training_contract_commit": "cc21734066087a130ddcce8663065140c88f997c",
+  "code_commit": "5c17b7e06886f0b84687f788f8fc01658c8bfe4e",
+  "formal_training_summary": {
+    "path": "reports/stage2/s2_03t_formal_training_summary.json",
+    "sha256": "1bc32374fdc009a6db8ee8b237dddd432d16f092ef11c7b8aec1e88021dde190"
+  },
+  "formal_training_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403",
+  "screening_run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_screening_contactfix_20260728_121814",
+  "campaign_start_utc": "2026-07-28T12:19:32Z",
+  "campaign_end_utc": "2026-07-28T13:04:29Z",
+  "campaign_rc": 0,
+  "candidate_order": [999, 900, 800, 700, 600, 500],
+  "development_seeds": [42, 43, 44],
+  "screened_checkpoint_count": 6,
+  "expected_episode_count": 18,
+  "observed_episode_count": 18,
+  "valid_episode_count": 18,
+  "pass_episode_count": 0,
+  "fail_episode_count": 18,
+  "invalid_episode_count": 0,
+  "qualified_screening_checkpoints": 0,
+  "selected_checkpoint": null,
+  "final_qualification": "NOT_RUN",
+  "execution_contract": {
+    "deterministic_actor_mean": true,
+    "num_envs": 1,
+    "episode_count_per_seed": 1,
+    "auto_reset_accumulation": false,
+    "post_initial_reset_count": 0,
+    "formal_s2_03_evaluator_unchanged": true,
+    "second_isaac_parallel_instance": false,
+    "box_push_commanded": false,
+    "planner_started": false
+  },
+  "common_checkpoint_certification": {
+    "training_config_sha256": "9bd8ed13852371775c84121b4cfb9762f39864ef4e0075f1c3c0f9c5d21437fb",
+    "training_config_provenance": "POSTHOC_RECONSTRUCTED_FROM_PRELAUNCH_COMMIT_AND_BYTE_IDENTICAL_SOURCE",
+    "clean_actor": true,
+    "resume": false,
+    "pilot_checkpoint_used": false,
+    "model_1999_used": false,
+    "actor_input_dim": 77,
+    "actor_output_dim": 14,
+    "lower_body_output_keys": [],
+    "all_checkpoint_tensors_finite": true,
+    "reference_sha256": "1e537e075af7f888fb95a63501d3976d0d7740eff51c6bd9000f574b00cd0e6c"
+  },
+  "checkpoints": [
+    {
+      "iteration": 999,
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/model_999.pt",
+      "sha256": "812d186dbbb6fd25ed2a3cfc47572b2fcedc4b1ed005806eee80dfd942c59978",
+      "size_bytes": 1503395,
+      "pass_count": 0,
+      "qualified_3_of_3": false,
+      "aggregate_metrics": {
+        "left_gap_minimum_m": 0.03070586919784546,
+        "right_gap_minimum_m": 0.014461100101470947,
+        "force_maximum_n": 0.0,
+        "impulse_maximum_ns": 0.0,
+        "box_translation_maximum_m": 0.001301563112065196,
+        "box_yaw_change_absolute_maximum_rad": 5.620416914098314e-07,
+        "root_height_minimum_m": 0.7246726751327515,
+        "root_tilt_maximum_deg": 4.378732681274414,
+        "arm_joint_margin_minimum_rad": 0.9135230779647827,
+        "arm_torque_ratio_maximum": 0.5099743008613586
+      },
+      "episodes": [
+        {"seed": 42, "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "rc": 0, "observed_frames": 1300, "result_sha256": "8a9040d7c012c2e0c137de7fa0ef8fd03fe9285d202aac128c9e5a32a18ae945", "metadata_sha256": "7450a89a6e43591c5debc345f943731e8030972a94bf95d85f0e39641a698f76", "trace_sha256": "397831b000eeab649d3f56fe7fcd5b78803f43dc775e85f55369dbb99d28a2ce"},
+        {"seed": 43, "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "rc": 0, "observed_frames": 1300, "result_sha256": "8a9040d7c012c2e0c137de7fa0ef8fd03fe9285d202aac128c9e5a32a18ae945", "metadata_sha256": "f82fff6619d488235bc1e882e0348cd6de9e9e491f7b0d8f215f0948d090f36e", "trace_sha256": "397831b000eeab649d3f56fe7fcd5b78803f43dc775e85f55369dbb99d28a2ce"},
+        {"seed": 44, "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "rc": 0, "observed_frames": 1300, "result_sha256": "8a9040d7c012c2e0c137de7fa0ef8fd03fe9285d202aac128c9e5a32a18ae945", "metadata_sha256": "774891e66c29eed08d6efeef5ae4074c7760fa960b432b9294e6a43490a5e54a", "trace_sha256": "397831b000eeab649d3f56fe7fcd5b78803f43dc775e85f55369dbb99d28a2ce"}
+      ]
+    },
+    {
+      "iteration": 900,
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/model_900.pt",
+      "sha256": "f8c193fbb1912ceffe4a3a03689df3449e0d6f1f15d33be5a6085d396bf45ce8",
+      "size_bytes": 1503395,
+      "pass_count": 0,
+      "qualified_3_of_3": false,
+      "aggregate_metrics": {
+        "left_gap_minimum_m": 0.02615576982498169,
+        "right_gap_minimum_m": 0.016065537929534912,
+        "force_maximum_n": 0.0,
+        "impulse_maximum_ns": 0.0,
+        "box_translation_maximum_m": 0.001301563112065196,
+        "box_yaw_change_absolute_maximum_rad": 5.620416914098314e-07,
+        "root_height_minimum_m": 0.7246726751327515,
+        "root_tilt_maximum_deg": 4.283451557159424,
+        "arm_joint_margin_minimum_rad": 0.9135230779647827,
+        "arm_torque_ratio_maximum": 0.6860218048095703
+      },
+      "episodes": [
+        {"seed": 42, "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "rc": 0, "observed_frames": 1300, "result_sha256": "0194f27e312e20799daa7021bc40ef0653e20fcd484e69f571f507ea493f46fe", "metadata_sha256": "530673a49ea83b8c70af649712c21798c3bcf15f567a42a8fe664e93ae15d5db", "trace_sha256": "366ce60d54b963b1486a1ea0195ba88de8345bde016da9010835ee26623b753a"},
+        {"seed": 43, "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "rc": 0, "observed_frames": 1300, "result_sha256": "0194f27e312e20799daa7021bc40ef0653e20fcd484e69f571f507ea493f46fe", "metadata_sha256": "7ca342448550383092075f6d2a4283787c28947bd929a4d3fd95bc3068ec50a3", "trace_sha256": "366ce60d54b963b1486a1ea0195ba88de8345bde016da9010835ee26623b753a"},
+        {"seed": 44, "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "rc": 0, "observed_frames": 1300, "result_sha256": "0194f27e312e20799daa7021bc40ef0653e20fcd484e69f571f507ea493f46fe", "metadata_sha256": "d9c992f95175a83cf073e165dabe5d4657038b266ccf90707217439ba45bb2e7", "trace_sha256": "366ce60d54b963b1486a1ea0195ba88de8345bde016da9010835ee26623b753a"}
+      ]
+    },
+    {
+      "iteration": 800,
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/model_800.pt",
+      "sha256": "155be98f8603916a46cb49eeb252b66650c31e25a98f04cfa729733bae6a2bf6",
+      "size_bytes": 1503395,
+      "pass_count": 0,
+      "qualified_3_of_3": false,
+      "aggregate_metrics": {
+        "left_gap_minimum_m": 0.024887382984161377,
+        "right_gap_minimum_m": 0.017481863498687744,
+        "force_maximum_n": 0.0,
+        "impulse_maximum_ns": 0.0,
+        "box_translation_maximum_m": 0.001301563112065196,
+        "box_yaw_change_absolute_maximum_rad": 5.620416914098314e-07,
+        "root_height_minimum_m": 0.7246726751327515,
+        "root_tilt_maximum_deg": 4.357254505157471,
+        "arm_joint_margin_minimum_rad": 0.9135230779647827,
+        "arm_torque_ratio_maximum": 0.41486698389053345
+      },
+      "episodes": [
+        {"seed": 42, "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "rc": 0, "observed_frames": 1300, "result_sha256": "178ac5f23b3b5c874d80333df4b363f8b155d4add09d66d9f241354c85bdf7c0", "metadata_sha256": "91debea43f5d2cdd27b91e4a6314f7a2eaf0325760ee64eaae9a1f4ade1fca85", "trace_sha256": "ac43335e7635fe8f0667b8309ce873a4ab94d25dab6e0fc7e11179f89277c43f"},
+        {"seed": 43, "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "rc": 0, "observed_frames": 1300, "result_sha256": "178ac5f23b3b5c874d80333df4b363f8b155d4add09d66d9f241354c85bdf7c0", "metadata_sha256": "c3500f8d4b3772351446d932646e6998eaef96321eb52ee900ad4b8fb129e011", "trace_sha256": "ac43335e7635fe8f0667b8309ce873a4ab94d25dab6e0fc7e11179f89277c43f"},
+        {"seed": 44, "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "rc": 0, "observed_frames": 1300, "result_sha256": "178ac5f23b3b5c874d80333df4b363f8b155d4add09d66d9f241354c85bdf7c0", "metadata_sha256": "96010d46a922fd1cb6a92446e4e09347beec70acc4e76bdcd37183bbcd9ebef8", "trace_sha256": "ac43335e7635fe8f0667b8309ce873a4ab94d25dab6e0fc7e11179f89277c43f"}
+      ]
+    },
+    {
+      "iteration": 700,
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/model_700.pt",
+      "sha256": "dc01a80d7a206a66ccc367bdb213ab706efa609f60e8041a6da0373a9962d401",
+      "size_bytes": 1503395,
+      "pass_count": 0,
+      "qualified_3_of_3": false,
+      "aggregate_metrics": {
+        "left_gap_minimum_m": 0.05193871259689331,
+        "right_gap_minimum_m": 0.05990391969680786,
+        "force_maximum_n": 0.0,
+        "impulse_maximum_ns": 0.0,
+        "box_translation_maximum_m": 0.001301563112065196,
+        "box_yaw_change_absolute_maximum_rad": 5.620416914098314e-07,
+        "root_height_minimum_m": 0.7246726751327515,
+        "root_tilt_maximum_deg": 4.307389736175537,
+        "arm_joint_margin_minimum_rad": 0.9135230779647827,
+        "arm_torque_ratio_maximum": 0.41486698389053345
+      },
+      "episodes": [
+        {"seed": 42, "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "rc": 0, "observed_frames": 1300, "result_sha256": "919bf71cf3cd2e490dbb9218f7827f54bad0d04bfbc21537620dec3a78d95baf", "metadata_sha256": "ac48168fca95e99cd82f57fe5805d90f94a3197be20a713dbd105157636ff61e", "trace_sha256": "d7d1fef1bdbb099275db01b27f382c4ec277de18e7f8654142db3f8130a59c56"},
+        {"seed": 43, "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "rc": 0, "observed_frames": 1300, "result_sha256": "919bf71cf3cd2e490dbb9218f7827f54bad0d04bfbc21537620dec3a78d95baf", "metadata_sha256": "9b0173b4fb86f5c5ce5f39761489e3d78da7f48446ef47b7bf3a60b0008ad3bd", "trace_sha256": "d7d1fef1bdbb099275db01b27f382c4ec277de18e7f8654142db3f8130a59c56"},
+        {"seed": 44, "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "rc": 0, "observed_frames": 1300, "result_sha256": "919bf71cf3cd2e490dbb9218f7827f54bad0d04bfbc21537620dec3a78d95baf", "metadata_sha256": "c93cf76b3184298bb479f3f392d7a86a3c5da835860329fde0b87e15ddb30632", "trace_sha256": "d7d1fef1bdbb099275db01b27f382c4ec277de18e7f8654142db3f8130a59c56"}
+      ]
+    },
+    {
+      "iteration": 600,
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/model_600.pt",
+      "sha256": "195e01690fa43fdb5c2cec7afd03561c016ee0aed735dbbc01ab829291486007",
+      "size_bytes": 1503395,
+      "pass_count": 0,
+      "qualified_3_of_3": false,
+      "aggregate_metrics": {
+        "left_gap_minimum_m": 0.027362525463104248,
+        "right_gap_minimum_m": 0.015404045581817627,
+        "force_maximum_n": 0.0,
+        "impulse_maximum_ns": 0.0,
+        "box_translation_maximum_m": 0.001301563112065196,
+        "box_yaw_change_absolute_maximum_rad": 5.620416914098314e-07,
+        "root_height_minimum_m": 0.7246726751327515,
+        "root_tilt_maximum_deg": 4.344560146331787,
+        "arm_joint_margin_minimum_rad": 0.9135230779647827,
+        "arm_torque_ratio_maximum": 0.41486698389053345
+      },
+      "episodes": [
+        {"seed": 42, "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "rc": 0, "observed_frames": 1300, "result_sha256": "915769c7856184a5a36452cfebb60ed3e405c9084616d4c69d3004d1a9ba0347", "metadata_sha256": "9f37f561e23f0141c971d0ac6c8b4032460ec9b17363cdd815488df878f6139d", "trace_sha256": "19390e930709c29678ba92a441dc3fd4b31f68215cc88688849ec8b753f6be3a"},
+        {"seed": 43, "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "rc": 0, "observed_frames": 1300, "result_sha256": "915769c7856184a5a36452cfebb60ed3e405c9084616d4c69d3004d1a9ba0347", "metadata_sha256": "18e29d34c8bca78db28581fa9a867f942e121ea911e23f9e57c2a4c2a4b7ec4e", "trace_sha256": "19390e930709c29678ba92a441dc3fd4b31f68215cc88688849ec8b753f6be3a"},
+        {"seed": 44, "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "rc": 0, "observed_frames": 1300, "result_sha256": "915769c7856184a5a36452cfebb60ed3e405c9084616d4c69d3004d1a9ba0347", "metadata_sha256": "7c64bd06dd30d13af05a63d6b1765d57867254663e05ff05c9b72af10f9578e0", "trace_sha256": "19390e930709c29678ba92a441dc3fd4b31f68215cc88688849ec8b753f6be3a"}
+      ]
+    },
+    {
+      "iteration": 500,
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/model_500.pt",
+      "sha256": "4865e70690a273ec2619ab5d7a02d22ce2957a3c663919a8ec29ad54aa8a8871",
+      "size_bytes": 1503395,
+      "pass_count": 0,
+      "qualified_3_of_3": false,
+      "aggregate_metrics": {
+        "left_gap_minimum_m": 0.02508622407913208,
+        "right_gap_minimum_m": 0.01568537950515747,
+        "force_maximum_n": 0.0,
+        "impulse_maximum_ns": 0.0,
+        "box_translation_maximum_m": 0.001301563112065196,
+        "box_yaw_change_absolute_maximum_rad": 5.620416914098314e-07,
+        "root_height_minimum_m": 0.7246726751327515,
+        "root_tilt_maximum_deg": 4.350192070007324,
+        "arm_joint_margin_minimum_rad": 0.9135230779647827,
+        "arm_torque_ratio_maximum": 0.41486698389053345
+      },
+      "episodes": [
+        {"seed": 42, "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "rc": 0, "observed_frames": 1300, "result_sha256": "b5f94d76017de96ffdc4feafc706c9c002611f57306c20efa276f267d5a37394", "metadata_sha256": "f2cff1656ca55efa9835e37653030bda1efae3c401ea010704de9d742b93d353", "trace_sha256": "126608f675a43645bab1530baae7b201a415eb0e09781a3dfb055d98bc6bf53f"},
+        {"seed": 43, "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "rc": 0, "observed_frames": 1300, "result_sha256": "b5f94d76017de96ffdc4feafc706c9c002611f57306c20efa276f267d5a37394", "metadata_sha256": "9af93500567397f70172520138f7f2af4e2a67e7cc6c3f0e50f78adae987e234", "trace_sha256": "126608f675a43645bab1530baae7b201a415eb0e09781a3dfb055d98bc6bf53f"},
+        {"seed": 44, "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "rc": 0, "observed_frames": 1300, "result_sha256": "b5f94d76017de96ffdc4feafc706c9c002611f57306c20efa276f267d5a37394", "metadata_sha256": "208aad94a06f00703dc64c96bcefea72a17772c279e6faec7ff573c7af6aabab", "trace_sha256": "126608f675a43645bab1530baae7b201a415eb0e09781a3dfb055d98bc6bf53f"}
+      ]
+    }
+  ],
+  "aggregate_metrics": {
+    "maximum_force_n": 0.0,
+    "maximum_impulse_ns": 0.0,
+    "maximum_combined_impulse_ns": 0.0,
+    "maximum_force_rate_nps": 0.0,
+    "maximum_box_translation_m": 0.001301563112065196,
+    "maximum_absolute_box_yaw_change_rad": 5.620416914098314e-07,
+    "minimum_root_height_m": 0.7246726751327515,
+    "maximum_root_tilt_deg": 4.378732681274414,
+    "minimum_arm_joint_margin_rad": 0.9135230779647827,
+    "maximum_arm_torque_ratio": 0.6860218048095703,
+    "minimum_left_gap_m": 0.024887382984161377,
+    "minimum_right_gap_m": 0.014461100101470947,
+    "bilateral_verify_steps": 0,
+    "attached_hold_steps": 0
+  },
+  "evidence_audit": {
+    "all_result_and_summary_pairs_identical": true,
+    "all_runner_status_complete": true,
+    "all_installed_reference_audits_pass": true,
+    "all_installed_reference_max_abs_diff_zero": true,
+    "all_checkpoint_paths_and_sha_match": true,
+    "all_episode_traces_have_1300_contiguous_frames": true,
+    "all_episode_traces_finite": true,
+    "all_episode_traces_no_reset": true,
+    "all_episode_traces_no_forbidden_collision": true,
+    "all_episode_traces_no_contact": true,
+    "all_episode_traces_no_push": true,
+    "all_episode_time_out": true,
+    "traceback_count": 0,
+    "oom_count": 0,
+    "nonfinite_count": 0,
+    "campaign_console_sha256": "dfb0dacf76fab3902f050db74b454e082b2618dd03590e0fe4282b436ab989fe",
+    "campaign_rc_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "terminal_boundaries": {
+    "formal_qualification_started": false,
+    "active_controller_manifest_updated": false,
+    "global_regression_run": false,
+    "second_ppo_training_started": false,
+    "box_pushed": false,
+    "planner_started": false,
+    "s2_04_started": false
+  }
+}

@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "stage": "S2-03T",
+  "result_type": "formal_training",
+  "status": "PASS",
+  "primary_reason": "TRAINING_COMPLETED_FINITE",
+  "training_contract_sha256": "221f27d2a22d3e07f9bd9a05680d61d57f3b2af59a2cf0ed4f5bd8af424e6316",
+  "source_s2_03_fail_commit": "e018fe2a3bb284bb51da6a7e245c6772c6e0a87e",
+  "training_contract_commit": "cc21734066087a130ddcce8663065140c88f997c",
+  "code_commit": "5c17b7e06886f0b84687f788f8fc01658c8bfe4e",
+  "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403",
+  "mode": "FORMAL",
+  "seed": 42,
+  "num_envs": 256,
+  "requested_iterations": 1000,
+  "completed_iterations": 1000,
+  "runner_final_iteration": 999,
+  "zero_indexed_iteration_contract": true,
+  "launcher_rc": 0,
+  "training_rc": 0,
+  "clean_actor": true,
+  "clean_optimizer": true,
+  "clean_normalizer": true,
+  "resume": false,
+  "checkpoint_loaded": false,
+  "pilot_checkpoint_used": false,
+  "model_1999_used": false,
+  "initial_actor_sha256": "080580a1754bce302a4ccbaaa754d9e83fd86880c274453fe736867a6acfdd0b",
+  "reference": {
+    "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_104740/precontact_reference.pt",
+    "sha256": "1e537e075af7f888fb95a63501d3976d0d7740eff51c6bd9000f574b00cd0e6c"
+  },
+  "interface": {
+    "actor_input_dim": 77,
+    "critic_input_dim": 77,
+    "actor_output_dim": 14,
+    "lower_body_action_dim": 0,
+    "certified_lower_body_checkpoint_sha256": "a0151975a757a33f0f5ed236d5616e2a98643abe2b36e50ac9ad01b6dd1f6d7e"
+  },
+  "finite_audit": {
+    "training_result_finite": true,
+    "all_1000_loss_records_finite": true,
+    "all_11_checkpoint_tensor_sets_finite": true,
+    "all_17_reward_series_finite": true,
+    "all_19_termination_series_finite": true,
+    "nonfinite_termination_max": 0.0,
+    "observation_fail_closed_source_check": true,
+    "action_fail_closed_source_check": true,
+    "traceback_count": 0,
+    "oom_count": 0
+  },
+  "training_curve": {
+    "record_count": 1000,
+    "iteration_first": 0,
+    "iteration_last": 999,
+    "mean_surface_gap_m_minimum": 0.02261934243142605,
+    "mean_surface_gap_m_minimum_iteration": 720,
+    "mean_surface_gap_m_final": 0.026583164930343628,
+    "bilateral_contact_fraction_maximum": 0.0,
+    "bilateral_contact_fraction_final": 0.0,
+    "success_fraction_maximum": 0.0,
+    "success_fraction_final": 0.0,
+    "mean_box_translation_m_maximum": 1.6877086181921186e-06,
+    "mean_root_height_m_minimum": 0.7250404357910156,
+    "maximum_root_tilt_deg": 4.538290977478027,
+    "minimum_arm_joint_margin_rad": 1.024380087852478,
+    "maximum_arm_torque_ratio": 0.7248386144638062
+  },
+  "tensorboard_audit": {
+    "scalar_tag_count": 49,
+    "reward_tag_count": 17,
+    "termination_tag_count": 19,
+    "points_per_reward_tag": 1000,
+    "points_per_termination_tag": 1000,
+    "force_imbalance_reward_minimum": 0.0,
+    "force_imbalance_reward_maximum": 0.0,
+    "force_impulse_rate_reward_minimum": 0.0,
+    "force_impulse_rate_reward_maximum": 0.0,
+    "force_peak_termination_maximum": 0.0,
+    "palm_impulse_termination_maximum": 0.0,
+    "combined_impulse_termination_maximum": 0.0,
+    "force_rate_termination_maximum": 0.0
+  },
+  "checkpoints": [
+    {
+      "iteration": 0,
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/model_0.pt",
+      "sha256": "0d62b2c172406405534463d5360b2890f044f54281343d4da99d88f748cb7da6",
+      "size_bytes": 1502783,
+      "actor_input_dim": 77,
+      "actor_output_dim": 14
+    },
+    {
+      "iteration": 100,
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/model_100.pt",
+      "sha256": "da6b14c38264f7df6cabe54f97299a18fdab40b1bc50f8d38f4a950fc5791ed0",
+      "size_bytes": 1503395,
+      "actor_input_dim": 77,
+      "actor_output_dim": 14
+    },
+    {
+      "iteration": 200,
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/model_200.pt",
+      "sha256": "1de7dba74f4f6cf7475aed4a3ec6c9a44baa858b319e0e4d3bc5cf2c305fbd74",
+      "size_bytes": 1503395,
+      "actor_input_dim": 77,
+      "actor_output_dim": 14
+    },
+    {
+      "iteration": 300,
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/model_300.pt",
+      "sha256": "7ce0d86b3c3898dbcbbf4b2b5c782610e8d7b01ee9e701c20d27f18948825063",
+      "size_bytes": 1503395,
+      "actor_input_dim": 77,
+      "actor_output_dim": 14
+    },
+    {
+      "iteration": 400,
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/model_400.pt",
+      "sha256": "5c7ad281839b2600b526ecddfaaf77a2e718a9a243e669b0ac372e60980130c8",
+      "size_bytes": 1503395,
+      "actor_input_dim": 77,
+      "actor_output_dim": 14
+    },
+    {
+      "iteration": 500,
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/model_500.pt",
+      "sha256": "4865e70690a273ec2619ab5d7a02d22ce2957a3c663919a8ec29ad54aa8a8871",
+      "size_bytes": 1503395,
+      "actor_input_dim": 77,
+      "actor_output_dim": 14
+    },
+    {
+      "iteration": 600,
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/model_600.pt",
+      "sha256": "195e01690fa43fdb5c2cec7afd03561c016ee0aed735dbbc01ab829291486007",
+      "size_bytes": 1503395,
+      "actor_input_dim": 77,
+      "actor_output_dim": 14
+    },
+    {
+      "iteration": 700,
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/model_700.pt",
+      "sha256": "dc01a80d7a206a66ccc367bdb213ab706efa609f60e8041a6da0373a9962d401",
+      "size_bytes": 1503395,
+      "actor_input_dim": 77,
+      "actor_output_dim": 14
+    },
+    {
+      "iteration": 800,
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/model_800.pt",
+      "sha256": "155be98f8603916a46cb49eeb252b66650c31e25a98f04cfa729733bae6a2bf6",
+      "size_bytes": 1503395,
+      "actor_input_dim": 77,
+      "actor_output_dim": 14
+    },
+    {
+      "iteration": 900,
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/model_900.pt",
+      "sha256": "f8c193fbb1912ceffe4a3a03689df3449e0d6f1f15d33be5a6085d396bf45ce8",
+      "size_bytes": 1503395,
+      "actor_input_dim": 77,
+      "actor_output_dim": 14
+    },
+    {
+      "iteration": 999,
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/model_999.pt",
+      "sha256": "812d186dbbb6fd25ed2a3cfc47572b2fcedc4b1ed005806eee80dfd942c59978",
+      "size_bytes": 1503395,
+      "actor_input_dim": 77,
+      "actor_output_dim": 14
+    }
+  ],
+  "evidence": {
+    "training_result_path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_clean_contactfix_20260728_113403/training_result.json",
+    "training_result_sha256": "76ea71da6297a5ceec234c1adec54e6f0c05178a09a95de75a14478dd9c93ff7",
+    "clean_initialization_sha256": "4a2876c820f30b6da36447132cb73c61c62362a9dd17a0e5f26ebc288b5b4325",
+    "console_sha256": "53b8aeb062f02583c72625baea544ce881363043716bca2d555372be600ecec9",
+    "tensorboard_event_sha256": "1607fef620c21664efc9d337d09e7cd1104d77c17cc3e780647a303336787c36",
+    "resolved_config_sha256": "9bd8ed13852371775c84121b4cfb9762f39864ef4e0075f1c3c0f9c5d21437fb",
+    "ppo_parameter_provenance_sha256": "6e9986da484d6213c2d0bf0b11cafaea2908b22de9007d83252049b78d89a35f",
+    "train_script_sha256": "13e054519e4d50451f3a95215654b4bc30d605315613681e61486dd49b1dede5",
+    "contract_source_sha256": "50ad6ee5a7cc219a536d0aff049a0e991c1e255eb8930d08b05dfd7bbd6f09b2",
+    "environment_config_sha256": "f6658901686d5a0c09ed2ca88c66d28817e2ba8181f2ab1e7da1fc874efa68f6"
+  },
+  "logging_contract_audit": {
+    "status": "PARTIAL_POSTHOC_RECONSTRUCTED",
+    "provenance_capture": "POSTHOC_RECONSTRUCTED_FROM_PRELAUNCH_COMMIT_AND_BYTE_IDENTICAL_SOURCE",
+    "launch_time_training_contract_sha_persisted_in_run": false,
+    "launch_time_config_sha_persisted_in_run": false,
+    "launch_time_code_sha_persisted_in_run": false,
+    "direct_training_force_curve_persisted": false,
+    "direct_training_force_curve": "METRIC_MISSING",
+    "force_evidence_available": "DERIVED_AGGREGATE_REWARD_AND_TERMINATION_SERIES_ONLY",
+    "per_step_training_trace": "NOT_REQUIRED",
+    "effect_on_terminal_scientific_result": "DOES_NOT_OVERRIDE_COMPLETE_ONE_EPISODE_SCREENING_EVIDENCE"
+  }
+}
