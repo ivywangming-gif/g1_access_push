@@ -33,6 +33,9 @@ def test_runner_uses_fsm_normal_only_and_records_bilateral_evidence() -> None:
     for metric in ("left_contact", "right_contact", "left_force_n", "right_force_n", "left_impulse_ns", "right_impulse_ns", "contact_force_rate_nps", "forbidden_contact_links"):
         assert metric in source
     assert "advance_rate_limited" in source
+    assert "expected_resolved_filters" in source
+    assert 'expression.replace("{ENV_REGEX_NS}", "/World/envs/env_.*")' in source
+    assert 'list(sensor.cfg.filter_prim_paths_expr) == list(BOX_FILTER_EXPRESSIONS)' not in source
     assert "failure_unload_steps" in source
     assert "box_displacement_subgoal" not in source
 

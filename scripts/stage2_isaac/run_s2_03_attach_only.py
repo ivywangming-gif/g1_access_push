@@ -184,6 +184,8 @@ def target_pose_in_pelvis(robot, box_pos: torch.Tensor, box_quat: torch.Tensor, 
 
 def audit_palm_sensor(stage, sensor, configured_path: str, expected_body_name: str) -> dict:
     force_matrix = sensor.data.force_matrix_w
+    resolved_filters = list(sensor.cfg.filter_prim_paths_expr)
+    expected_resolved_filters = [expression.replace("{ENV_REGEX_NS}", "/World/envs/env_.*") for expression in BOX_FILTER_EXPRESSIONS]
     actual_paths = list(sensor.body_physx_view.prim_paths[: sensor.num_bodies])
     actual_path = actual_paths[0] if len(actual_paths) == 1 else ""
     prim = stage.GetPrimAtPath(actual_path)
@@ -196,11 +198,14 @@ def audit_palm_sensor(stage, sensor, configured_path: str, expected_body_name: s
         "force_matrix_finite": force_matrix is not None and bool(torch.isfinite(force_matrix).all()),
         "contact_reporter": bool(prim.IsValid() and prim.HasAPI(PhysxSchema.PhysxContactReportAPI)),
         "rigid_body": bool(prim.IsValid() and prim.HasAPI(UsdPhysics.RigidBodyAPI)),
-        "box_filter_config": list(sensor.cfg.filter_prim_paths_expr) == list(BOX_FILTER_EXPRESSIONS),
+        "box_filter_resolved": resolved_filters == expected_resolved_filters,
     }
     return {
         "configured_prim_path": configured_path, "resolved_prim_expression": sensor.cfg.prim_path,
         "actual_body_paths": actual_paths, "body_names": list(sensor.body_names),
+        "configured_filter_templates": list(BOX_FILTER_EXPRESSIONS),
+        "resolved_filter_expressions": resolved_filters,
+        "expected_resolved_filter_expressions": expected_resolved_filters,
         "filter_count": int(sensor.contact_physx_view.filter_count),
         "force_matrix_shape": None if force_matrix is None else list(force_matrix.shape),
         "checks": checks, "status": "PASS" if all(checks.values()) else "FAIL",
