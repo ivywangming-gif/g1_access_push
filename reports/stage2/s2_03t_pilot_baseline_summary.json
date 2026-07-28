@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "stage": "S2-03T",
+  "mode": "CLEAN_UNTRAINED_ACTOR_BASELINE",
+  "status": "PASS",
+  "primary_reason": "FOUR_VALID_BASELINE_EPISODES_COMPLETE",
+  "scientific_result_created": false,
+  "code_commit": "51a0cd9b7df9911e735e6ec76cf2c00b7cbf2edc",
+  "training_contract_sha256": "221f27d2a22d3e07f9bd9a05680d61d57f3b2af59a2cf0ed4f5bd8af424e6316",
+  "reference_path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_091813/precontact_reference.pt",
+  "reference_sha256": "1e537e075af7f888fb95a63501d3976d0d7740eff51c6bd9000f574b00cd0e6c",
+  "invalid_infrastructure_attempts": [
+    {
+      "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_baseline_seed42_20260728_092524",
+      "status": "INVALID",
+      "primary_reason": "PRECONTACT_REFERENCE_REPLAY_MISMATCH",
+      "actor_episode_started": false
+    }
+  ],
+  "episodes": [
+    {"seed": 42, "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_baseline_seed42_20260728_093657", "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "left_minimum_surface_gap_m": 0.05929344892501831, "right_minimum_surface_gap_m": 0.05525928735733032, "bilateral_contact": false, "finite": true, "forbidden_collision": false, "reset_count": 0, "installed_reference_max_abs_diff": 0.0},
+    {"seed": 43, "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_baseline_seed43_20260728_094042", "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "left_minimum_surface_gap_m": 0.05928415060043335, "right_minimum_surface_gap_m": 0.05660909414291382, "bilateral_contact": false, "finite": true, "forbidden_collision": false, "reset_count": 0, "installed_reference_max_abs_diff": 0.0},
+    {"seed": 44, "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_baseline_seed44_20260728_094356", "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "left_minimum_surface_gap_m": 0.05929344892501831, "right_minimum_surface_gap_m": 0.05626159906387329, "bilateral_contact": false, "finite": true, "forbidden_collision": false, "reset_count": 0, "installed_reference_max_abs_diff": 0.0},
+    {"seed": 45, "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_baseline_seed45_20260728_094724", "status": "FAIL", "primary_reason": "BILATERAL_CONTACT_TIMEOUT", "left_minimum_surface_gap_m": 0.0590786337852478, "right_minimum_surface_gap_m": 0.05556279420852661, "bilateral_contact": false, "finite": true, "forbidden_collision": false, "reset_count": 0, "installed_reference_max_abs_diff": 0.0}
+  ],
+  "valid_episode_count": 4,
+  "aggregate_mean_minimum_surface_gap_m": 0.05758030712604523,
+  "left_mean_minimum_surface_gap_m": 0.05923742055892944,
+  "right_mean_minimum_surface_gap_m": 0.05592319369316101,
+  "bilateral_contact_episode_count": 0,
+  "all_finite": true,
+  "all_safety_valid": true,
+  "checkpoint_loaded": false,
+  "pilot_checkpoint_used": false,
+  "model_1999_used": false
+}
