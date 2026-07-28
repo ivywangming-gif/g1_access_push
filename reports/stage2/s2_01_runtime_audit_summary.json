@@ -1,0 +1,39 @@
+{
+  "box_material_prim_path": "/World/envs/env_0/Box/geometry/material",
+  "com_local_xyz_m": [
+    0.0,
+    0.0,
+    -0.4000000059604645
+  ],
+  "configured_ground_material_prim_path": "/World/ground/physicsMaterial",
+  "contact_sensor_audit_pass": true,
+  "episode_robot_contact_force_max_n": 0.0,
+  "ground_material_path_resolution": "UNIQUE_COLLISION_BINDING",
+  "inertia_diagonal_kg_m2": [
+    0.12083332240581512,
+    0.4333333373069763,
+    0.5208333134651184
+  ],
+  "initial_robot_box_overlap_count": 0,
+  "initial_robot_contact_force_max_n": 0.0,
+  "mass_kg": 5.0,
+  "mass_tolerance_checks": {
+    "com": true,
+    "inertia": true,
+    "mass": true,
+    "principal_axes": true
+  },
+  "material_pair_pass": true,
+  "optional_robot_aabb": "OPTIONAL_METRIC_NOT_RUN",
+  "property_query_disagreement": {
+    "com_max_abs_diff": 0.0,
+    "inertia_max_abs_diff": 0.0,
+    "mass_abs_diff": 0.0
+  },
+  "resolved_ground_material_prim_path": "/World/ground/terrain/physicsMaterial",
+  "runtime_authority": "root_physx_view",
+  "schema_version": 1,
+  "source_commit_sha": "adb6090abe8a214b5333fbc1dddd12b2aaf5b582",
+  "stage": "S2-01",
+  "status": "PASS"
+}

@@ -1,0 +1,98 @@
+{
+  "all_reasons": [],
+  "box_stillness": "PASS",
+  "config_sha256": "1f75cea857fb17717d853da5a2bc9a035ab4095df5e135771eb36798a56f7c2b",
+  "development_baseline_id": "S2_LIGHT_BOX_DEVELOPMENT_BASELINE_V1",
+  "episode_count": 1,
+  "evaluator_rc": 0,
+  "evidence": {
+    "ATTACH_NOT_RUN": true,
+    "BOX_NOT_PUSHED": true,
+    "PLANNER_NOT_STARTED": true,
+    "S2_02_NOT_STARTED": true
+  },
+  "expected_frames": 3000,
+  "final_image_present": true,
+  "launcher_rc": 0,
+  "observed_frames": 3000,
+  "primary_reason": "ALL_FROZEN_GATES_PASSED",
+  "reset_count": 0,
+  "resolved_config_sha256": "afd556bc4878a2483f8928d7b8c4c92a2db1b1e5a7fe2e15ec26da0ef7aaa909",
+  "result_json_sha256": "97b8c6de0b01dbc92685dc76977f686f043d224ca4006ee61db11414692be6d9",
+  "robot_stability": "PASS",
+  "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_01_formal_20260728_051400",
+  "runner_effective_rc": 0,
+  "runner_raw_rc": 0,
+  "runtime_audits": [
+    "box_mass_properties_audit.json",
+    "box_rigid_body_audit.json",
+    "contact_sensor_audit.json",
+    "physics_material_audit.json",
+    "scene_geometry_audit.json"
+  ],
+  "schema_version": 1,
+  "source_commit_sha": "adb6090abe8a214b5333fbc1dddd12b2aaf5b582",
+  "stage": "S2-01",
+  "status": "PASS",
+  "stillness_metrics": {
+    "box_abs_pitch_rad": {
+      "final": 7.146675621913463e-08,
+      "first_threshold_exceeding_frame": null,
+      "maximum": 4.769344143296119e-07,
+      "p95": 2.59842847577472e-07,
+      "pass": true,
+      "threshold": 0.008726646259971648
+    },
+    "box_abs_roll_rad": {
+      "final": 3.6027522032014785e-08,
+      "first_threshold_exceeding_frame": null,
+      "maximum": 2.234975774260083e-06,
+      "p95": 1.817823322285447e-06,
+      "pass": true,
+      "threshold": 0.008726646259971648
+    },
+    "box_abs_vertical_drift_m": {
+      "final": 5.960464477539063e-08,
+      "first_threshold_exceeding_frame": null,
+      "maximum": 7.152557373046875e-07,
+      "p95": 4.172325134277344e-07,
+      "pass": true,
+      "threshold": 0.003
+    },
+    "box_abs_yaw_change_rad": {
+      "final": 9.085283996638711e-08,
+      "first_threshold_exceeding_frame": null,
+      "maximum": 7.575749232425306e-07,
+      "p95": 5.054493286074775e-07,
+      "pass": true,
+      "threshold": 0.008726646259971648
+    },
+    "box_angular_speed_radps": {
+      "final": 0.0017098936950787902,
+      "first_threshold_exceeding_frame": null,
+      "maximum": 0.0019309415947645903,
+      "p95": 0.0016996076912619172,
+      "pass": true,
+      "threshold": 0.008726646259971648
+    },
+    "box_linear_speed_mps": {
+      "final": 0.0007947869598865509,
+      "first_threshold_exceeding_frame": null,
+      "maximum": 0.001255917944945395,
+      "p95": 0.0009226388006936758,
+      "pass": true,
+      "threshold": 0.005
+    },
+    "box_translation_from_reference_m": {
+      "final": 1.1658793255264754e-06,
+      "first_threshold_exceeding_frame": null,
+      "maximum": 1.886294967334834e-06,
+      "p95": 1.2514748334524476e-06,
+      "pass": true,
+      "threshold": 0.005
+    }
+  },
+  "task": "BOX_SPAWN_NO_CONTACT_STAND_SANITY",
+  "trace_complete": true,
+  "wall_time_seconds": 258
+}

@@ -1,0 +1,15 @@
+{
+  "final_image_committed": false,
+  "formal_attempts": 1,
+  "formal_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_01_formal_20260728_051400",
+  "next_branch": "stage2/s2-02-precontact-audit",
+  "preflight_attempts": 2,
+  "preflight_pass_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_01_preflight_20260728_051222",
+  "primary_reason": "ALL_FROZEN_GATES_PASSED",
+  "raw_trace_committed": false,
+  "schema_version": 1,
+  "source_commit_sha": "adb6090abe8a214b5333fbc1dddd12b2aaf5b582",
+  "stage": "S2-01",
+  "status": "PASS",
+  "thresholds_changed_after_preflight": false
+}

@@ -1,0 +1,11 @@
+{
+  "bash_n": "PASS",
+  "command": "PYTHONPATH=src python -m pytest -q tests/stage2/test_s2_00_contract.py tests/stage2/test_s2_01_contract.py tests/stage2/test_s2_01_config_and_process.py tests/test_stage1_grounded_contact_geometry.py",
+  "failed": 0,
+  "git_diff_check": "PASS",
+  "passed": 67,
+  "py_compile": "PASS",
+  "schema_version": 1,
+  "stage": "S2-01",
+  "status": "PASS"
+}
