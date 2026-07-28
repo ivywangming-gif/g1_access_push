@@ -1,0 +1,500 @@
+{
+  "action": {
+    "arm_action_dim": 14,
+    "joint_limit_margin_rad": 0.1,
+    "lower_body_action_dim": 0,
+    "lower_body_command": [
+      0.0,
+      0.0,
+      0.0,
+      0.7
+    ],
+    "lower_body_trainable": false,
+    "maximum_residual_change_per_control_step_rad": 0.005,
+    "normalized_range": [
+      -1.0,
+      1.0
+    ],
+    "ordered_joint_names": [
+      "left_shoulder_pitch_joint",
+      "right_shoulder_pitch_joint",
+      "left_shoulder_roll_joint",
+      "right_shoulder_roll_joint",
+      "left_shoulder_yaw_joint",
+      "right_shoulder_yaw_joint",
+      "left_elbow_joint",
+      "right_elbow_joint",
+      "left_wrist_roll_joint",
+      "right_wrist_roll_joint",
+      "left_wrist_pitch_joint",
+      "right_wrist_pitch_joint",
+      "left_wrist_yaw_joint",
+      "right_wrist_yaw_joint"
+    ],
+    "policy_action_dim": 14,
+    "residual_scale_rad": 0.05
+  },
+  "contract_conflicts_path": "reports/stage2/s2_03t_contract_conflicts.json",
+  "formal": {
+    "clean_actor": true,
+    "maximum_iterations": 1000,
+    "num_env_candidates_oom_only": [
+      256,
+      128,
+      64
+    ],
+    "pilot_checkpoint_used": false,
+    "resume": false,
+    "save_interval": 100
+  },
+  "initialization": {
+    "clean_actor": true,
+    "load_checkpoint": false,
+    "model_1999_allowed": false,
+    "pilot_checkpoint_used_for_formal": false,
+    "resume": false,
+    "seed": 42
+  },
+  "observation": {
+    "batch_first": true,
+    "components": [
+      {
+        "clip_max": 5.0,
+        "clip_min": -5.0,
+        "dimension": 3,
+        "inclusive_index_range": [
+          0,
+          2
+        ],
+        "name": "base_ang_vel_body",
+        "order": 1,
+        "start": 0,
+        "stop": 3,
+        "unit": "rad_per_s"
+      },
+      {
+        "clip_max": 1.0,
+        "clip_min": -1.0,
+        "dimension": 3,
+        "inclusive_index_range": [
+          3,
+          5
+        ],
+        "name": "projected_gravity_body",
+        "order": 2,
+        "start": 3,
+        "stop": 6,
+        "unit": "dimensionless"
+      },
+      {
+        "clip_max": 1.0,
+        "clip_min": -1.0,
+        "dimension": 14,
+        "inclusive_index_range": [
+          6,
+          19
+        ],
+        "name": "arm_joint_position_error_to_ik_reference",
+        "order": 3,
+        "start": 6,
+        "stop": 20,
+        "unit": "rad"
+      },
+      {
+        "clip_max": 10.0,
+        "clip_min": -10.0,
+        "dimension": 14,
+        "inclusive_index_range": [
+          20,
+          33
+        ],
+        "name": "arm_joint_velocity",
+        "order": 4,
+        "start": 20,
+        "stop": 34,
+        "unit": "rad_per_s"
+      },
+      {
+        "clip_max": 0.1,
+        "clip_min": -0.1,
+        "dimension": 3,
+        "inclusive_index_range": [
+          34,
+          36
+        ],
+        "name": "left_palm_position_error_in_box",
+        "order": 5,
+        "start": 34,
+        "stop": 37,
+        "unit": "m"
+      },
+      {
+        "clip_max": 0.1,
+        "clip_min": -0.1,
+        "dimension": 3,
+        "inclusive_index_range": [
+          37,
+          39
+        ],
+        "name": "right_palm_position_error_in_box",
+        "order": 6,
+        "start": 37,
+        "stop": 40,
+        "unit": "m"
+      },
+      {
+        "clip_max": 0.5,
+        "clip_min": -0.5,
+        "dimension": 3,
+        "inclusive_index_range": [
+          40,
+          42
+        ],
+        "name": "left_palm_orientation_error_axis_angle_in_box",
+        "order": 7,
+        "start": 40,
+        "stop": 43,
+        "unit": "rad"
+      },
+      {
+        "clip_max": 0.5,
+        "clip_min": -0.5,
+        "dimension": 3,
+        "inclusive_index_range": [
+          43,
+          45
+        ],
+        "name": "right_palm_orientation_error_axis_angle_in_box",
+        "order": 8,
+        "start": 43,
+        "stop": 46,
+        "unit": "rad"
+      },
+      {
+        "clip_max": 0.1,
+        "clip_min": -0.02,
+        "dimension": 2,
+        "inclusive_index_range": [
+          46,
+          47
+        ],
+        "name": "palm_actual_surface_gap",
+        "order": 9,
+        "start": 46,
+        "stop": 48,
+        "unit": "m"
+      },
+      {
+        "clip_max": 9.81,
+        "clip_min": 0.0,
+        "dimension": 2,
+        "inclusive_index_range": [
+          48,
+          49
+        ],
+        "name": "palm_box_force_norm",
+        "order": 10,
+        "start": 48,
+        "stop": 50,
+        "unit": "N"
+      },
+      {
+        "clip_max": 1.0,
+        "clip_min": 0.0,
+        "dimension": 2,
+        "inclusive_index_range": [
+          50,
+          51
+        ],
+        "name": "palm_contact_flags",
+        "order": 11,
+        "start": 50,
+        "stop": 52,
+        "unit": "bool"
+      },
+      {
+        "clip_max": 0.005,
+        "clip_min": -0.005,
+        "dimension": 3,
+        "inclusive_index_range": [
+          52,
+          54
+        ],
+        "name": "box_translation_from_attach_start",
+        "order": 12,
+        "start": 52,
+        "stop": 55,
+        "unit": "m"
+      },
+      {
+        "clip_max": 0.008726646259971648,
+        "clip_min": -0.008726646259971648,
+        "dimension": 1,
+        "inclusive_index_range": [
+          55,
+          55
+        ],
+        "name": "box_yaw_change_from_attach_start",
+        "order": 13,
+        "start": 55,
+        "stop": 56,
+        "unit": "rad"
+      },
+      {
+        "clip_max": 0.005,
+        "clip_min": -0.005,
+        "dimension": 3,
+        "inclusive_index_range": [
+          56,
+          58
+        ],
+        "name": "box_linear_velocity",
+        "order": 14,
+        "start": 56,
+        "stop": 59,
+        "unit": "m_per_s"
+      },
+      {
+        "clip_max": 0.008726646259971648,
+        "clip_min": -0.008726646259971648,
+        "dimension": 3,
+        "inclusive_index_range": [
+          59,
+          61
+        ],
+        "name": "box_angular_velocity",
+        "order": 15,
+        "start": 59,
+        "stop": 62,
+        "unit": "rad_per_s"
+      },
+      {
+        "clip_max": 1.0,
+        "clip_min": 0.0,
+        "dimension": 1,
+        "inclusive_index_range": [
+          62,
+          62
+        ],
+        "name": "approach_progress_fraction",
+        "order": 16,
+        "start": 62,
+        "stop": 63,
+        "unit": "dimensionless"
+      },
+      {
+        "clip_max": 1.0,
+        "clip_min": -1.0,
+        "dimension": 14,
+        "inclusive_index_range": [
+          63,
+          76
+        ],
+        "name": "previous_arm_action",
+        "order": 17,
+        "start": 63,
+        "stop": 77,
+        "unit": "normalized"
+      }
+    ],
+    "finite_required": true,
+    "index_convention": "zero_based_half_open",
+    "policy_observation_dim": 77,
+    "representation": "RAW_SI_WITH_COMPONENT_CLIPPING",
+    "schema_version": 1,
+    "stage": "S2-03T",
+    "training_contract_sha256": "221f27d2a22d3e07f9bd9a05680d61d57f3b2af59a2cf0ed4f5bd8af424e6316"
+  },
+  "pilot": {
+    "baseline_evaluation_episodes": 4,
+    "checkpoint_load": false,
+    "evaluation_episodes_per_target_maximum": 4,
+    "minimum_mean_gap_improvement_m": 0.005,
+    "num_envs": 64,
+    "process_semantics": "INDEPENDENT_CLEAN_FROM_ITERATION_ZERO",
+    "resume": false,
+    "total_iteration_targets": [
+      25,
+      50,
+      75,
+      100
+    ]
+  },
+  "ppo_parameter_provenance_path": "reports/stage2/s2_03t_ppo_parameter_provenance.json",
+  "reward_terms": [
+    {
+      "formula": "both_contact_flags",
+      "name": "bilateral_contact_verify_step",
+      "weight": 2.0
+    },
+    {
+      "formula": "both_contacts_and_all_frozen_gates",
+      "name": "attached_hold_step",
+      "weight": 4.0
+    },
+    {
+      "formula": "frozen_attach_success",
+      "name": "success_terminal",
+      "weight": 100.0
+    },
+    {
+      "formula": "exp_minus_50_times_sum_abs_surface_gap",
+      "name": "symmetric_gap_closure",
+      "weight": 1.0
+    },
+    {
+      "formula": "sum_palm_position_error_m",
+      "name": "hand_position_tracking",
+      "weight": -2.0
+    },
+    {
+      "formula": "sum_palm_orientation_error_rad",
+      "name": "hand_orientation_tracking",
+      "weight": -0.1
+    },
+    {
+      "formula": "abs_left_force_minus_right_force_n",
+      "name": "force_imbalance",
+      "weight": -0.5
+    },
+    {
+      "formula": "box_translation_m",
+      "name": "box_translation",
+      "weight": -40.0
+    },
+    {
+      "formula": "abs_box_yaw_change_rad",
+      "name": "box_yaw_change",
+      "weight": -40.0
+    },
+    {
+      "formula": "normalized_peak_plus_impulse_plus_rate",
+      "name": "force_impulse_rate",
+      "weight": -2.0
+    },
+    {
+      "formula": "root_tilt_deg",
+      "name": "root_tilt",
+      "weight": -0.1
+    },
+    {
+      "formula": "positive_part_0p10_minus_margin_rad",
+      "name": "joint_limit_margin",
+      "weight": -5.0
+    },
+    {
+      "formula": "positive_part_torque_ratio_minus_1",
+      "name": "torque_ratio",
+      "weight": -2.0
+    },
+    {
+      "formula": "squared_action_norm",
+      "name": "action_l2",
+      "weight": -0.001
+    },
+    {
+      "formula": "squared_action_delta_norm",
+      "name": "action_rate",
+      "weight": -0.01
+    },
+    {
+      "formula": "any_non_palm_box_collision",
+      "name": "forbidden_collision_terminal",
+      "weight": -100.0
+    },
+    {
+      "formula": "bilateral_contact_timeout",
+      "name": "contact_timeout_terminal",
+      "weight": -25.0
+    }
+  ],
+  "schema_version": 1,
+  "scientific_contract_valid": true,
+  "source_sha256": {
+    "configs/stage2/s2_03_attach_only.yaml": "fa53584719fc9730e1d87a451f8f69132c7396d07336eef1546a1ec5423d77bd",
+    "configs/stage2/s2_03t_contact_training_contract.yaml": "221f27d2a22d3e07f9bd9a05680d61d57f3b2af59a2cf0ed4f5bd8af424e6316",
+    "reports/stage2/s2_03_formal_result.json": "ec3ec3d93266e1b64c0ed86ffc773c9511785f258a4c4f783f543f28be0c70f1",
+    "reports/stage2/training-recommendation.json": "53b8681a25fb2460e683532dd8dd40d8509ada3c67e194668dac1261031e7853"
+  },
+  "stage": "S2-03T",
+  "status": "STATIC_CONTRACT_RESOLVED",
+  "termination": {
+    "failure_contract": {
+      "bilateral_contact_timeout": 1000,
+      "contact_force_rate_threshold_nps": 490.5,
+      "contact_loss_grace_steps": 5,
+      "excessive_combined_impulse_threshold_ns": 1.962,
+      "forbidden_non_palm_box_collision": "immediate",
+      "maximum_arm_torque_ratio": 1.001,
+      "maximum_base_xy_excursion_m": 0.05,
+      "maximum_box_angular_speed_radps": 0.008726646259971648,
+      "maximum_box_linear_speed_mps": 0.005,
+      "maximum_box_translation_m": 0.005,
+      "maximum_box_yaw_change_rad": 0.008726646259971648,
+      "maximum_root_height_m": 1.0,
+      "maximum_root_tilt_deg": 6.2075676918029785,
+      "minimum_arm_joint_limit_margin_rad": 0.1,
+      "minimum_root_height_m": 0.5,
+      "nonfinite": "immediate",
+      "per_palm_force_peak_threshold_n": 9.81,
+      "per_palm_impulse_threshold_ns": 0.981,
+      "post_initial_reset_count_limit": 0,
+      "single_hand_maximum_steps": 25
+    },
+    "limits": {
+      "attached_hold_steps": 100,
+      "bilateral_contact_threshold_n": 1.0,
+      "bilateral_verification_steps": 20,
+      "contact_force_rate_threshold_nps": 490.5,
+      "contact_loss_grace_steps": 5,
+      "excessive_combined_impulse_threshold_ns": 1.962,
+      "maximum_arm_torque_ratio": 1.001,
+      "maximum_base_xy_excursion_m": 0.05,
+      "maximum_box_angular_speed_radps": 0.008726646259971648,
+      "maximum_box_linear_speed_mps": 0.005,
+      "maximum_box_translation_m": 0.005,
+      "maximum_box_yaw_change_rad": 0.008726646259971648,
+      "maximum_episode_steps": 1000,
+      "maximum_root_height_m": 1.0,
+      "maximum_root_tilt_deg": 6.2075676918029785,
+      "minimum_arm_joint_limit_margin_rad": 0.1,
+      "minimum_root_height_m": 0.5,
+      "per_palm_force_peak_threshold_n": 9.81,
+      "per_palm_impulse_threshold_ns": 0.981,
+      "single_hand_maximum_steps": 25
+    },
+    "maximum_episode_steps": 1000,
+    "physical_safety_classification": "TERMINATION",
+    "success_classification": "INDEPENDENT_SUCCESS_TERM",
+    "success_contract": {
+      "all_frozen_safety_gates_required": true,
+      "attached_hold_steps": 100,
+      "bilateral_contact_threshold_n": [
+        1.0,
+        1.0
+      ],
+      "bilateral_verification_steps": 20
+    },
+    "timeout_classification": "TRUNCATION"
+  },
+  "validation_checks": {
+    "action_dim": true,
+    "contract_sha256": true,
+    "episode_steps": true,
+    "joint_margin": true,
+    "joint_order": true,
+    "lower_body_action_dim": true,
+    "no_base_progress_reward": true,
+    "no_box_progress_reward": true,
+    "observation_components_exact": true,
+    "observation_dim": true,
+    "observation_finite": true,
+    "residual_rate": true,
+    "residual_scale": true,
+    "reward_records_exact": true,
+    "stage": true,
+    "termination_failure_exact": true,
+    "termination_limits": true,
+    "termination_success_exact": true
+  }
+}

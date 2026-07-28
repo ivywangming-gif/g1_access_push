@@ -1,0 +1,250 @@
+{
+  "batch_first": true,
+  "components": [
+    {
+      "clip_max": 5.0,
+      "clip_min": -5.0,
+      "dimension": 3,
+      "inclusive_index_range": [
+        0,
+        2
+      ],
+      "name": "base_ang_vel_body",
+      "order": 1,
+      "start": 0,
+      "stop": 3,
+      "unit": "rad_per_s"
+    },
+    {
+      "clip_max": 1.0,
+      "clip_min": -1.0,
+      "dimension": 3,
+      "inclusive_index_range": [
+        3,
+        5
+      ],
+      "name": "projected_gravity_body",
+      "order": 2,
+      "start": 3,
+      "stop": 6,
+      "unit": "dimensionless"
+    },
+    {
+      "clip_max": 1.0,
+      "clip_min": -1.0,
+      "dimension": 14,
+      "inclusive_index_range": [
+        6,
+        19
+      ],
+      "name": "arm_joint_position_error_to_ik_reference",
+      "order": 3,
+      "start": 6,
+      "stop": 20,
+      "unit": "rad"
+    },
+    {
+      "clip_max": 10.0,
+      "clip_min": -10.0,
+      "dimension": 14,
+      "inclusive_index_range": [
+        20,
+        33
+      ],
+      "name": "arm_joint_velocity",
+      "order": 4,
+      "start": 20,
+      "stop": 34,
+      "unit": "rad_per_s"
+    },
+    {
+      "clip_max": 0.1,
+      "clip_min": -0.1,
+      "dimension": 3,
+      "inclusive_index_range": [
+        34,
+        36
+      ],
+      "name": "left_palm_position_error_in_box",
+      "order": 5,
+      "start": 34,
+      "stop": 37,
+      "unit": "m"
+    },
+    {
+      "clip_max": 0.1,
+      "clip_min": -0.1,
+      "dimension": 3,
+      "inclusive_index_range": [
+        37,
+        39
+      ],
+      "name": "right_palm_position_error_in_box",
+      "order": 6,
+      "start": 37,
+      "stop": 40,
+      "unit": "m"
+    },
+    {
+      "clip_max": 0.5,
+      "clip_min": -0.5,
+      "dimension": 3,
+      "inclusive_index_range": [
+        40,
+        42
+      ],
+      "name": "left_palm_orientation_error_axis_angle_in_box",
+      "order": 7,
+      "start": 40,
+      "stop": 43,
+      "unit": "rad"
+    },
+    {
+      "clip_max": 0.5,
+      "clip_min": -0.5,
+      "dimension": 3,
+      "inclusive_index_range": [
+        43,
+        45
+      ],
+      "name": "right_palm_orientation_error_axis_angle_in_box",
+      "order": 8,
+      "start": 43,
+      "stop": 46,
+      "unit": "rad"
+    },
+    {
+      "clip_max": 0.1,
+      "clip_min": -0.02,
+      "dimension": 2,
+      "inclusive_index_range": [
+        46,
+        47
+      ],
+      "name": "palm_actual_surface_gap",
+      "order": 9,
+      "start": 46,
+      "stop": 48,
+      "unit": "m"
+    },
+    {
+      "clip_max": 9.81,
+      "clip_min": 0.0,
+      "dimension": 2,
+      "inclusive_index_range": [
+        48,
+        49
+      ],
+      "name": "palm_box_force_norm",
+      "order": 10,
+      "start": 48,
+      "stop": 50,
+      "unit": "N"
+    },
+    {
+      "clip_max": 1.0,
+      "clip_min": 0.0,
+      "dimension": 2,
+      "inclusive_index_range": [
+        50,
+        51
+      ],
+      "name": "palm_contact_flags",
+      "order": 11,
+      "start": 50,
+      "stop": 52,
+      "unit": "bool"
+    },
+    {
+      "clip_max": 0.005,
+      "clip_min": -0.005,
+      "dimension": 3,
+      "inclusive_index_range": [
+        52,
+        54
+      ],
+      "name": "box_translation_from_attach_start",
+      "order": 12,
+      "start": 52,
+      "stop": 55,
+      "unit": "m"
+    },
+    {
+      "clip_max": 0.008726646259971648,
+      "clip_min": -0.008726646259971648,
+      "dimension": 1,
+      "inclusive_index_range": [
+        55,
+        55
+      ],
+      "name": "box_yaw_change_from_attach_start",
+      "order": 13,
+      "start": 55,
+      "stop": 56,
+      "unit": "rad"
+    },
+    {
+      "clip_max": 0.005,
+      "clip_min": -0.005,
+      "dimension": 3,
+      "inclusive_index_range": [
+        56,
+        58
+      ],
+      "name": "box_linear_velocity",
+      "order": 14,
+      "start": 56,
+      "stop": 59,
+      "unit": "m_per_s"
+    },
+    {
+      "clip_max": 0.008726646259971648,
+      "clip_min": -0.008726646259971648,
+      "dimension": 3,
+      "inclusive_index_range": [
+        59,
+        61
+      ],
+      "name": "box_angular_velocity",
+      "order": 15,
+      "start": 59,
+      "stop": 62,
+      "unit": "rad_per_s"
+    },
+    {
+      "clip_max": 1.0,
+      "clip_min": 0.0,
+      "dimension": 1,
+      "inclusive_index_range": [
+        62,
+        62
+      ],
+      "name": "approach_progress_fraction",
+      "order": 16,
+      "start": 62,
+      "stop": 63,
+      "unit": "dimensionless"
+    },
+    {
+      "clip_max": 1.0,
+      "clip_min": -1.0,
+      "dimension": 14,
+      "inclusive_index_range": [
+        63,
+        76
+      ],
+      "name": "previous_arm_action",
+      "order": 17,
+      "start": 63,
+      "stop": 77,
+      "unit": "normalized"
+    }
+  ],
+  "finite_required": true,
+  "index_convention": "zero_based_half_open",
+  "policy_observation_dim": 77,
+  "representation": "RAW_SI_WITH_COMPONENT_CLIPPING",
+  "schema_version": 1,
+  "stage": "S2-03T",
+  "training_contract_sha256": "221f27d2a22d3e07f9bd9a05680d61d57f3b2af59a2cf0ed4f5bd8af424e6316"
+}

@@ -1,0 +1,72 @@
+{
+  "conflict_count": 4,
+  "conflicts": [
+    {
+      "execution_directive": "Run the complete autonomous S2-03T training and qualification workflow.",
+      "frozen_contract_value": {
+        "status": "FROZEN_DRAFT_NOT_STARTED",
+        "training_launch_authorized": false,
+        "training_started": false
+      },
+      "id": "TRAINING_AUTHORIZATION_OVERRIDE",
+      "resolution": "The later explicit execution directive overrides only launch/status authorization. The frozen scientific observation, action, reward, termination, and formal gates remain unchanged."
+    },
+    {
+      "execution_directive": "Close training after each 25-iteration pilot block, evaluate separately, and never resume.",
+      "frozen_contract_value": {
+        "resume_enabled": false
+      },
+      "id": "PILOT_CLOSE_PROCESS_VS_NO_RESUME",
+      "pilot_total_iteration_targets": [
+        25,
+        50,
+        75,
+        100
+      ],
+      "resolution": "Use four independent clean no-load/no-resume pilot trainings with total targets 25, 50, 75, and 100 iterations. Every process initializes actor, optimizer, and normalizer from iteration zero; earlier pilot checkpoints are evaluation-only and never loaded."
+    },
+    {
+      "execution_directive": "Mark environment timeout as truncation and physical/safety failures as termination.",
+      "frozen_contract_value": {
+        "bilateral_contact_timeout_steps": 1000,
+        "maximum_episode_steps": 1000
+      },
+      "id": "CONTACT_TIMEOUT_FAILURE_LIST_VS_TRUNCATION",
+      "resolution": "At step 1000, set time_out=true and truncated=true. Record bilateral_contact_timeout independently in extras and its -25 reward term; do not classify it as a physical/safety termination."
+    },
+    {
+      "execution_directive": "Keep every formal S2-03 evaluator threshold unchanged.",
+      "frozen_contract_value": {
+        "formal_hand_orientation_gate_deg": 8.0,
+        "formal_hand_position_gate_m": 0.06,
+        "training_failure_keys": [
+          "bilateral_contact_timeout",
+          "contact_force_rate_threshold_nps",
+          "contact_loss_grace_steps",
+          "excessive_combined_impulse_threshold_ns",
+          "forbidden_non_palm_box_collision",
+          "maximum_arm_torque_ratio",
+          "maximum_base_xy_excursion_m",
+          "maximum_box_angular_speed_radps",
+          "maximum_box_linear_speed_mps",
+          "maximum_box_translation_m",
+          "maximum_box_yaw_change_rad",
+          "maximum_root_height_m",
+          "maximum_root_tilt_deg",
+          "minimum_arm_joint_limit_margin_rad",
+          "minimum_root_height_m",
+          "nonfinite",
+          "per_palm_force_peak_threshold_n",
+          "per_palm_impulse_threshold_ns",
+          "post_initial_reset_count_limit",
+          "single_hand_maximum_steps"
+        ]
+      },
+      "id": "S2_03_FORMAL_GATE_COVERAGE",
+      "resolution": "Training terminations implement exactly the frozen S2-03T YAML and do not silently add the two omitted hand-tracking gates. Checkpoint screening and formal qualification reuse the unchanged S2-03 evaluator; its current implementation records hand-tracking errors but does not promote the two declared attach-config values into additional decision gates."
+    }
+  ],
+  "schema_version": 1,
+  "stage": "S2-03T",
+  "status": "RESOLVED_WITH_EXPLICIT_PRECEDENCE"
+}

@@ -1,0 +1,223 @@
+{
+  "critic_observation": "same_77d_as_actor",
+  "forbidden": {
+    "checkpoint_load": true,
+    "curriculum": true,
+    "distributed_training": true,
+    "domain_randomization": true,
+    "model_1999": true,
+    "multi_gpu": true,
+    "pilot_checkpoint_for_formal": true,
+    "privileged_critic": true,
+    "recurrent_upper_actor": true,
+    "resume": true,
+    "vision": true
+  },
+  "parameters": {
+    "activation": {
+      "project_new": false,
+      "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",
+      "source_file": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+      "source_sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05",
+      "value": "elu"
+    },
+    "actor_hidden_dims": {
+      "project_new": false,
+      "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",
+      "source_file": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+      "source_sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05",
+      "value": [
+        256,
+        128,
+        64
+      ]
+    },
+    "clip_param": {
+      "project_new": false,
+      "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",
+      "source_file": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+      "source_sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05",
+      "value": 0.2
+    },
+    "critic_hidden_dims": {
+      "project_new": false,
+      "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",
+      "source_file": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+      "source_sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05",
+      "value": [
+        256,
+        128,
+        64
+      ]
+    },
+    "desired_kl": {
+      "project_new": false,
+      "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",
+      "source_file": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+      "source_sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05",
+      "value": 0.01
+    },
+    "empirical_normalization": {
+      "project_new": false,
+      "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",
+      "source_file": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+      "source_sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05",
+      "value": true
+    },
+    "entropy_coef": {
+      "project_new": false,
+      "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",
+      "source_file": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+      "source_sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05",
+      "value": 0.005
+    },
+    "formal_max_iterations": {
+      "project_new": true,
+      "rationale": "Frozen formal execution budget.",
+      "source_file": "/root/.codex/attachments/9b0429d4-e60c-43a1-855c-3e981bc09ab7/pasted-text.txt",
+      "source_sha256": "d7e8d53d37c22d85fc2a49acfdba6f05732560fa5b7f7393e67a8e840af361e5",
+      "value": 1000
+    },
+    "formal_num_env_candidates": {
+      "project_new": true,
+      "rationale": "One pre-training capacity smoke may downshift only on OOM.",
+      "source_file": "/root/.codex/attachments/9b0429d4-e60c-43a1-855c-3e981bc09ab7/pasted-text.txt",
+      "source_sha256": "d7e8d53d37c22d85fc2a49acfdba6f05732560fa5b7f7393e67a8e840af361e5",
+      "value": [
+        256,
+        128,
+        64
+      ]
+    },
+    "formal_save_interval": {
+      "project_new": true,
+      "rationale": "Required checkpoint screening cadence.",
+      "source_file": "/root/.codex/attachments/9b0429d4-e60c-43a1-855c-3e981bc09ab7/pasted-text.txt",
+      "source_sha256": "d7e8d53d37c22d85fc2a49acfdba6f05732560fa5b7f7393e67a8e840af361e5",
+      "value": 100
+    },
+    "gamma": {
+      "project_new": false,
+      "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",
+      "source_file": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+      "source_sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05",
+      "value": 0.99
+    },
+    "init_noise_std": {
+      "project_new": false,
+      "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",
+      "source_file": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+      "source_sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05",
+      "value": 1.0
+    },
+    "lam": {
+      "project_new": false,
+      "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",
+      "source_file": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+      "source_sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05",
+      "value": 0.95
+    },
+    "learning_rate": {
+      "project_new": false,
+      "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",
+      "source_file": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+      "source_sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05",
+      "value": 0.001
+    },
+    "max_grad_norm": {
+      "project_new": false,
+      "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",
+      "source_file": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+      "source_sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05",
+      "value": 1.0
+    },
+    "num_learning_epochs": {
+      "project_new": false,
+      "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",
+      "source_file": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+      "source_sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05",
+      "value": 5
+    },
+    "num_mini_batches": {
+      "project_new": false,
+      "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",
+      "source_file": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+      "source_sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05",
+      "value": 4
+    },
+    "num_steps_per_env": {
+      "project_new": false,
+      "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",
+      "source_file": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+      "source_sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05",
+      "value": 24
+    },
+    "pilot_num_envs": {
+      "project_new": true,
+      "rationale": "Frozen pilot workflow.",
+      "source_file": "/root/.codex/attachments/9b0429d4-e60c-43a1-855c-3e981bc09ab7/pasted-text.txt",
+      "source_sha256": "d7e8d53d37c22d85fc2a49acfdba6f05732560fa5b7f7393e67a8e840af361e5",
+      "value": 64
+    },
+    "pilot_total_iteration_targets": {
+      "project_new": true,
+      "rationale": "Each target is a separate clean run from iteration zero; no resume or checkpoint load.",
+      "source_file": "/root/.codex/attachments/9b0429d4-e60c-43a1-855c-3e981bc09ab7/pasted-text.txt",
+      "source_sha256": "d7e8d53d37c22d85fc2a49acfdba6f05732560fa5b7f7393e67a8e840af361e5",
+      "value": [
+        25,
+        50,
+        75,
+        100
+      ]
+    },
+    "privileged_critic": {
+      "project_new": true,
+      "rationale": "Critic receives the actor's same 77-D input.",
+      "source_file": "/root/.codex/attachments/9b0429d4-e60c-43a1-855c-3e981bc09ab7/pasted-text.txt",
+      "source_sha256": "d7e8d53d37c22d85fc2a49acfdba6f05732560fa5b7f7393e67a8e840af361e5",
+      "value": false
+    },
+    "schedule": {
+      "project_new": false,
+      "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",
+      "source_file": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+      "source_sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05",
+      "value": "adaptive"
+    },
+    "seed": {
+      "project_new": false,
+      "rationale": "Frozen clean actor seed.",
+      "source_file": "configs/stage2/s2_03t_contact_training_contract.yaml",
+      "source_sha256": "221f27d2a22d3e07f9bd9a05680d61d57f3b2af59a2cf0ed4f5bd8af424e6316",
+      "value": 42
+    },
+    "upper_actor_recurrent": {
+      "project_new": true,
+      "rationale": "First version explicitly excludes recurrence.",
+      "source_file": "/root/.codex/attachments/9b0429d4-e60c-43a1-855c-3e981bc09ab7/pasted-text.txt",
+      "source_sha256": "d7e8d53d37c22d85fc2a49acfdba6f05732560fa5b7f7393e67a8e840af361e5",
+      "value": false
+    },
+    "use_clipped_value_loss": {
+      "project_new": false,
+      "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",
+      "source_file": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+      "source_sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05",
+      "value": true
+    },
+    "value_loss_coef": {
+      "project_new": false,
+      "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",
+      "source_file": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+      "source_sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05",
+      "value": 1.0
+    }
+  },
+  "reference_config": {
+    "path": "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/rl_env/tasks/pick_place/g1/agents/rsl_rl_ppo_cfg.py",
+    "sha256": "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05"
+  },
+  "schema_version": 1,
+  "stage": "S2-03T"
+}
