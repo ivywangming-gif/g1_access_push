@@ -54,6 +54,14 @@ def test_runtime_body_states_satisfy_geometry_audit_when_usd_reference_paths_are
     assert "bool(robot_collision_paths and" not in source
 
 
+def test_palm_collision_support_offset_is_runtime_scanned_and_frozen() -> None:
+    source = RUNNER.read_text(encoding="utf-8")
+    assert "palm_support_offset_audit.json" in source
+    assert "PHYSX_SCENE_QUERY_OVERLAP_BOX" in source
+    assert "calibrated_palm_collision_support_offset_m" in source
+    assert 'candidate = {**candidate, "palm_collision_support_offset_m": support_offset_used}' in source
+
+
 def test_preflight_and_formal_modes_are_mutually_exclusive() -> None:
     source = RUNNER.read_text(encoding="utf-8")
     assert 'mode = parser.add_mutually_exclusive_group(required=True)' in source

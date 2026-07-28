@@ -28,22 +28,33 @@ controller:
   desired_palm_quaternion_in_object_wxyz: [0.7071067811865476, 0.0, 0.7071067811865476, 0.0]
   maximum_position_correction_m: 0.005
   maximum_orientation_correction_rad: 0.03
+  palm_support_offset_scan_rear_range_m: [0.20, 0.60]
+  palm_support_offset_scan_step_m: 0.02
+  palm_support_offset_tolerance_m: 0.021
 
 search:
   maximum_candidates: 40
   warmup_steps: 100
-  transition_steps: 60
-  hold_steps: 15
-  return_steps: 20
+  transition_steps: 25
+  hold_steps: 8
+  return_steps: 7
   candidates:
-    - {contact_height_m: 0.62, tangential_separation_m: 0.30, base_to_box_center_distance_m: 0.84, precontact_gap_m: 0.08}
-    - {contact_height_m: 0.62, tangential_separation_m: 0.36, base_to_box_center_distance_m: 0.84, precontact_gap_m: 0.06}
-    - {contact_height_m: 0.68, tangential_separation_m: 0.30, base_to_box_center_distance_m: 0.84, precontact_gap_m: 0.06}
-    - {contact_height_m: 0.68, tangential_separation_m: 0.36, base_to_box_center_distance_m: 0.90, precontact_gap_m: 0.08}
-    - {contact_height_m: 0.62, tangential_separation_m: 0.30, base_to_box_center_distance_m: 0.90, precontact_gap_m: 0.06}
-    - {contact_height_m: 0.68, tangential_separation_m: 0.36, base_to_box_center_distance_m: 0.84, precontact_gap_m: 0.08}
-    - {contact_height_m: 0.62, tangential_separation_m: 0.36, base_to_box_center_distance_m: 0.90, precontact_gap_m: 0.06}
-    - {contact_height_m: 0.68, tangential_separation_m: 0.30, base_to_box_center_distance_m: 0.90, precontact_gap_m: 0.08}
+    - {contact_height_m: 0.62, tangential_separation_m: 0.30, base_to_box_center_distance_m: 0.98, precontact_gap_m: 0.06}
+    - {contact_height_m: 0.62, tangential_separation_m: 0.34, base_to_box_center_distance_m: 0.98, precontact_gap_m: 0.08}
+    - {contact_height_m: 0.66, tangential_separation_m: 0.30, base_to_box_center_distance_m: 0.98, precontact_gap_m: 0.06}
+    - {contact_height_m: 0.66, tangential_separation_m: 0.34, base_to_box_center_distance_m: 0.98, precontact_gap_m: 0.08}
+    - {contact_height_m: 0.62, tangential_separation_m: 0.30, base_to_box_center_distance_m: 1.02, precontact_gap_m: 0.06}
+    - {contact_height_m: 0.62, tangential_separation_m: 0.34, base_to_box_center_distance_m: 1.02, precontact_gap_m: 0.08}
+    - {contact_height_m: 0.66, tangential_separation_m: 0.30, base_to_box_center_distance_m: 1.02, precontact_gap_m: 0.06}
+    - {contact_height_m: 0.66, tangential_separation_m: 0.34, base_to_box_center_distance_m: 1.02, precontact_gap_m: 0.08}
+    - {contact_height_m: 0.62, tangential_separation_m: 0.30, base_to_box_center_distance_m: 1.06, precontact_gap_m: 0.06}
+    - {contact_height_m: 0.62, tangential_separation_m: 0.34, base_to_box_center_distance_m: 1.06, precontact_gap_m: 0.08}
+    - {contact_height_m: 0.66, tangential_separation_m: 0.30, base_to_box_center_distance_m: 1.06, precontact_gap_m: 0.06}
+    - {contact_height_m: 0.66, tangential_separation_m: 0.34, base_to_box_center_distance_m: 1.06, precontact_gap_m: 0.08}
+    - {contact_height_m: 0.62, tangential_separation_m: 0.30, base_to_box_center_distance_m: 1.10, precontact_gap_m: 0.06}
+    - {contact_height_m: 0.62, tangential_separation_m: 0.34, base_to_box_center_distance_m: 1.10, precontact_gap_m: 0.08}
+    - {contact_height_m: 0.66, tangential_separation_m: 0.30, base_to_box_center_distance_m: 1.10, precontact_gap_m: 0.06}
+    - {contact_height_m: 0.66, tangential_separation_m: 0.34, base_to_box_center_distance_m: 1.10, precontact_gap_m: 0.08}
 
 selection:
   status: UNRESOLVED
@@ -53,6 +64,7 @@ selection:
   base_to_box_center_distance_m: null
   precontact_gap_m: null
   desired_palm_quaternion_in_object_wxyz: null
+  palm_collision_support_offset_m: null
 
 formal:
   stand_settle_steps: 100

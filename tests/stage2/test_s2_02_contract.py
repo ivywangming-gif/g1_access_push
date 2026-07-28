@@ -45,7 +45,7 @@ def test_same_s2_01_box_mass_low_com_and_inertia() -> None:
 def test_candidate_count_bound_and_all_static_geometry() -> None:
     config = cfg()
     candidates = config["search"]["candidates"]
-    assert len(candidates) == 8 <= config["search"]["maximum_candidates"] == 40
+    assert len(candidates) == 16 <= config["search"]["maximum_candidates"] == 40
     assert all(all(candidate_static_checks(candidate, config["object"]).values()) for candidate in candidates)
 
 
@@ -55,6 +55,17 @@ def test_object_targets_are_mirrored_equal_height_and_outside_rear() -> None:
         assert left[0] == right[0] < -0.6
         assert left[1] == -right[1]
         assert left[2] == right[2]
+
+
+def test_runtime_palm_support_offset_is_applied_before_surface_gap() -> None:
+    candidate = {
+        "contact_height_m": 0.62,
+        "tangential_separation_m": 0.30,
+        "precontact_gap_m": 0.06,
+        "palm_collision_support_offset_m": 0.32,
+    }
+    left, right = object_local_targets(candidate)
+    assert left[0] == right[0] == -0.98
 
 
 def test_palm_local_plus_z_quaternion_maps_to_object_plus_x() -> None:
@@ -74,6 +85,7 @@ def test_initial_config_is_search_only_not_formal_runnable() -> None:
         "contact_height_m": None, "tangential_separation_m": None,
         "base_to_box_center_distance_m": None, "precontact_gap_m": None,
         "desired_palm_quaternion_in_object_wxyz": None,
+        "palm_collision_support_offset_m": None,
     }
     resolved = resolved_config(CONFIG)
     assert resolved["runnable"] is False

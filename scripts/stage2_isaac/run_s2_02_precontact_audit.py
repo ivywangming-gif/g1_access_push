@@ -381,6 +381,64 @@ def main() -> None:
     baseline_positions = palms.data.target_pos_source[0].clone()
     baseline_quaternions = palms.data.target_quat_source[0].clone()
     baseline_arm_positions = robot.data.joint_pos[0, arm_ids].clone()
+    baseline_palm_world_pos, _ = math_utils.combine_frame_transforms(
+        robot.data.root_link_pos_w[0].expand(2, 3),
+        robot.data.root_link_quat_w[0].expand(2, 4),
+        baseline_positions,
+        baseline_quaternions,
+    )
+    scan_start, scan_end = [float(value) for value in config["controller"]["palm_support_offset_scan_rear_range_m"]]
+    scan_step = float(config["controller"]["palm_support_offset_scan_step_m"])
+    scan_records = []
+    scan_count = int(round((scan_end - scan_start) / scan_step)) + 1
+    identity_quat = torch.tensor([1.0, 0.0, 0.0, 0.0], device=env.device)
+    for scan_index in range(scan_count):
+        rear_x_in_pelvis = scan_start + scan_index * scan_step
+        query_pos = torch.tensor(
+            [
+                float(baseline_root_pos[0]) + rear_x_in_pelvis + 0.6,
+                float(baseline_root_pos[1]),
+                float(config["object"]["spawn_center_z_m"]),
+            ],
+            device=env.device,
+        )
+        query = overlap_query(query_pos, identity_quat, [0.6, 0.3, 0.6])
+        scan_records.append({
+            "rear_face_x_in_pelvis_m": rear_x_in_pelvis,
+            "robot_hit_count": query["robot_hit_count"],
+            "robot_hits": query["robot_hits"],
+        })
+    overlap_rears = [record["rear_face_x_in_pelvis_m"] for record in scan_records if record["robot_hit_count"] > 0]
+    clear_rears = [record["rear_face_x_in_pelvis_m"] for record in scan_records if record["robot_hit_count"] == 0]
+    if not overlap_rears or not clear_rears:
+        raise RuntimeError("PALM_SUPPORT_OFFSET_SCAN_UNBRACKETED")
+    last_overlap_rear = max(overlap_rears)
+    first_clear_rear = min(value for value in clear_rears if value > last_overlap_rear)
+    palm_midpoint_x_in_pelvis = float(baseline_positions[:, 0].mean().item())
+    calibrated_support_offset = first_clear_rear - palm_midpoint_x_in_pelvis
+    frozen_support_offset = config["selection"].get("palm_collision_support_offset_m")
+    support_offset_matches_frozen = (
+        frozen_support_offset is None
+        or abs(float(frozen_support_offset) - calibrated_support_offset)
+        <= float(config["controller"]["palm_support_offset_tolerance_m"])
+    )
+    support_offset_used = calibrated_support_offset if frozen_support_offset is None else float(frozen_support_offset)
+    support_audit = {
+        "schema_version": 1,
+        "backend": "PHYSX_SCENE_QUERY_OVERLAP_BOX",
+        "scan_records": scan_records,
+        "last_overlap_rear_x_in_pelvis_m": last_overlap_rear,
+        "first_clear_rear_x_in_pelvis_m": first_clear_rear,
+        "baseline_palm_midpoint_x_in_pelvis_m": palm_midpoint_x_in_pelvis,
+        "calibrated_palm_collision_support_offset_m": calibrated_support_offset,
+        "frozen_palm_collision_support_offset_m": frozen_support_offset,
+        "support_offset_used_m": support_offset_used,
+        "support_offset_matches_frozen": support_offset_matches_frozen,
+        "status": "PASS" if support_offset_matches_frozen else "FAIL",
+    }
+    write_json(RUN / "palm_support_offset_audit.json", support_audit)
+    if not support_offset_matches_frozen:
+        raise RuntimeError("PALM_SUPPORT_OFFSET_FROZEN_MISMATCH")
     camera.set_world_poses_from_view(
         torch.tensor([[2.0, -2.0, 1.55]], device=env.device),
         torch.tensor([[0.45, 0.0, 0.70]], device=env.device),
@@ -437,8 +495,8 @@ def main() -> None:
             "right_orientation_error_deg": float(quaternion_error_deg(actual_quaternions, desired_quaternions)[right_frame].item()),
             "left_palm_normal_alignment_dot": float(normal_dots[left_frame].item()),
             "right_palm_normal_alignment_dot": float(normal_dots[right_frame].item()),
-            "left_actual_gap_m": float(config["object"]["rear_face_xO_m"] - palm_object_pos[left_frame, 0]),
-            "right_actual_gap_m": float(config["object"]["rear_face_xO_m"] - palm_object_pos[right_frame, 0]),
+            "left_actual_gap_m": float(config["object"]["rear_face_xO_m"] - palm_object_pos[left_frame, 0] - candidate["palm_collision_support_offset_m"]),
+            "right_actual_gap_m": float(config["object"]["rear_face_xO_m"] - palm_object_pos[right_frame, 0] - candidate["palm_collision_support_offset_m"]),
             "commanded_precontact_gap_m": float(candidate["precontact_gap_m"]),
             "box_rear_face_position_world_m": [float(value) for value in rear_world[0]],
             "minimum_arm_joint_limit_margin_rad": float(torch.minimum(lower_margin, upper_margin).min().item()),
@@ -466,6 +524,7 @@ def main() -> None:
             candidates = list(config["search"]["candidates"])
             candidate_indices = list(range(1, len(candidates) + 1))
         for candidate_index, candidate in zip(candidate_indices, candidates, strict=True):
+            candidate = {**candidate, "palm_collision_support_offset_m": support_offset_used}
             static_checks = candidate_static_checks(candidate, config["object"])
             center_x = float(baseline_root_pos[0]) + float(candidate["base_to_box_center_distance_m"])
             center_y = float(baseline_root_pos[1])
@@ -592,6 +651,7 @@ def main() -> None:
             "contact_sensor": contact_audit["status"] == "PASS",
             "controller_contract": checkpoint_audit["status"] == "PASS" and all(recurrent_reset.values()),
             "runtime_geometry_complete": bool(len(robot.body_names) > 0 and len(arm_names) == 14 and len(palm_body_names) == 2),
+            "palm_support_offset_calibration": support_audit["status"] == "PASS",
             "candidate_sweep_complete": len(candidate_records) == (1 if frozen else len(config["search"]["candidates"])),
             "frozen_candidate_valid": (not frozen) or search_result["status"] == "PASS",
             "trace_writer": sum(1 for line in (RUN / "trace.jsonl").read_text().splitlines() if line.strip()) == expected_frames,
@@ -617,7 +677,7 @@ def main() -> None:
         return
 
     selection = config["selection"]
-    candidate = {key: selection[key] for key in ("contact_height_m", "tangential_separation_m", "base_to_box_center_distance_m", "precontact_gap_m")}
+    candidate = {key: selection[key] for key in ("contact_height_m", "tangential_separation_m", "base_to_box_center_distance_m", "precontact_gap_m", "palm_collision_support_offset_m")}
     place_box(
         box,
         float(baseline_root_pos[0]) + float(candidate["base_to_box_center_distance_m"]),

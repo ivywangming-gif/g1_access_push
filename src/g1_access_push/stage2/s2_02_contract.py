@@ -62,7 +62,8 @@ def object_local_targets(candidate: dict[str, float], rear_face_x: float = -0.6)
     separation = float(candidate["tangential_separation_m"])
     height = float(candidate["contact_height_m"])
     gap = float(candidate["precontact_gap_m"])
-    x = float(rear_face_x) - gap
+    support = float(candidate.get("palm_collision_support_offset_m", 0.0))
+    x = float(rear_face_x) - gap - support
     z = -0.6 + height
     return [[x, separation / 2.0, z], [x, -separation / 2.0, z]]
 
@@ -109,7 +110,11 @@ def select_candidate(records: list[dict[str, Any]]) -> dict[str, Any] | None:
 def resolved_config(path: Path) -> dict[str, Any]:
     config = load_config(path)
     selection = config["selection"]
-    runnable = selection["status"] == "FROZEN" and selection["candidate_index"] is not None
+    runnable = (
+        selection["status"] == "FROZEN"
+        and selection["candidate_index"] is not None
+        and selection["palm_collision_support_offset_m"] is not None
+    )
     canonical = json.dumps(config, sort_keys=True, separators=(",", ":"))
     return {
         "schema_version": 1,

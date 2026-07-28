@@ -1,7 +1,7 @@
 {
-  "config_sha256": "5dd6072b262a225425a8a255b5a61c077e3b051a84cbecab226e715bce3fdf5c",
-  "contract_digest_sha256": "78d5c72ddf58a1c056b6be75a7168c6c53cf13136d52aadf4727c677a55d856a",
-  "git_head": "e5149a3c3098f8c1a04ef4eafd5a86cd1110456b",
+  "config_sha256": "2b22f7a38a2bc33852029d7e5d3a504e9634b976ff0454e1906ceb946b566b03",
+  "contract_digest_sha256": "8b1f16bb8a167ba68e66c3f8bcbf79f2310b72e3c708c10a68ebf16b2296823d",
+  "git_head": "6b43b360d33a837f71938e7e3077be5aaf0f9679",
   "qualification_state": "READY_FOR_DEVELOPMENT_SEARCH",
   "resolved": {
     "acceptance": {
@@ -53,6 +53,12 @@
         0.0,
         1.0
       ],
+      "palm_support_offset_scan_rear_range_m": [
+        0.2,
+        0.6
+      ],
+      "palm_support_offset_scan_step_m": 0.02,
+      "palm_support_offset_tolerance_m": 0.021,
       "source": "S1_07_DIFFERENTIAL_IK_PLUS_CERTIFIED_RECURRENT_LOWER_BODY",
       "waist_command": [
         0.0,
@@ -105,58 +111,106 @@
     "search": {
       "candidates": [
         {
-          "base_to_box_center_distance_m": 0.84,
-          "contact_height_m": 0.62,
-          "precontact_gap_m": 0.08,
-          "tangential_separation_m": 0.3
-        },
-        {
-          "base_to_box_center_distance_m": 0.84,
-          "contact_height_m": 0.62,
-          "precontact_gap_m": 0.06,
-          "tangential_separation_m": 0.36
-        },
-        {
-          "base_to_box_center_distance_m": 0.84,
-          "contact_height_m": 0.68,
-          "precontact_gap_m": 0.06,
-          "tangential_separation_m": 0.3
-        },
-        {
-          "base_to_box_center_distance_m": 0.9,
-          "contact_height_m": 0.68,
-          "precontact_gap_m": 0.08,
-          "tangential_separation_m": 0.36
-        },
-        {
-          "base_to_box_center_distance_m": 0.9,
+          "base_to_box_center_distance_m": 0.98,
           "contact_height_m": 0.62,
           "precontact_gap_m": 0.06,
           "tangential_separation_m": 0.3
         },
         {
-          "base_to_box_center_distance_m": 0.84,
-          "contact_height_m": 0.68,
+          "base_to_box_center_distance_m": 0.98,
+          "contact_height_m": 0.62,
           "precontact_gap_m": 0.08,
-          "tangential_separation_m": 0.36
+          "tangential_separation_m": 0.34
         },
         {
-          "base_to_box_center_distance_m": 0.9,
+          "base_to_box_center_distance_m": 0.98,
+          "contact_height_m": 0.66,
+          "precontact_gap_m": 0.06,
+          "tangential_separation_m": 0.3
+        },
+        {
+          "base_to_box_center_distance_m": 0.98,
+          "contact_height_m": 0.66,
+          "precontact_gap_m": 0.08,
+          "tangential_separation_m": 0.34
+        },
+        {
+          "base_to_box_center_distance_m": 1.02,
           "contact_height_m": 0.62,
           "precontact_gap_m": 0.06,
-          "tangential_separation_m": 0.36
+          "tangential_separation_m": 0.3
         },
         {
-          "base_to_box_center_distance_m": 0.9,
-          "contact_height_m": 0.68,
+          "base_to_box_center_distance_m": 1.02,
+          "contact_height_m": 0.62,
           "precontact_gap_m": 0.08,
+          "tangential_separation_m": 0.34
+        },
+        {
+          "base_to_box_center_distance_m": 1.02,
+          "contact_height_m": 0.66,
+          "precontact_gap_m": 0.06,
           "tangential_separation_m": 0.3
+        },
+        {
+          "base_to_box_center_distance_m": 1.02,
+          "contact_height_m": 0.66,
+          "precontact_gap_m": 0.08,
+          "tangential_separation_m": 0.34
+        },
+        {
+          "base_to_box_center_distance_m": 1.06,
+          "contact_height_m": 0.62,
+          "precontact_gap_m": 0.06,
+          "tangential_separation_m": 0.3
+        },
+        {
+          "base_to_box_center_distance_m": 1.06,
+          "contact_height_m": 0.62,
+          "precontact_gap_m": 0.08,
+          "tangential_separation_m": 0.34
+        },
+        {
+          "base_to_box_center_distance_m": 1.06,
+          "contact_height_m": 0.66,
+          "precontact_gap_m": 0.06,
+          "tangential_separation_m": 0.3
+        },
+        {
+          "base_to_box_center_distance_m": 1.06,
+          "contact_height_m": 0.66,
+          "precontact_gap_m": 0.08,
+          "tangential_separation_m": 0.34
+        },
+        {
+          "base_to_box_center_distance_m": 1.1,
+          "contact_height_m": 0.62,
+          "precontact_gap_m": 0.06,
+          "tangential_separation_m": 0.3
+        },
+        {
+          "base_to_box_center_distance_m": 1.1,
+          "contact_height_m": 0.62,
+          "precontact_gap_m": 0.08,
+          "tangential_separation_m": 0.34
+        },
+        {
+          "base_to_box_center_distance_m": 1.1,
+          "contact_height_m": 0.66,
+          "precontact_gap_m": 0.06,
+          "tangential_separation_m": 0.3
+        },
+        {
+          "base_to_box_center_distance_m": 1.1,
+          "contact_height_m": 0.66,
+          "precontact_gap_m": 0.08,
+          "tangential_separation_m": 0.34
         }
       ],
-      "hold_steps": 15,
+      "hold_steps": 8,
       "maximum_candidates": 40,
-      "return_steps": 20,
-      "transition_steps": 60,
+      "return_steps": 7,
+      "transition_steps": 25,
       "warmup_steps": 100
     },
     "selection": {
@@ -164,6 +218,7 @@
       "candidate_index": null,
       "contact_height_m": null,
       "desired_palm_quaternion_in_object_wxyz": null,
+      "palm_collision_support_offset_m": null,
       "precontact_gap_m": null,
       "status": "UNRESOLVED",
       "tangential_separation_m": null

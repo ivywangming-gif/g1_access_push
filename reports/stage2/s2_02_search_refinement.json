@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "stage": "S2-02",
+  "source_preflight_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_02_search_preflight_20260728_060914",
+  "source_preflight_status": "PASS",
+  "source_candidate_count": 8,
+  "source_selected_candidate": null,
+  "source_disposition": "DEVELOPMENT_SEARCH_GRID_NOT_YET_SUFFICIENT_FOR_NO_FEASIBLE_CLAIM",
+  "observed_topology": {
+    "common_failed_checks": [
+      "no_overlap",
+      "reachable",
+      "gap_clear"
+    ],
+    "minimum_observed_palm_normal_alignment_dot": 0.9991015791893005,
+    "minimum_observed_arm_joint_limit_margin_rad": 0.6908612251281738,
+    "maximum_observed_arm_joint_target_p95_error_rad": 0.026237852871418,
+    "maximum_observed_base_xy_excursion_m": 0.003385777585208416,
+    "maximum_observed_root_tilt_deg": 3.9189599900248857,
+    "maximum_observed_box_translation_m": 1.468620439482038e-06,
+    "maximum_observed_robot_box_contact_force_n": 0.0
+  },
+  "localized_implementation_semantics": {
+    "primary_reason": "PALM_COLLISION_SUPPORT_OFFSET_OMITTED_FROM_PRECONTACT_GAP",
+    "previous_gap_interpretation": "PALM_LINK_ORIGIN_TO_REAR_FACE",
+    "corrected_gap_interpretation": "FORWARDMOST_RUNTIME_HAND_COLLIDER_TO_REAR_FACE",
+    "support_offset_source": "PHYSX_SCENE_QUERY_REAR_FACE_SCAN",
+    "support_offset_is_frozen_before_formal": true
+  },
+  "deterministic_refinement": {
+    "candidate_count": 16,
+    "maximum_authorized_candidate_count": 40,
+    "contact_height_values_m": [
+      0.62,
+      0.66
+    ],
+    "tangential_separation_values_m": [
+      0.3,
+      0.34
+    ],
+    "base_to_box_center_distance_values_m": [
+      0.98,
+      1.02,
+      1.06,
+      1.1
+    ],
+    "surface_precontact_gap_values_m": [
+      0.06,
+      0.08
+    ],
+    "acceptance_thresholds_changed": false
+  }
+}
