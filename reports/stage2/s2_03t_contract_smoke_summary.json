@@ -4,6 +4,8 @@
     {
       "attempt": 1,
       "status": "INVALID",
+      "evidence_disposition": "INVALID",
+      "usable_evidence": false,
       "primary_reason": "IMPLEMENTATION_EXCEPTION",
       "diagnosed_infrastructure_reason": "RUNTIME_METRIC_VALUE_MASK_NAMESPACE_COLLISION",
       "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_085727"
@@ -11,6 +13,8 @@
     {
       "attempt": 2,
       "status": "INVALID",
+      "evidence_disposition": "INVALID",
+      "usable_evidence": false,
       "primary_reason": "IMPLEMENTATION_EXCEPTION",
       "diagnosed_infrastructure_reason": "ARM_REFERENCE_BATCH_SHAPE_MISMATCH",
       "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_091025"
@@ -18,27 +22,35 @@
     {
       "attempt": 3,
       "status": "INVALID",
+      "evidence_disposition": "INVALID",
+      "usable_evidence": false,
       "primary_reason": "IMPLEMENTATION_EXCEPTION",
       "diagnosed_infrastructure_reason": "COUNTED_TERMINATION_ROUTE_MISMATCH",
       "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_091329"
     },
     {
       "attempt": 4,
-      "status": "INVALID",
+      "status": "PASS",
+      "evidence_disposition": "INVALID",
+      "usable_evidence": false,
       "primary_reason": "ALL_RUNTIME_CONTRACT_CHECKS_PASSED",
       "diagnosed_infrastructure_reason": "UNSUPPORTED_BATCHED_MULTI_BODY_FILTER_SENSOR_NOT_AUDITED",
       "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_091813"
     },
     {
       "attempt": 5,
-      "status": "INVALID",
+      "status": "PASS",
+      "evidence_disposition": "INVALID",
+      "usable_evidence": false,
       "primary_reason": "ALL_RUNTIME_CONTRACT_CHECKS_PASSED",
       "diagnosed_infrastructure_reason": "ROBOT_FILTER_WILDCARD_COUNT_MISMATCH",
       "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_103259"
     },
     {
       "attempt": 6,
-      "status": "INVALID",
+      "status": "FAIL",
+      "evidence_disposition": "INVALID",
+      "usable_evidence": false,
       "primary_reason": "RUNTIME_CONTRACT_CHECK_FAILED",
       "diagnosed_infrastructure_reason": "ENV_NAMESPACE_REGEX_MISCLASSIFIED_AS_BODY_WILDCARD",
       "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_104328"
@@ -46,6 +58,8 @@
     {
       "attempt": 7,
       "status": "PASS",
+      "evidence_disposition": "PASS",
+      "usable_evidence": true,
       "primary_reason": "ALL_RUNTIME_CONTRACT_CHECKS_PASSED",
       "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_104740"
     }
