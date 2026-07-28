@@ -1,0 +1,1261 @@
+{
+  "actual_reward_semantics": "raw_term_times_weight_times_control_dt",
+  "audit": "PRE_REDESIGN_REWARD_LANDSCAPE_AUDIT",
+  "control_dt_s": 0.02,
+  "current_reward_has_hover_local_optimum": "YES",
+  "episode_returns": {
+    "approach_60_to_25_mm_then_hover": {
+      "definition": {
+        "approach_steps": 175,
+        "gap_end_m": 0.025,
+        "gap_start_m": 0.06,
+        "hover_steps": 825,
+        "normal_speed_mps": 0.01,
+        "timeout_on_step": 1000,
+        "total_steps": 1000
+      },
+      "return": -1.3087925602701067
+    },
+    "bilateral_contact_verify_hold": {
+      "definition": {
+        "box_translation_terminal_m": null,
+        "single_hand_termination_after_steps": null,
+        "steps": 120
+      },
+      "final_step_reward": 2.1318450560652398,
+      "first_step_reward": 0.05102956167176351,
+      "return": 16.225484199796135,
+      "term_returns": {
+        "action_l2": 0.0,
+        "action_rate": 0.0,
+        "attached_hold_step": 8.000000000000005,
+        "bilateral_contact_verify_step": 4.800000000000003,
+        "box_translation": 0.0,
+        "box_yaw_change": 0.0,
+        "contact_timeout_terminal": 0.0,
+        "forbidden_collision_terminal": 0.0,
+        "force_imbalance": 0.0,
+        "force_impulse_rate": -0.9745158002038748,
+        "hand_orientation_tracking": 0.0,
+        "hand_position_tracking": 0.0,
+        "joint_limit_margin": 0.0,
+        "root_tilt": 0.0,
+        "success_terminal": 2.0,
+        "symmetric_gap_closure": 2.4000000000000017,
+        "torque_ratio": 0.0
+      }
+    },
+    "contact_then_pushing": {
+      "definition": {
+        "box_translation_terminal_m": 0.005000001,
+        "single_hand_termination_after_steps": null,
+        "steps": 21
+      },
+      "final_step_reward": 0.04784505526523955,
+      "first_step_reward": 0.05102956167176351,
+      "return": 1.088823648537411,
+      "term_returns": {
+        "action_l2": 0.0,
+        "action_rate": 0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.8400000000000002,
+        "box_translation": -0.0040000007999999995,
+        "box_yaw_change": 0.0,
+        "contact_timeout_terminal": 0.0,
+        "forbidden_collision_terminal": 0.0,
+        "force_imbalance": 0.0,
+        "force_impulse_rate": -0.16717635066258923,
+        "hand_orientation_tracking": 0.0,
+        "hand_position_tracking": 0.0,
+        "joint_limit_margin": 0.0,
+        "root_tilt": 0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.4200000000000001,
+        "torque_ratio": 0.0
+      }
+    },
+    "hard_impact_immediate": {
+      "definition": {
+        "force_each_n": 9.82,
+        "steps": 1
+      },
+      "return": -0.028089704383282385
+    },
+    "hover_10_mm_1000_steps": {
+      "definition": {
+        "gap_each_m": 0.01,
+        "steps": 1000,
+        "timeout_on_step": 1000
+      },
+      "ordinary_step_reward": 0.006557588823428846,
+      "return": 6.057588823428847,
+      "terminal_step_reward": -0.49344241117657117
+    },
+    "hover_25_mm_1000_steps": {
+      "definition": {
+        "gap_each_m": 0.025,
+        "steps": 1000,
+        "timeout_on_step": 1000
+      },
+      "ordinary_step_reward": -0.0003583000275220239,
+      "return": -0.8583000275220238,
+      "terminal_step_reward": -0.500358300027522
+    },
+    "single_hand_contact_then_timeout": {
+      "definition": {
+        "box_translation_terminal_m": null,
+        "single_hand_termination_after_steps": 26,
+        "steps": 26
+      },
+      "final_step_reward": -0.011386112013866535,
+      "first_step_reward": -0.01383259519429467,
+      "return": -0.2960389123605299,
+      "term_returns": {
+        "action_l2": 0.0,
+        "action_rate": 0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.0,
+        "box_translation": 0.0,
+        "box_yaw_change": 0.0,
+        "contact_timeout_terminal": 0.0,
+        "forbidden_collision_terminal": 0.0,
+        "force_imbalance": -0.26000000000000006,
+        "force_impulse_rate": -0.15902140672782877,
+        "hand_orientation_tracking": 0.0,
+        "hand_position_tracking": -0.026000000000000016,
+        "joint_limit_margin": 0.0,
+        "root_tilt": 0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.1489824943672989,
+        "torque_ratio": 0.0
+      }
+    }
+  },
+  "hover_evidence": {
+    "absolute_gap_term_rewards_stationary_near_contact": true,
+    "hover_10_mm_return": 6.057588823428847,
+    "hover_25_mm_return": -0.8583000275220238,
+    "safe_contact_verify_hold_return": 16.225484199796135,
+    "ten_mm_hover_is_positive": true
+  },
+  "old_scientific_result_preserved": {
+    "formal_bilateral_contact_fraction_maximum": 0.0,
+    "primary_reason": "NO_QUALIFIED_CONTACT_POLICY",
+    "screening_valid_failures": "18/18",
+    "status": "FAIL"
+  },
+  "scenario_assumptions": {
+    "action": "14D_ZERO",
+    "contact_force_n": 1.0,
+    "gap_states": "left_equals_right; palm_position_error_is_normal_gap; other_safe_terms_zero",
+    "hard_impact_force_each_n": 9.82,
+    "impulse_window_steps": 5
+  },
+  "schema_version": 1,
+  "source_commit": "8bef297b38051bb9b550e6e97bc7f3ee6370a635",
+  "source_provenance": {
+    "/root/autodl-tmp/robotics/third_party/IsaacLab/source/isaaclab/isaaclab/managers/reward_manager.py": {
+      "dt_scaling_confirmed": true,
+      "sha256": "5d41d6a376cfb456849d861c3232694ea5662cc38970e2e2c7e5152f156d88d7",
+      "source_line": 149
+    },
+    "configs/stage2/s2_03t_contact_training_contract.yaml": {
+      "actual_sha256": "221f27d2a22d3e07f9bd9a05680d61d57f3b2af59a2cf0ed4f5bd8af424e6316",
+      "expected_sha256": "221f27d2a22d3e07f9bd9a05680d61d57f3b2af59a2cf0ed4f5bd8af424e6316",
+      "matches": true
+    },
+    "reports/stage2/s2_03t_formal_training_summary.json": {
+      "actual_sha256": "1bc32374fdc009a6db8ee8b237dddd432d16f092ef11c7b8aec1e88021dde190",
+      "expected_sha256": "1bc32374fdc009a6db8ee8b237dddd432d16f092ef11c7b8aec1e88021dde190",
+      "matches": true
+    },
+    "reports/stage2/s2_03t_screening_summary.json": {
+      "actual_sha256": "69a5fd8b8958e241120cb0a61b624989ccfbba7ea7e14f6a83212aa1518bd930",
+      "expected_sha256": "69a5fd8b8958e241120cb0a61b624989ccfbba7ea7e14f6a83212aa1518bd930",
+      "matches": true
+    },
+    "src/g1_access_push/sim/stage2/s2_03t_env_cfg.py": {
+      "actual_sha256": "f6658901686d5a0c09ed2ca88c66d28817e2ba8181f2ab1e7da1fc874efa68f6",
+      "expected_sha256": "f6658901686d5a0c09ed2ca88c66d28817e2ba8181f2ab1e7da1fc874efa68f6",
+      "matches": true
+    },
+    "src/g1_access_push/sim/stage2/s2_03t_mdp.py": {
+      "actual_sha256": "93c53c2ca24a9ff87389bfba0b35994293976413204bb037ea3b25455898ce44",
+      "expected_sha256": "93c53c2ca24a9ff87389bfba0b35994293976413204bb037ea3b25455898ce44",
+      "matches": true
+    },
+    "src/g1_access_push/stage2/s2_03t_contract.py": {
+      "actual_sha256": "50ad6ee5a7cc219a536d0aff049a0e991c1e255eb8930d08b05dfd7bbd6f09b2",
+      "expected_sha256": "50ad6ee5a7cc219a536d0aff049a0e991c1e255eb8930d08b05dfd7bbd6f09b2",
+      "matches": true
+    }
+  },
+  "stage": "S2-03T",
+  "state_rewards": {
+    "bilateral_contact_onset": {
+      "actual_total_reward_per_control_step": 0.05102956167176351,
+      "actual_weighted_terms_per_control_step": {
+        "action_l2": -0.0,
+        "action_rate": -0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.04,
+        "box_translation": -0.0,
+        "box_yaw_change": -0.0,
+        "contact_timeout_terminal": -0.0,
+        "forbidden_collision_terminal": -0.0,
+        "force_imbalance": -0.0,
+        "force_impulse_rate": -0.008970438328236493,
+        "hand_orientation_tracking": -0.0,
+        "hand_position_tracking": -0.0,
+        "joint_limit_margin": -0.0,
+        "root_tilt": -0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.02,
+        "torque_ratio": -0.0
+      },
+      "label": "bilateral_contact_onset",
+      "raw_terms": {
+        "action_l2": 0.0,
+        "action_rate": 0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 1.0,
+        "box_translation": 0.0,
+        "box_yaw_change": 0.0,
+        "contact_timeout_terminal": 0.0,
+        "forbidden_collision_terminal": 0.0,
+        "force_imbalance": 0.0,
+        "force_impulse_rate": 0.22426095820591233,
+        "hand_orientation_tracking": 0.0,
+        "hand_position_tracking": 0.0,
+        "joint_limit_margin": 0.0,
+        "root_tilt": 0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 1.0,
+        "torque_ratio": 0.0
+      },
+      "state": {
+        "all_frozen_gates": false,
+        "arm_torque_ratio_max": 0.0,
+        "bilateral_contact_timeout": false,
+        "box_translation_m": 0.0,
+        "box_yaw_change_rad": 0.0,
+        "forbidden_non_palm_box_collision": false,
+        "frozen_attach_success": false,
+        "left_contact": true,
+        "minimum_arm_joint_limit_margin_rad": 1.0,
+        "normalized_peak_plus_impulse_plus_rate": 0.22426095820591233,
+        "palm_force_norm_n": [
+          1.0,
+          1.0
+        ],
+        "palm_orientation_error_rad": [
+          0.0,
+          0.0
+        ],
+        "palm_position_error_m": [
+          0.0,
+          0.0
+        ],
+        "right_contact": true,
+        "root_tilt_deg": 0.0,
+        "surface_gap_m": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "bilateral_gap_10_mm": {
+      "actual_total_reward_per_control_step": 0.006557588823428846,
+      "actual_weighted_terms_per_control_step": {
+        "action_l2": -0.0,
+        "action_rate": -0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.0,
+        "box_translation": -0.0,
+        "box_yaw_change": -0.0,
+        "contact_timeout_terminal": -0.0,
+        "forbidden_collision_terminal": -0.0,
+        "force_imbalance": -0.0,
+        "force_impulse_rate": -0.0,
+        "hand_orientation_tracking": -0.0,
+        "hand_position_tracking": -0.0008,
+        "joint_limit_margin": -0.0,
+        "root_tilt": -0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.007357588823428847,
+        "torque_ratio": -0.0
+      },
+      "label": "bilateral_gap_10_mm",
+      "raw_terms": {
+        "action_l2": 0.0,
+        "action_rate": 0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.0,
+        "box_translation": 0.0,
+        "box_yaw_change": 0.0,
+        "contact_timeout_terminal": 0.0,
+        "forbidden_collision_terminal": 0.0,
+        "force_imbalance": 0.0,
+        "force_impulse_rate": 0.0,
+        "hand_orientation_tracking": 0.0,
+        "hand_position_tracking": 0.02,
+        "joint_limit_margin": 0.0,
+        "root_tilt": 0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.36787944117144233,
+        "torque_ratio": 0.0
+      },
+      "state": {
+        "all_frozen_gates": false,
+        "arm_torque_ratio_max": 0.0,
+        "bilateral_contact_timeout": false,
+        "box_translation_m": 0.0,
+        "box_yaw_change_rad": 0.0,
+        "forbidden_non_palm_box_collision": false,
+        "frozen_attach_success": false,
+        "left_contact": false,
+        "minimum_arm_joint_limit_margin_rad": 1.0,
+        "normalized_peak_plus_impulse_plus_rate": 0.0,
+        "palm_force_norm_n": [
+          0.0,
+          0.0
+        ],
+        "palm_orientation_error_rad": [
+          0.0,
+          0.0
+        ],
+        "palm_position_error_m": [
+          0.01,
+          0.01
+        ],
+        "right_contact": false,
+        "root_tilt_deg": 0.0,
+        "surface_gap_m": [
+          0.01,
+          0.01
+        ]
+      }
+    },
+    "bilateral_gap_25_mm": {
+      "actual_total_reward_per_control_step": -0.0003583000275220239,
+      "actual_weighted_terms_per_control_step": {
+        "action_l2": -0.0,
+        "action_rate": -0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.0,
+        "box_translation": -0.0,
+        "box_yaw_change": -0.0,
+        "contact_timeout_terminal": -0.0,
+        "forbidden_collision_terminal": -0.0,
+        "force_imbalance": -0.0,
+        "force_impulse_rate": -0.0,
+        "hand_orientation_tracking": -0.0,
+        "hand_position_tracking": -0.002,
+        "joint_limit_margin": -0.0,
+        "root_tilt": -0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.0016416999724779761,
+        "torque_ratio": -0.0
+      },
+      "label": "bilateral_gap_25_mm",
+      "raw_terms": {
+        "action_l2": 0.0,
+        "action_rate": 0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.0,
+        "box_translation": 0.0,
+        "box_yaw_change": 0.0,
+        "contact_timeout_terminal": 0.0,
+        "forbidden_collision_terminal": 0.0,
+        "force_imbalance": 0.0,
+        "force_impulse_rate": 0.0,
+        "hand_orientation_tracking": 0.0,
+        "hand_position_tracking": 0.05,
+        "joint_limit_margin": 0.0,
+        "root_tilt": 0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.0820849986238988,
+        "torque_ratio": 0.0
+      },
+      "state": {
+        "all_frozen_gates": false,
+        "arm_torque_ratio_max": 0.0,
+        "bilateral_contact_timeout": false,
+        "box_translation_m": 0.0,
+        "box_yaw_change_rad": 0.0,
+        "forbidden_non_palm_box_collision": false,
+        "frozen_attach_success": false,
+        "left_contact": false,
+        "minimum_arm_joint_limit_margin_rad": 1.0,
+        "normalized_peak_plus_impulse_plus_rate": 0.0,
+        "palm_force_norm_n": [
+          0.0,
+          0.0
+        ],
+        "palm_orientation_error_rad": [
+          0.0,
+          0.0
+        ],
+        "palm_position_error_m": [
+          0.025,
+          0.025
+        ],
+        "right_contact": false,
+        "root_tilt_deg": 0.0,
+        "surface_gap_m": [
+          0.025,
+          0.025
+        ]
+      }
+    },
+    "bilateral_gap_30_mm": {
+      "actual_total_reward_per_control_step": -0.0014042586326427208,
+      "actual_weighted_terms_per_control_step": {
+        "action_l2": -0.0,
+        "action_rate": -0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.0,
+        "box_translation": -0.0,
+        "box_yaw_change": -0.0,
+        "contact_timeout_terminal": -0.0,
+        "forbidden_collision_terminal": -0.0,
+        "force_imbalance": -0.0,
+        "force_impulse_rate": -0.0,
+        "hand_orientation_tracking": -0.0,
+        "hand_position_tracking": -0.0024,
+        "joint_limit_margin": -0.0,
+        "root_tilt": -0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.000995741367357279,
+        "torque_ratio": -0.0
+      },
+      "label": "bilateral_gap_30_mm",
+      "raw_terms": {
+        "action_l2": 0.0,
+        "action_rate": 0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.0,
+        "box_translation": 0.0,
+        "box_yaw_change": 0.0,
+        "contact_timeout_terminal": 0.0,
+        "forbidden_collision_terminal": 0.0,
+        "force_imbalance": 0.0,
+        "force_impulse_rate": 0.0,
+        "hand_orientation_tracking": 0.0,
+        "hand_position_tracking": 0.06,
+        "joint_limit_margin": 0.0,
+        "root_tilt": 0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.049787068367863944,
+        "torque_ratio": 0.0
+      },
+      "state": {
+        "all_frozen_gates": false,
+        "arm_torque_ratio_max": 0.0,
+        "bilateral_contact_timeout": false,
+        "box_translation_m": 0.0,
+        "box_yaw_change_rad": 0.0,
+        "forbidden_non_palm_box_collision": false,
+        "frozen_attach_success": false,
+        "left_contact": false,
+        "minimum_arm_joint_limit_margin_rad": 1.0,
+        "normalized_peak_plus_impulse_plus_rate": 0.0,
+        "palm_force_norm_n": [
+          0.0,
+          0.0
+        ],
+        "palm_orientation_error_rad": [
+          0.0,
+          0.0
+        ],
+        "palm_position_error_m": [
+          0.03,
+          0.03
+        ],
+        "right_contact": false,
+        "root_tilt_deg": 0.0,
+        "surface_gap_m": [
+          0.03,
+          0.03
+        ]
+      }
+    },
+    "bilateral_gap_5_mm": {
+      "actual_total_reward_per_control_step": 0.011730613194252669,
+      "actual_weighted_terms_per_control_step": {
+        "action_l2": -0.0,
+        "action_rate": -0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.0,
+        "box_translation": -0.0,
+        "box_yaw_change": -0.0,
+        "contact_timeout_terminal": -0.0,
+        "forbidden_collision_terminal": -0.0,
+        "force_imbalance": -0.0,
+        "force_impulse_rate": -0.0,
+        "hand_orientation_tracking": -0.0,
+        "hand_position_tracking": -0.0004,
+        "joint_limit_margin": -0.0,
+        "root_tilt": -0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.012130613194252668,
+        "torque_ratio": -0.0
+      },
+      "label": "bilateral_gap_5_mm",
+      "raw_terms": {
+        "action_l2": 0.0,
+        "action_rate": 0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.0,
+        "box_translation": 0.0,
+        "box_yaw_change": 0.0,
+        "contact_timeout_terminal": 0.0,
+        "forbidden_collision_terminal": 0.0,
+        "force_imbalance": 0.0,
+        "force_impulse_rate": 0.0,
+        "hand_orientation_tracking": 0.0,
+        "hand_position_tracking": 0.01,
+        "joint_limit_margin": 0.0,
+        "root_tilt": 0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.6065306597126334,
+        "torque_ratio": 0.0
+      },
+      "state": {
+        "all_frozen_gates": false,
+        "arm_torque_ratio_max": 0.0,
+        "bilateral_contact_timeout": false,
+        "box_translation_m": 0.0,
+        "box_yaw_change_rad": 0.0,
+        "forbidden_non_palm_box_collision": false,
+        "frozen_attach_success": false,
+        "left_contact": false,
+        "minimum_arm_joint_limit_margin_rad": 1.0,
+        "normalized_peak_plus_impulse_plus_rate": 0.0,
+        "palm_force_norm_n": [
+          0.0,
+          0.0
+        ],
+        "palm_orientation_error_rad": [
+          0.0,
+          0.0
+        ],
+        "palm_position_error_m": [
+          0.005,
+          0.005
+        ],
+        "right_contact": false,
+        "root_tilt_deg": 0.0,
+        "surface_gap_m": [
+          0.005,
+          0.005
+        ]
+      }
+    },
+    "bilateral_gap_60_mm": {
+      "actual_total_reward_per_control_step": -0.004750424956466673,
+      "actual_weighted_terms_per_control_step": {
+        "action_l2": -0.0,
+        "action_rate": -0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.0,
+        "box_translation": -0.0,
+        "box_yaw_change": -0.0,
+        "contact_timeout_terminal": -0.0,
+        "forbidden_collision_terminal": -0.0,
+        "force_imbalance": -0.0,
+        "force_impulse_rate": -0.0,
+        "hand_orientation_tracking": -0.0,
+        "hand_position_tracking": -0.0048,
+        "joint_limit_margin": -0.0,
+        "root_tilt": -0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 4.957504353332717e-05,
+        "torque_ratio": -0.0
+      },
+      "label": "bilateral_gap_60_mm",
+      "raw_terms": {
+        "action_l2": 0.0,
+        "action_rate": 0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.0,
+        "box_translation": 0.0,
+        "box_yaw_change": 0.0,
+        "contact_timeout_terminal": 0.0,
+        "forbidden_collision_terminal": 0.0,
+        "force_imbalance": 0.0,
+        "force_impulse_rate": 0.0,
+        "hand_orientation_tracking": 0.0,
+        "hand_position_tracking": 0.12,
+        "joint_limit_margin": 0.0,
+        "root_tilt": 0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.0024787521766663585,
+        "torque_ratio": 0.0
+      },
+      "state": {
+        "all_frozen_gates": false,
+        "arm_torque_ratio_max": 0.0,
+        "bilateral_contact_timeout": false,
+        "box_translation_m": 0.0,
+        "box_yaw_change_rad": 0.0,
+        "forbidden_non_palm_box_collision": false,
+        "frozen_attach_success": false,
+        "left_contact": false,
+        "minimum_arm_joint_limit_margin_rad": 1.0,
+        "normalized_peak_plus_impulse_plus_rate": 0.0,
+        "palm_force_norm_n": [
+          0.0,
+          0.0
+        ],
+        "palm_orientation_error_rad": [
+          0.0,
+          0.0
+        ],
+        "palm_position_error_m": [
+          0.06,
+          0.06
+        ],
+        "right_contact": false,
+        "root_tilt_deg": 0.0,
+        "surface_gap_m": [
+          0.06,
+          0.06
+        ]
+      }
+    },
+    "bilateral_verify": {
+      "actual_total_reward_per_control_step": 0.05184505606523955,
+      "actual_weighted_terms_per_control_step": {
+        "action_l2": -0.0,
+        "action_rate": -0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.04,
+        "box_translation": -0.0,
+        "box_yaw_change": -0.0,
+        "contact_timeout_terminal": -0.0,
+        "forbidden_collision_terminal": -0.0,
+        "force_imbalance": -0.0,
+        "force_impulse_rate": -0.008154943934760447,
+        "hand_orientation_tracking": -0.0,
+        "hand_position_tracking": -0.0,
+        "joint_limit_margin": -0.0,
+        "root_tilt": -0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.02,
+        "torque_ratio": -0.0
+      },
+      "label": "bilateral_verify",
+      "raw_terms": {
+        "action_l2": 0.0,
+        "action_rate": 0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 1.0,
+        "box_translation": 0.0,
+        "box_yaw_change": 0.0,
+        "contact_timeout_terminal": 0.0,
+        "forbidden_collision_terminal": 0.0,
+        "force_imbalance": 0.0,
+        "force_impulse_rate": 0.2038735983690112,
+        "hand_orientation_tracking": 0.0,
+        "hand_position_tracking": 0.0,
+        "joint_limit_margin": 0.0,
+        "root_tilt": 0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 1.0,
+        "torque_ratio": 0.0
+      },
+      "state": {
+        "all_frozen_gates": false,
+        "arm_torque_ratio_max": 0.0,
+        "bilateral_contact_timeout": false,
+        "box_translation_m": 0.0,
+        "box_yaw_change_rad": 0.0,
+        "forbidden_non_palm_box_collision": false,
+        "frozen_attach_success": false,
+        "left_contact": true,
+        "minimum_arm_joint_limit_margin_rad": 1.0,
+        "normalized_peak_plus_impulse_plus_rate": 0.2038735983690112,
+        "palm_force_norm_n": [
+          1.0,
+          1.0
+        ],
+        "palm_orientation_error_rad": [
+          0.0,
+          0.0
+        ],
+        "palm_position_error_m": [
+          0.0,
+          0.0
+        ],
+        "right_contact": true,
+        "root_tilt_deg": 0.0,
+        "surface_gap_m": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "hard_impact": {
+      "actual_total_reward_per_control_step": -0.028089704383282385,
+      "actual_weighted_terms_per_control_step": {
+        "action_l2": -0.0,
+        "action_rate": -0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.04,
+        "box_translation": -0.0,
+        "box_yaw_change": -0.0,
+        "contact_timeout_terminal": -0.0,
+        "forbidden_collision_terminal": -0.0,
+        "force_imbalance": -0.0,
+        "force_impulse_rate": -0.08808970438328238,
+        "hand_orientation_tracking": -0.0,
+        "hand_position_tracking": -0.0,
+        "joint_limit_margin": -0.0,
+        "root_tilt": -0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.02,
+        "torque_ratio": -0.0
+      },
+      "label": "hard_impact",
+      "raw_terms": {
+        "action_l2": 0.0,
+        "action_rate": 0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 1.0,
+        "box_translation": 0.0,
+        "box_yaw_change": 0.0,
+        "contact_timeout_terminal": 0.0,
+        "forbidden_collision_terminal": 0.0,
+        "force_imbalance": 0.0,
+        "force_impulse_rate": 2.2022426095820595,
+        "hand_orientation_tracking": 0.0,
+        "hand_position_tracking": 0.0,
+        "joint_limit_margin": 0.0,
+        "root_tilt": 0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 1.0,
+        "torque_ratio": 0.0
+      },
+      "state": {
+        "all_frozen_gates": false,
+        "arm_torque_ratio_max": 0.0,
+        "bilateral_contact_timeout": false,
+        "box_translation_m": 0.0,
+        "box_yaw_change_rad": 0.0,
+        "forbidden_non_palm_box_collision": false,
+        "frozen_attach_success": false,
+        "left_contact": true,
+        "minimum_arm_joint_limit_margin_rad": 1.0,
+        "normalized_peak_plus_impulse_plus_rate": 2.2022426095820595,
+        "palm_force_norm_n": [
+          9.82,
+          9.82
+        ],
+        "palm_orientation_error_rad": [
+          0.0,
+          0.0
+        ],
+        "palm_position_error_m": [
+          0.0,
+          0.0
+        ],
+        "right_contact": true,
+        "root_tilt_deg": 0.0,
+        "surface_gap_m": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "pushing": {
+      "actual_total_reward_per_control_step": 0.04784505526523955,
+      "actual_weighted_terms_per_control_step": {
+        "action_l2": -0.0,
+        "action_rate": -0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.04,
+        "box_translation": -0.0040000007999999995,
+        "box_yaw_change": -0.0,
+        "contact_timeout_terminal": -0.0,
+        "forbidden_collision_terminal": -0.0,
+        "force_imbalance": -0.0,
+        "force_impulse_rate": -0.008154943934760447,
+        "hand_orientation_tracking": -0.0,
+        "hand_position_tracking": -0.0,
+        "joint_limit_margin": -0.0,
+        "root_tilt": -0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.02,
+        "torque_ratio": -0.0
+      },
+      "label": "pushing",
+      "raw_terms": {
+        "action_l2": 0.0,
+        "action_rate": 0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 1.0,
+        "box_translation": 0.005000001,
+        "box_yaw_change": 0.0,
+        "contact_timeout_terminal": 0.0,
+        "forbidden_collision_terminal": 0.0,
+        "force_imbalance": 0.0,
+        "force_impulse_rate": 0.2038735983690112,
+        "hand_orientation_tracking": 0.0,
+        "hand_position_tracking": 0.0,
+        "joint_limit_margin": 0.0,
+        "root_tilt": 0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 1.0,
+        "torque_ratio": 0.0
+      },
+      "state": {
+        "all_frozen_gates": false,
+        "arm_torque_ratio_max": 0.0,
+        "bilateral_contact_timeout": false,
+        "box_translation_m": 0.005000001,
+        "box_yaw_change_rad": 0.0,
+        "forbidden_non_palm_box_collision": false,
+        "frozen_attach_success": false,
+        "left_contact": true,
+        "minimum_arm_joint_limit_margin_rad": 1.0,
+        "normalized_peak_plus_impulse_plus_rate": 0.2038735983690112,
+        "palm_force_norm_n": [
+          1.0,
+          1.0
+        ],
+        "palm_orientation_error_rad": [
+          0.0,
+          0.0
+        ],
+        "palm_position_error_m": [
+          0.0,
+          0.0
+        ],
+        "right_contact": true,
+        "root_tilt_deg": 0.0,
+        "surface_gap_m": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "safe_hold": {
+      "actual_total_reward_per_control_step": 0.13184505606523955,
+      "actual_weighted_terms_per_control_step": {
+        "action_l2": -0.0,
+        "action_rate": -0.0,
+        "attached_hold_step": 0.08,
+        "bilateral_contact_verify_step": 0.04,
+        "box_translation": -0.0,
+        "box_yaw_change": -0.0,
+        "contact_timeout_terminal": -0.0,
+        "forbidden_collision_terminal": -0.0,
+        "force_imbalance": -0.0,
+        "force_impulse_rate": -0.008154943934760447,
+        "hand_orientation_tracking": -0.0,
+        "hand_position_tracking": -0.0,
+        "joint_limit_margin": -0.0,
+        "root_tilt": -0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.02,
+        "torque_ratio": -0.0
+      },
+      "label": "safe_hold",
+      "raw_terms": {
+        "action_l2": 0.0,
+        "action_rate": 0.0,
+        "attached_hold_step": 1.0,
+        "bilateral_contact_verify_step": 1.0,
+        "box_translation": 0.0,
+        "box_yaw_change": 0.0,
+        "contact_timeout_terminal": 0.0,
+        "forbidden_collision_terminal": 0.0,
+        "force_imbalance": 0.0,
+        "force_impulse_rate": 0.2038735983690112,
+        "hand_orientation_tracking": 0.0,
+        "hand_position_tracking": 0.0,
+        "joint_limit_margin": 0.0,
+        "root_tilt": 0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 1.0,
+        "torque_ratio": 0.0
+      },
+      "state": {
+        "all_frozen_gates": true,
+        "arm_torque_ratio_max": 0.0,
+        "bilateral_contact_timeout": false,
+        "box_translation_m": 0.0,
+        "box_yaw_change_rad": 0.0,
+        "forbidden_non_palm_box_collision": false,
+        "frozen_attach_success": false,
+        "left_contact": true,
+        "minimum_arm_joint_limit_margin_rad": 1.0,
+        "normalized_peak_plus_impulse_plus_rate": 0.2038735983690112,
+        "palm_force_norm_n": [
+          1.0,
+          1.0
+        ],
+        "palm_orientation_error_rad": [
+          0.0,
+          0.0
+        ],
+        "palm_position_error_m": [
+          0.0,
+          0.0
+        ],
+        "right_contact": true,
+        "root_tilt_deg": 0.0,
+        "surface_gap_m": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "safe_hold_success_terminal": {
+      "actual_total_reward_per_control_step": 2.1318450560652398,
+      "actual_weighted_terms_per_control_step": {
+        "action_l2": -0.0,
+        "action_rate": -0.0,
+        "attached_hold_step": 0.08,
+        "bilateral_contact_verify_step": 0.04,
+        "box_translation": -0.0,
+        "box_yaw_change": -0.0,
+        "contact_timeout_terminal": -0.0,
+        "forbidden_collision_terminal": -0.0,
+        "force_imbalance": -0.0,
+        "force_impulse_rate": -0.008154943934760447,
+        "hand_orientation_tracking": -0.0,
+        "hand_position_tracking": -0.0,
+        "joint_limit_margin": -0.0,
+        "root_tilt": -0.0,
+        "success_terminal": 2.0,
+        "symmetric_gap_closure": 0.02,
+        "torque_ratio": -0.0
+      },
+      "label": "safe_hold_success_terminal",
+      "raw_terms": {
+        "action_l2": 0.0,
+        "action_rate": 0.0,
+        "attached_hold_step": 1.0,
+        "bilateral_contact_verify_step": 1.0,
+        "box_translation": 0.0,
+        "box_yaw_change": 0.0,
+        "contact_timeout_terminal": 0.0,
+        "forbidden_collision_terminal": 0.0,
+        "force_imbalance": 0.0,
+        "force_impulse_rate": 0.2038735983690112,
+        "hand_orientation_tracking": 0.0,
+        "hand_position_tracking": 0.0,
+        "joint_limit_margin": 0.0,
+        "root_tilt": 0.0,
+        "success_terminal": 1.0,
+        "symmetric_gap_closure": 1.0,
+        "torque_ratio": 0.0
+      },
+      "state": {
+        "all_frozen_gates": true,
+        "arm_torque_ratio_max": 0.0,
+        "bilateral_contact_timeout": false,
+        "box_translation_m": 0.0,
+        "box_yaw_change_rad": 0.0,
+        "forbidden_non_palm_box_collision": false,
+        "frozen_attach_success": true,
+        "left_contact": true,
+        "minimum_arm_joint_limit_margin_rad": 1.0,
+        "normalized_peak_plus_impulse_plus_rate": 0.2038735983690112,
+        "palm_force_norm_n": [
+          1.0,
+          1.0
+        ],
+        "palm_orientation_error_rad": [
+          0.0,
+          0.0
+        ],
+        "palm_position_error_m": [
+          0.0,
+          0.0
+        ],
+        "right_contact": true,
+        "root_tilt_deg": 0.0,
+        "surface_gap_m": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "single_hand_contact_onset": {
+      "actual_total_reward_per_control_step": -0.01383259519429467,
+      "actual_weighted_terms_per_control_step": {
+        "action_l2": -0.0,
+        "action_rate": -0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.0,
+        "box_translation": -0.0,
+        "box_yaw_change": -0.0,
+        "contact_timeout_terminal": -0.0,
+        "forbidden_collision_terminal": -0.0,
+        "force_imbalance": -0.01,
+        "force_impulse_rate": -0.00856269113149847,
+        "hand_orientation_tracking": -0.0,
+        "hand_position_tracking": -0.001,
+        "joint_limit_margin": -0.0,
+        "root_tilt": -0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.005730095937203802,
+        "torque_ratio": -0.0
+      },
+      "label": "single_hand_contact_onset",
+      "raw_terms": {
+        "action_l2": 0.0,
+        "action_rate": 0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.0,
+        "box_translation": 0.0,
+        "box_yaw_change": 0.0,
+        "contact_timeout_terminal": 0.0,
+        "forbidden_collision_terminal": 0.0,
+        "force_imbalance": 1.0,
+        "force_impulse_rate": 0.21406727828746175,
+        "hand_orientation_tracking": 0.0,
+        "hand_position_tracking": 0.025,
+        "joint_limit_margin": 0.0,
+        "root_tilt": 0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.2865047968601901,
+        "torque_ratio": 0.0
+      },
+      "state": {
+        "all_frozen_gates": false,
+        "arm_torque_ratio_max": 0.0,
+        "bilateral_contact_timeout": false,
+        "box_translation_m": 0.0,
+        "box_yaw_change_rad": 0.0,
+        "forbidden_non_palm_box_collision": false,
+        "frozen_attach_success": false,
+        "left_contact": true,
+        "minimum_arm_joint_limit_margin_rad": 1.0,
+        "normalized_peak_plus_impulse_plus_rate": 0.21406727828746175,
+        "palm_force_norm_n": [
+          1.0,
+          0.0
+        ],
+        "palm_orientation_error_rad": [
+          0.0,
+          0.0
+        ],
+        "palm_position_error_m": [
+          0.0,
+          0.025
+        ],
+        "right_contact": false,
+        "root_tilt_deg": 0.0,
+        "surface_gap_m": [
+          0.0,
+          0.025
+        ]
+      }
+    },
+    "timeout_at_25_mm": {
+      "actual_total_reward_per_control_step": -0.500358300027522,
+      "actual_weighted_terms_per_control_step": {
+        "action_l2": -0.0,
+        "action_rate": -0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.0,
+        "box_translation": -0.0,
+        "box_yaw_change": -0.0,
+        "contact_timeout_terminal": -0.5,
+        "forbidden_collision_terminal": -0.0,
+        "force_imbalance": -0.0,
+        "force_impulse_rate": -0.0,
+        "hand_orientation_tracking": -0.0,
+        "hand_position_tracking": -0.002,
+        "joint_limit_margin": -0.0,
+        "root_tilt": -0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.0016416999724779761,
+        "torque_ratio": -0.0
+      },
+      "label": "timeout_at_25_mm",
+      "raw_terms": {
+        "action_l2": 0.0,
+        "action_rate": 0.0,
+        "attached_hold_step": 0.0,
+        "bilateral_contact_verify_step": 0.0,
+        "box_translation": 0.0,
+        "box_yaw_change": 0.0,
+        "contact_timeout_terminal": 1.0,
+        "forbidden_collision_terminal": 0.0,
+        "force_imbalance": 0.0,
+        "force_impulse_rate": 0.0,
+        "hand_orientation_tracking": 0.0,
+        "hand_position_tracking": 0.05,
+        "joint_limit_margin": 0.0,
+        "root_tilt": 0.0,
+        "success_terminal": 0.0,
+        "symmetric_gap_closure": 0.0820849986238988,
+        "torque_ratio": 0.0
+      },
+      "state": {
+        "all_frozen_gates": false,
+        "arm_torque_ratio_max": 0.0,
+        "bilateral_contact_timeout": true,
+        "box_translation_m": 0.0,
+        "box_yaw_change_rad": 0.0,
+        "forbidden_non_palm_box_collision": false,
+        "frozen_attach_success": false,
+        "left_contact": false,
+        "minimum_arm_joint_limit_margin_rad": 1.0,
+        "normalized_peak_plus_impulse_plus_rate": 0.0,
+        "palm_force_norm_n": [
+          0.0,
+          0.0
+        ],
+        "palm_orientation_error_rad": [
+          0.0,
+          0.0
+        ],
+        "palm_position_error_m": [
+          0.025,
+          0.025
+        ],
+        "right_contact": false,
+        "root_tilt_deg": 0.0,
+        "surface_gap_m": [
+          0.025,
+          0.025
+        ]
+      }
+    }
+  },
+  "status": "PASS",
+  "successful_episode_relative_contributions": {
+    "attached_hold_step": 0.4930515417284448,
+    "bilateral_contact_verify_step": 0.29583092503706687,
+    "force_impulse_rate": -0.06006081471615615,
+    "success_terminal": 0.12326288543211111,
+    "symmetric_gap_closure": 0.14791546251853344
+  },
+  "term_units_and_bounds": [
+    {
+      "maximum_actual_single_step_contribution_with_dt": 0.04,
+      "maximum_episode_contribution_or_bound": 40.0,
+      "name": "bilateral_contact_verify_step",
+      "raw_unit": "bool",
+      "weight": 2.0
+    },
+    {
+      "maximum_actual_single_step_contribution_with_dt": 0.08,
+      "maximum_episode_contribution_or_bound": 8.0,
+      "name": "attached_hold_step",
+      "raw_unit": "bool",
+      "weight": 4.0
+    },
+    {
+      "maximum_actual_single_step_contribution_with_dt": 2.0,
+      "maximum_episode_contribution_or_bound": 2.0,
+      "name": "success_terminal",
+      "raw_unit": "bool",
+      "weight": 100.0
+    },
+    {
+      "maximum_actual_single_step_contribution_with_dt": 0.02,
+      "maximum_episode_contribution_or_bound": 20.0,
+      "name": "symmetric_gap_closure",
+      "raw_unit": "dimensionless",
+      "weight": 1.0
+    },
+    {
+      "maximum_actual_single_step_contribution_with_dt": "UNBOUNDED_IN_REWARD_FUNCTION",
+      "maximum_episode_contribution_or_bound": "UNBOUNDED",
+      "name": "hand_position_tracking",
+      "raw_unit": "m",
+      "weight": -2.0
+    },
+    {
+      "maximum_actual_single_step_contribution_with_dt": -0.012566370614359173,
+      "maximum_episode_contribution_or_bound": "GATE_BOUNDED_ONLY",
+      "name": "hand_orientation_tracking",
+      "raw_unit": "rad",
+      "weight": -0.1
+    },
+    {
+      "maximum_actual_single_step_contribution_with_dt": -0.0981,
+      "maximum_episode_contribution_or_bound": "TERMINATES_ABOVE_FORCE_GATE",
+      "name": "force_imbalance",
+      "raw_unit": "N",
+      "weight": -0.5
+    },
+    {
+      "maximum_actual_single_step_contribution_with_dt": -0.004,
+      "maximum_episode_contribution_or_bound": "TERMINATES_ABOVE_0P005_M",
+      "name": "box_translation",
+      "raw_unit": "m",
+      "weight": -40.0
+    },
+    {
+      "maximum_actual_single_step_contribution_with_dt": -0.006981317007977318,
+      "maximum_episode_contribution_or_bound": "TERMINATES_ABOVE_GATE",
+      "name": "box_yaw_change",
+      "raw_unit": "rad",
+      "weight": -40.0
+    },
+    {
+      "maximum_actual_single_step_contribution_with_dt": -0.12,
+      "maximum_episode_contribution_or_bound": "TERMINATES_ABOVE_COMPONENT_GATES",
+      "name": "force_impulse_rate",
+      "raw_unit": "dimensionless",
+      "weight": -2.0
+    },
+    {
+      "maximum_actual_single_step_contribution_with_dt": -0.012415135383605959,
+      "maximum_episode_contribution_or_bound": "TERMINATES_ABOVE_GATE",
+      "name": "root_tilt",
+      "raw_unit": "degree",
+      "weight": -0.1
+    },
+    {
+      "maximum_actual_single_step_contribution_with_dt": 0.0,
+      "maximum_episode_contribution_or_bound": "ZERO_INSIDE_VALID_MARGIN",
+      "name": "joint_limit_margin",
+      "raw_unit": "rad",
+      "weight": -5.0
+    },
+    {
+      "maximum_actual_single_step_contribution_with_dt": -4e-05,
+      "maximum_episode_contribution_or_bound": "TERMINATES_ABOVE_1P001",
+      "name": "torque_ratio",
+      "raw_unit": "ratio",
+      "weight": -2.0
+    },
+    {
+      "maximum_actual_single_step_contribution_with_dt": -0.00028,
+      "maximum_episode_contribution_or_bound": -0.28,
+      "name": "action_l2",
+      "raw_unit": "normalized_action_squared",
+      "weight": -0.001
+    },
+    {
+      "maximum_actual_single_step_contribution_with_dt": -0.0112,
+      "maximum_episode_contribution_or_bound": -11.2,
+      "name": "action_rate",
+      "raw_unit": "normalized_action_delta_squared",
+      "weight": -0.01
+    },
+    {
+      "maximum_actual_single_step_contribution_with_dt": -2.0,
+      "maximum_episode_contribution_or_bound": -2.0,
+      "name": "forbidden_collision_terminal",
+      "raw_unit": "bool",
+      "weight": -100.0
+    },
+    {
+      "maximum_actual_single_step_contribution_with_dt": -0.5,
+      "maximum_episode_contribution_or_bound": -0.5,
+      "name": "contact_timeout_terminal",
+      "raw_unit": "bool",
+      "weight": -25.0
+    }
+  ]
+}

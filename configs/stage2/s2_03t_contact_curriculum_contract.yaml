@@ -1,0 +1,66 @@
+schema_version: 1
+stage: S2-03T
+contract: CONTACT_GAP_CURRICULUM
+status: IMPLEMENTED_FOR_NEW_TRAINING
+development_scope: SIMULATION_DEVELOPMENT_ONLY
+
+levels:
+  - {id: 0, name: CURRICULUM_0, minimum_gap_m: 0.0, maximum_gap_m: 0.005}
+  - {id: 1, name: CURRICULUM_1, minimum_gap_m: 0.0, maximum_gap_m: 0.010}
+  - {id: 2, name: CURRICULUM_2, minimum_gap_m: 0.010, maximum_gap_m: 0.030}
+  - {id: 3, name: CURRICULUM_3, minimum_gap_m: 0.030, maximum_gap_m: 0.060}
+
+sampling:
+  type: uniform_per_episode_with_full_gap_endpoint_mixture
+  full_gap_endpoint_m: 0.060
+  full_gap_endpoint_probability_at_curriculum_3: 0.05
+  geometry_change: translate_box_along_frozen_object_x_only
+  reference_robot_state_changed: false
+  reference_lower_body_state_changed: false
+  formal_screening_fixed_gap_m: 0.060
+  formal_screening_curriculum_enabled: false
+
+promotion:
+  automatic: true
+  skip_levels_allowed: false
+  rolling_completed_episode_window: 2048
+  success_metric: bilateral_verify_and_safe_hold
+  success_threshold_by_source_level: {0: 0.80, 1: 0.75, 2: 0.65}
+  maximum_hard_safety_violation_fraction: 0.005
+  maximum_pushing_violation_fraction: 0.001
+  maximum_nonfinite_count: 0
+  clear_window_after_promotion: true
+  pilot_maximum_level: 1
+  formal_maximum_level: 3
+
+reset_must_clear:
+  - reward_mode
+  - previous_gap_sum
+  - onset_flags
+  - bilateral_onset_flag
+  - verify_counter
+  - hold_counter
+  - action_history
+  - contact_history
+  - force_history
+  - impulse_history
+
+observation_isolation:
+  actor_frame_dimension: 45
+  actor_history_frames: 3
+  actor_dimension: 135
+  critic_privileged_append_dimension: 40
+  critic_dimension: 175
+  exact_force_in_actor: false
+  exact_force_in_critic: true
+  jacobian_authority_in_actor: false
+  jacobian_authority_in_critic: true
+  torque_margin_in_actor: false
+  torque_margin_in_critic: true
+
+frozen_boundaries:
+  lower_body_frozen: true
+  pushing_enabled: false
+  planner_enabled: false
+  falcon_enabled: false
+  formal_s2_03_gates_changed: false

@@ -17,9 +17,8 @@ from g1_access_push.stage2.s2_03t_contact_filter_contract import (
     FORBIDDEN_ROBOT_RELATIVE_PATHS,
     S2_03_RUNTIME_GEOMETRY_SHA256,
 )
+from g1_access_push.stage2.s2_03t_contract import ACTION_JOINT_NAMES
 from g1_access_push.stage2.s2_03t_tensor_contract import filtered_contact_activity
-from g1_access_push.stage2.s2_03t_contract import ACTION_JOINT_NAMES, REWARD_SPECS
-
 
 ROOT = Path(__file__).resolve().parents[2]
 ACTIONS = ROOT / "src/g1_access_push/sim/stage2/s2_03t_actions.py"
@@ -73,24 +72,30 @@ def test_batched_adapter_has_zero_public_dim_and_subset_reset_contract() -> None
     assert sha256(CHECKPOINT) == "a0151975a757a33f0f5ed236d5616e2a98643abe2b36e50ac9ad01b6dd1f6d7e"
 
 
-def test_arm_action_is_exact_14d_rate_limited_reference_mapping() -> None:
+def test_arm_action_is_exact_2d_hybrid_normal_mapping() -> None:
     source = ACTIONS.read_text(encoding="utf-8")
     module = ast.parse(source)
     arm_names = next(
         ast.literal_eval(node.value)
         for node in module.body
         if isinstance(node, ast.Assign)
-        and any(isinstance(target, ast.Name) and target.id == "ARM_JOINT_NAMES" for target in node.targets)
+        and any(
+            isinstance(target, ast.Name) and target.id == "ARM_JOINT_NAMES"
+            for target in node.targets
+        )
     )
     assert arm_names == ACTION_JOINT_NAMES
     for token in (
-        "desired = clipped * float(self.cfg.residual_scale_rad)",
-        "desired - self._applied_residual",
-        "maximum_residual_change_rad",
-        "self._reference + self._applied_residual",
+        "HYBRID_ACTION_DIM = 2",
+        "correction_scale_m",
+        "nominal_maximum_displacement_m",
+        "dls_damping_lambda",
+        "joint_target_rate_limit_rad_per_control_step",
         "joint_limit_margin_rad",
     ):
         assert token in source
+    assert "residual_scale_rad" not in source
+    assert "maximum_residual_change_rad" not in source
 
 
 def test_forbidden_filter_expands_the_authoritative_46_body_collision_set_exactly() -> None:
@@ -115,27 +120,33 @@ def test_forbidden_filter_expands_the_authoritative_46_body_collision_set_exactl
 def test_manager_based_task_has_exact_dimensions_and_no_training_camera() -> None:
     source = ENV_CFG.read_text(encoding="utf-8")
     assert "ManagerBasedRLEnvCfg" in source
-    assert 'arm_residual = ArmResidualActionCfg(' in source
-    assert 'frozen_lower_body = FrozenRecurrentLowerBodyActionCfg(' in source
+    assert "arm_residual = HybridNormalApproachActionCfg(" in source
+    assert "frozen_lower_body = FrozenRecurrentLowerBodyActionCfg(" in source
     assert "CameraCfg" not in source
     assert "episode_length_s: float = 20.0" in source
     assert "self.decimation = 4" in source and "self.sim.dt = 0.005" in source
     assert "self.scene.num_envs" not in source
     assert "filter_prim_paths_expr=list(BOX_FILTER_EXPRESSIONS)" in source
     assert 'FORBIDDEN_SENSOR_PRIM_PATH = "{ENV_REGEX_NS}/Box"' in source
-    assert "from g1_access_push.stage2.s2_03t_contact_filter_contract import FORBIDDEN_FILTER_EXPRESSIONS" in source
+    assert (
+        "from g1_access_push.stage2.s2_03t_contact_filter_contract import FORBIDDEN_FILTER_EXPRESSIONS"
+        in source
+    )
     assert "prim_path=FORBIDDEN_SENSOR_PRIM_PATH" in source
     assert "filter_prim_paths_expr=list(FORBIDDEN_FILTER_EXPRESSIONS)" in source
 
 
-def test_reward_names_and_weights_match_frozen_yaml() -> None:
+def test_reward_names_and_weights_match_frozen_v2_yaml() -> None:
     source = ENV_CFG.read_text(encoding="utf-8")
-    contract = yaml.safe_load((ROOT / "configs/stage2/s2_03t_contact_training_contract.yaml").read_text())
-    expected = {item["name"]: float(item["weight"]) for item in contract["reward_contract"]["terms"]}
-    assert expected == {item.name: item.weight for item in REWARD_SPECS}
+    contract = yaml.safe_load(
+        (ROOT / "configs/stage2/s2_03t_contact_curriculum_reward_contract.yaml").read_text()
+    )
+    expected = {item["name"]: float(item["weight"]) for item in contract["terms"]}
     for name, weight in expected.items():
         assert f"{name} = RewTerm(func=mdp.{name}, weight={weight}" in source
-    assert "progress_reward" not in source
+    assert "bilateral_contact_verify_step = RewTerm" not in source
+    assert "symmetric_gap_closure = RewTerm" not in source
+    assert "gap_progress = RewTerm" in source
 
 
 def test_terminations_are_independent_and_timeout_is_truncation() -> None:
@@ -166,7 +177,12 @@ def test_terminations_are_independent_and_timeout_is_truncation() -> None:
 def test_precontact_reference_captures_full_exact_state_and_restores_on_subset_reset() -> None:
     bootstrap = BOOTSTRAP.read_text(encoding="utf-8")
     environment = ENV.read_text(encoding="utf-8")
-    for steps in ("WARMUP_STEPS = 100", "STAND_SETTLE_STEPS = 100", "MOVE_TO_PRECONTACT_STEPS = 150", "PRECONTACT_HOLD_STEPS = 50"):
+    for steps in (
+        "WARMUP_STEPS = 100",
+        "STAND_SETTLE_STEPS = 100",
+        "MOVE_TO_PRECONTACT_STEPS = 150",
+        "PRECONTACT_HOLD_STEPS = 50",
+    ):
         assert steps in bootstrap
     for field in (
         "robot_root_state_relative",
@@ -203,20 +219,23 @@ def test_agent_and_training_entry_are_clean_no_resume_current_api() -> None:
         "load_checkpoint = None",
     ):
         assert token in agent
-    assert "runner.learn(num_learning_iterations=args.max_iterations, init_at_random_ep_len=False)" in train
+    assert (
+        "runner.learn(num_learning_iterations=args.max_iterations, init_at_random_ep_len=False)"
+        in train
+    )
     assert "runner.load(" not in train
     assert '"model_1999_used": False' in train
 
 
 def test_formal_capacity_smoke_allocates_clean_runner_storage_without_training() -> None:
     source = CAPACITY.read_text(encoding="utf-8")
-    assert 'choices=(256, 128, 64)' in source
-    assert 'runner = OnPolicyRunner(' in source
-    assert 'storage = runner.alg.storage' in source
+    assert "choices=(256, 128, 64)" in source
+    assert "runner = OnPolicyRunner(" in source
+    assert "storage = runner.alg.storage" in source
     assert '"rollout_storage_allocated": storage is not None' in source
-    assert 'agent_cfg.max_iterations = 1000' in source
-    assert 'agent_cfg.resume = False' in source
-    assert 'agent_cfg.load_checkpoint = None' in source
+    assert "agent_cfg.max_iterations = 1000" in source
+    assert "agent_cfg.resume = False" in source
+    assert "agent_cfg.load_checkpoint = None" in source
     assert '"training_started": False' in source
     assert '"checkpoint_created": False' in source
     assert '"forbidden_configured_filter_count_46"' in source
@@ -232,7 +251,7 @@ def test_actor_evaluation_stops_on_first_done_and_calls_unchanged_evaluator() ->
     assert "if bool(done[0]):" in evaluator
     assert "terminal_snapshot = env.pop_terminal_snapshot(0)" in evaluator
     assert "break" in evaluator
-    assert "post_initial_reset_count\": 0" in evaluator
+    assert 'post_initial_reset_count": 0' in evaluator
     assert "scripts/stage2/evaluate_s2_03_attach_only.py" in wrapper
     assert "--enable_cameras" in wrapper
     assert "precontact_reference_replay_comparison.json" in evaluator
@@ -246,14 +265,16 @@ def test_actor_evaluation_stops_on_first_done_and_calls_unchanged_evaluator() ->
 
 def test_launchers_derive_effective_rc_from_authoritative_json() -> None:
     smoke = (ROOT / "scripts/stage2_isaac/run_s2_03t_smoke_once.sh").read_text(encoding="utf-8")
-    capacity = (ROOT / "scripts/stage2_isaac/run_s2_03t_capacity_smoke_once.sh").read_text(encoding="utf-8")
+    capacity = (ROOT / "scripts/stage2_isaac/run_s2_03t_capacity_smoke_once.sh").read_text(
+        encoding="utf-8"
+    )
     train = (ROOT / "scripts/stage2_isaac/run_s2_03t_training_once.sh").read_text(encoding="utf-8")
     evaluate = EVAL_WRAPPER.read_text(encoding="utf-8")
-    assert "contract_smoke_result.json\" PASS" in smoke
-    assert "capacity_smoke_result.json\" PASS" in capacity
-    assert "training_result.json\" PASS" in train
-    assert "runner_status.json\" COMPLETE" in evaluate
-    assert "result.json\" PASS FAIL" in evaluate
+    assert 'contract_smoke_result.json" PASS' in smoke
+    assert 'capacity_smoke_result.json" PASS' in capacity
+    assert 'training_result.json" PASS' in train
+    assert 'runner_status.json" COMPLETE' in evaluate
+    assert 'result.json" PASS FAIL' in evaluate
     for wrapper in (smoke, capacity, train, evaluate):
         assert "AUTHORITATIVE_STATUS={status}" in wrapper
         assert "STATUS_RC=${PIPESTATUS[0]}" in wrapper
@@ -284,10 +305,10 @@ def test_runtime_metric_values_and_failure_masks_have_disjoint_namespaces() -> N
     tensor_source = TENSOR_CONTRACT.read_text(encoding="utf-8")
     assert "failure_arm_joint_margin" in source
     assert "failure_forbidden_non_palm_box_collision" in source
-    assert "COUNTER_TERMINATION_METRIC_NAMES = {\"contact_loss\", \"single_hand_timeout\"}" in source
+    assert 'COUNTER_TERMINATION_METRIC_NAMES = {"contact_loss", "single_hand_timeout"}' in source
     assert "name if name in COUNTER_TERMINATION_METRIC_NAMES" in source
-    assert "key = metric_name if metric_name in COUNTER_TERMINATION_METRIC_NAMES" in source
-    assert "\"termination_reasons\": reasons" in source
+    assert 'else f"failure_{metric_name}"' in source
+    assert '"termination_reasons": reasons' in source
     assert "torch.linalg.vector_norm(force_matrix, dim=-1).flatten(start_dim=1)" in tensor_source
     assert "matrix[..., 0, :]" not in source
     assert "carb.Float3(0.6, 0.3, 0.6)" in source
@@ -306,6 +327,8 @@ def test_original_54_path_hash_snapshot_remains_unchanged() -> None:
     mismatches = []
     for record in records:
         path = ROOT / record["path"]
-        if record["file_type"] == "regular" and (not path.is_file() or sha256(path) != record["sha256"]):
+        if record["file_type"] == "regular" and (
+            not path.is_file() or sha256(path) != record["sha256"]
+        ):
             mismatches.append(record["path"])
     assert mismatches == []

@@ -9,11 +9,10 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
+import isaaclab.utils.math as math_utils
 import numpy as np
 import torch
 from PIL import Image, ImageDraw, ImageFont
-
-import isaaclab.utils.math as math_utils
 
 
 def _sha256(path: Path) -> str:
@@ -26,7 +25,9 @@ def _sha256(path: Path) -> str:
 
 def _write_json(path: Path, payload: object) -> None:
     temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n", encoding="utf-8")
+    temporary.write_text(
+        json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n", encoding="utf-8"
+    )
     temporary.replace(path)
 
 
@@ -89,7 +90,9 @@ class _RawVideoWriter:
         stderr = b"" if self._process.stderr is None else self._process.stderr.read()
         return_code = self._process.wait()
         if return_code != 0:
-            raise RuntimeError(f"FFMPEG_FAILED:{return_code}:{stderr.decode(errors='replace')[-2000:]}")
+            raise RuntimeError(
+                f"FFMPEG_FAILED:{return_code}:{stderr.decode(errors='replace')[-2000:]}"
+            )
         if not self.path.is_file() or self.path.stat().st_size == 0:
             raise RuntimeError(f"VIDEO_MISSING_OR_EMPTY:{self.path}")
 
@@ -156,7 +159,9 @@ class VisualEvidenceRecorder:
         self.contact_seen = [False, False]
         self.maximum_abs_residual_rad = 0.0
         self.maximum_abs_residual_per_joint_rad = [0.0] * 14
-        self.maximum_abs_normalized_action_per_joint = [0.0] * 14
+        self.maximum_abs_normalized_action_per_hand = [0.0] * 2
+        self.maximum_abs_learned_correction_m = [0.0] * 2
+        self.maximum_nominal_displacement_m = [0.0] * 2
         self.maximum_original_commanded_normal_displacement_m = 0.0
         self.precontact_palm_world_position: torch.Tensor | None = None
         self.maximum_actual_palm_displacement_m = [0.0, 0.0]
@@ -221,6 +226,10 @@ class VisualEvidenceRecorder:
         if not records:
             raise RuntimeError("VISUAL_EVIDENCE_HAS_NO_RECORDS")
         terminal_record = records[-1]
+        first_video_frame = int(self.keyframe_snapshots.get("initial", {}).get("frame", 0))
+        video_observed_frames = int(terminal_record["frame"]) - first_video_frame + 1
+        if video_observed_frames <= 0:
+            raise RuntimeError("VISUAL_OBSERVED_FRAME_COUNT_INVALID")
         if "terminal" not in self.keyframe_snapshots:
             raise RuntimeError("TERMINAL_PRE_RESET_FRAME_MISSING")
         if self._minimum_front is None or self._minimum_side is None:
@@ -253,7 +262,11 @@ class VisualEvidenceRecorder:
             "terminal": self.run_root / "frame_terminal.png",
             "terminal_side": self.run_root / "frame_terminal_side.png",
         }
-        missing_images = [str(path) for path in image_paths.values() if not path.is_file() or path.stat().st_size == 0]
+        missing_images = [
+            str(path)
+            for path in image_paths.values()
+            if not path.is_file() or path.stat().st_size == 0
+        ]
         if missing_images:
             raise RuntimeError(f"REQUIRED_VISUAL_IMAGES_MISSING:{missing_images}")
         image_manifest = {
@@ -297,8 +310,10 @@ class VisualEvidenceRecorder:
                 "control_frame_stride": self.frame_stride,
                 "terminal_capture": "PRE_AUTO_RESET_PHYSICS_FRAME",
                 "terminal_frame_is_synthetic_aggregate": False,
+                "video_start": "INSTALLED_PRECONTACT",
             },
-            "observed_frames": len(records),
+            "observed_frames": video_observed_frames,
+            "scientific_trace_observed_frames": len(records),
             "minimum_gap": {
                 "left_m": self.minimum_left_gap_m,
                 "left_frame": self.minimum_left_gap_frame,
@@ -316,7 +331,9 @@ class VisualEvidenceRecorder:
             "action_and_motion": {
                 "maximum_abs_commanded_residual_rad": self.maximum_abs_residual_rad,
                 "maximum_abs_commanded_residual_per_joint_rad": self.maximum_abs_residual_per_joint_rad,
-                "maximum_abs_normalized_action_per_joint": self.maximum_abs_normalized_action_per_joint,
+                "maximum_abs_normalized_action_per_hand": self.maximum_abs_normalized_action_per_hand,
+                "maximum_abs_learned_correction_m": self.maximum_abs_learned_correction_m,
+                "maximum_nominal_displacement_m": self.maximum_nominal_displacement_m,
                 "maximum_original_commanded_normal_displacement_m": self.maximum_original_commanded_normal_displacement_m,
                 "maximum_actual_palm_displacement_m": self.maximum_actual_palm_displacement_m,
                 "maximum_actual_palm_box_displacement_m": self.maximum_actual_palm_box_displacement_m,
@@ -396,7 +413,9 @@ class VisualEvidenceRecorder:
         line_height = 13
         draw.rectangle((5, 5, 242, 10 + line_height * len(lines)), fill=(0, 0, 0, 170))
         for index, line in enumerate(lines):
-            draw.text((10, 8 + line_height * index), line, fill=(255, 255, 255, 255), font=self.font)
+            draw.text(
+                (10, 8 + line_height * index), line, fill=(255, 255, 255, 255), font=self.font
+            )
         return image
 
     def _save_keyframe(self, name: str, record: dict[str, Any]) -> None:
@@ -437,13 +456,22 @@ class VisualEvidenceRecorder:
         arm = self.env.action_manager.get_term("arm_residual")
         residual = arm.applied_residual[0].detach().abs().cpu()
         raw = arm.raw_actions[0].detach().abs().cpu()
+        correction = arm.correction_m[0].detach().abs().cpu()
+        nominal = arm.nominal_displacement_m[0].detach().abs().cpu()
         self.maximum_abs_residual_rad = max(self.maximum_abs_residual_rad, float(residual.max()))
         for index in range(14):
             self.maximum_abs_residual_per_joint_rad[index] = max(
                 self.maximum_abs_residual_per_joint_rad[index], float(residual[index])
             )
-            self.maximum_abs_normalized_action_per_joint[index] = max(
-                self.maximum_abs_normalized_action_per_joint[index], float(raw[index])
+        for index in range(2):
+            self.maximum_abs_normalized_action_per_hand[index] = max(
+                self.maximum_abs_normalized_action_per_hand[index], float(raw[index])
+            )
+            self.maximum_abs_learned_correction_m[index] = max(
+                self.maximum_abs_learned_correction_m[index], float(correction[index])
+            )
+            self.maximum_nominal_displacement_m[index] = max(
+                self.maximum_nominal_displacement_m[index], float(nominal[index])
             )
         if self.precontact_palm_world_position is not None:
             palm_pos_w, _ = self._palm_world_pose()
@@ -522,6 +550,8 @@ class VisualEvidenceRecorder:
             "right_force_n": float(record["right_force_n"]),
             "applied_residual_rad": arm.applied_residual[0].detach().cpu().tolist(),
             "normalized_action": arm.raw_actions[0].detach().cpu().tolist(),
+            "learned_correction_m": arm.correction_m[0].detach().cpu().tolist(),
+            "nominal_displacement_m": arm.nominal_displacement_m[0].detach().cpu().tolist(),
             "root_height_m": float(record["root_height_m"]),
             "root_tilt_deg": float(record["root_tilt_deg"]),
         }

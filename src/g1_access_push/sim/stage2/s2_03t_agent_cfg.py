@@ -1,4 +1,4 @@
-"""Frozen first-version PPO configuration for S2-03T."""
+"""Frozen clean PPO configuration for the S2-03T contact redesign."""
 
 from agile.rl_env.rsl_rl import (
     RslRlOnPolicyRunnerCfg,
@@ -13,9 +13,9 @@ class S203TPPORunnerCfg(RslRlOnPolicyRunnerCfg):
     seed = 42
     device = "cuda:0"
     num_steps_per_env = 24
-    max_iterations = 1000
+    max_iterations = 1200
     save_interval = 100
-    experiment_name = "s2_03t_clean_contact_training"
+    experiment_name = "s2_03t_reachable_contact_curriculum"
     run_name = ""
     logger = "tensorboard"
     empirical_normalization = True

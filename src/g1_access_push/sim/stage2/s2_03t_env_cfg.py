@@ -13,6 +13,7 @@ from agile.rl_env.assets.robots.unitree_g1 import (
 )
 from isaaclab.assets import RigidObjectCfg
 from isaaclab.envs import ManagerBasedRLEnvCfg
+from isaaclab.managers import CurriculumTermCfg as CurrTerm
 from isaaclab.managers import EventTermCfg as EventTerm
 from isaaclab.managers import ObservationGroupCfg as ObsGroup
 from isaaclab.managers import ObservationTermCfg as ObsTerm
@@ -32,11 +33,10 @@ from g1_access_push.sim.stage2.s2_03_attach_env import (
 )
 from g1_access_push.sim.stage2.s2_03t_actions import (
     ARM_JOINT_NAMES,
-    ArmResidualActionCfg,
     FrozenRecurrentLowerBodyActionCfg,
+    HybridNormalApproachActionCfg,
 )
 from g1_access_push.stage2.s2_03t_contact_filter_contract import FORBIDDEN_FILTER_EXPRESSIONS
-
 
 FORBIDDEN_SENSOR_PRIM_PATH = "{ENV_REGEX_NS}/Box"
 
@@ -94,11 +94,9 @@ class S203TSceneCfg(Stage1SceneCfg):
 
 @configclass
 class ActionsCfg:
-    arm_residual = ArmResidualActionCfg(
+    arm_residual = HybridNormalApproachActionCfg(
         asset_name="robot",
         joint_names=ARM_JOINT_NAMES,
-        residual_scale_rad=0.05,
-        maximum_residual_change_rad=0.005,
         joint_limit_margin_rad=0.10,
     )
     frozen_lower_body = FrozenRecurrentLowerBodyActionCfg(
@@ -115,7 +113,24 @@ class ActionsCfg:
 class ObservationsCfg:
     @configclass
     class PolicyCfg(ObsGroup):
-        observation = ObsTerm(func=mdp.policy_observation)
+        actor_history = ObsTerm(
+            func=mdp.actor_frame_observation,
+            history_length=3,
+            flatten_history_dim=True,
+        )
+
+        def __post_init__(self) -> None:
+            self.enable_corruption = False
+            self.concatenate_terms = True
+
+    @configclass
+    class CriticCfg(ObsGroup):
+        actor_history = ObsTerm(
+            func=mdp.actor_frame_observation,
+            history_length=3,
+            flatten_history_dim=True,
+        )
+        privileged = ObsTerm(func=mdp.critic_privileged_observation)
 
         def __post_init__(self) -> None:
             self.enable_corruption = False
@@ -140,26 +155,39 @@ class ObservationsCfg:
             self.concatenate_terms = True
 
     policy: PolicyCfg = PolicyCfg()
+    critic: CriticCfg = CriticCfg()
     student_policy: StudentPolicyCfg = StudentPolicyCfg()
 
 
 @configclass
 class RewardsCfg:
-    bilateral_contact_verify_step = RewTerm(func=mdp.bilateral_contact_verify_step, weight=2.0)
+    gap_progress = RewTerm(func=mdp.gap_progress, weight=250.0)
+    approach_symmetry = RewTerm(func=mdp.approach_symmetry, weight=50.0)
+    left_contact_onset = RewTerm(func=mdp.left_contact_onset, weight=1.0)
+    right_contact_onset = RewTerm(func=mdp.right_contact_onset, weight=1.0)
+    bilateral_contact_onset = RewTerm(func=mdp.bilateral_contact_onset, weight=3.0)
+    verify_progress = RewTerm(func=mdp.verify_progress, weight=4.0)
+    safe_force_band = RewTerm(func=mdp.safe_force_band, weight=1.0)
+    single_contact_step = RewTerm(func=mdp.single_contact_step, weight=-0.5)
+    contact_retention = RewTerm(func=mdp.contact_retention, weight=1.0)
     attached_hold_step = RewTerm(func=mdp.attached_hold_step, weight=4.0)
+    force_balance = RewTerm(func=mdp.force_balance, weight=1.0)
     success_terminal = RewTerm(func=mdp.success_terminal, weight=100.0)
-    symmetric_gap_closure = RewTerm(func=mdp.symmetric_gap_closure, weight=1.0)
-    hand_position_tracking = RewTerm(func=mdp.hand_position_tracking, weight=-2.0)
-    hand_orientation_tracking = RewTerm(func=mdp.hand_orientation_tracking, weight=-0.1)
+    time_cost = RewTerm(func=mdp.time_cost, weight=-0.01)
+    hand_orientation_tracking = RewTerm(func=mdp.hand_orientation_tracking, weight=-0.05)
+    unsafe_force = RewTerm(func=mdp.unsafe_force, weight=-4.0)
+    force_impulse_rate = RewTerm(func=mdp.force_impulse_rate, weight=-2.0)
     force_imbalance = RewTerm(func=mdp.force_imbalance, weight=-0.5)
     box_translation = RewTerm(func=mdp.box_translation, weight=-40.0)
     box_yaw_change = RewTerm(func=mdp.box_yaw_change, weight=-40.0)
-    force_impulse_rate = RewTerm(func=mdp.force_impulse_rate, weight=-2.0)
-    root_tilt = RewTerm(func=mdp.root_tilt, weight=-0.1)
+    root_risk = RewTerm(func=mdp.root_risk, weight=-1.0)
     joint_limit_margin = RewTerm(func=mdp.joint_limit_margin, weight=-5.0)
     torque_ratio = RewTerm(func=mdp.torque_ratio, weight=-2.0)
-    action_l2 = RewTerm(func=mdp.action_l2, weight=-0.001)
+    action_l2 = RewTerm(func=mdp.action_l2, weight=-0.002)
     action_rate = RewTerm(func=mdp.action_rate, weight=-0.01)
+    hard_force_terminal = RewTerm(func=mdp.hard_force_terminal, weight=-100.0)
+    pushing_terminal = RewTerm(func=mdp.pushing_terminal, weight=-100.0)
+    contact_loss_terminal = RewTerm(func=mdp.contact_loss_terminal, weight=-25.0)
     forbidden_collision_terminal = RewTerm(func=mdp.forbidden_collision_terminal, weight=-100.0)
     contact_timeout_terminal = RewTerm(func=mdp.contact_timeout_terminal, weight=-25.0)
 
@@ -199,6 +227,11 @@ class EventCfg:
 
 
 @configclass
+class CurriculumCfg:
+    contact_gap = CurrTerm(func=mdp.contact_gap_curriculum)
+
+
+@configclass
 class S203TContactEnvCfg(ManagerBasedRLEnvCfg):
     scene: S203TSceneCfg = S203TSceneCfg(num_envs=1, env_spacing=2.5)
     observations: ObservationsCfg = ObservationsCfg()
@@ -207,7 +240,7 @@ class S203TContactEnvCfg(ManagerBasedRLEnvCfg):
     terminations: TerminationsCfg = TerminationsCfg()
     events: EventCfg = EventCfg()
     commands = None
-    curriculum = None
+    curriculum: CurriculumCfg = CurriculumCfg()
     episode_length_s: float = 20.0
     is_finite_horizon: bool = False
 

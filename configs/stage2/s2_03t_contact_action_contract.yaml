@@ -1,0 +1,100 @@
+schema_version: 1
+stage: S2-03T
+contract: CONTACT_ACTION_REDESIGN
+status: IMPLEMENTED_FOR_NEW_TRAINING
+action_name: HYBRID_NOMINAL_NORMAL_APPROACH_PLUS_LEARNED_BILATERAL_NORMAL_CORRECTION
+development_scope: SIMULATION_DEVELOPMENT_ONLY
+
+source_facts:
+  physics_dt_s: 0.005
+  control_decimation: 4
+  control_dt_s: 0.02
+  frozen_s2_02_orientation_wxyz: [0.7071067811865476, 0.0, 0.7071067811865476, 0.0]
+  upper_body_joint_order:
+    - left_shoulder_pitch_joint
+    - right_shoulder_pitch_joint
+    - left_shoulder_roll_joint
+    - right_shoulder_roll_joint
+    - left_shoulder_yaw_joint
+    - right_shoulder_yaw_joint
+    - left_elbow_joint
+    - right_elbow_joint
+    - left_wrist_roll_joint
+    - right_wrist_roll_joint
+    - left_wrist_pitch_joint
+    - right_wrist_pitch_joint
+    - left_wrist_yaw_joint
+    - right_wrist_yaw_joint
+  frozen_lower_body_command: [0.0, 0.0, 0.0, 0.7]
+  frozen_lower_body_checkpoint_sha256: a0151975a757a33f0f5ed236d5616e2a98643abe2b36e50ac9ad01b6dd1f6d7e
+  frozen_precontact_reference_sha256: 1e537e075af7f888fb95a63501d3976d0d7740eff51c6bd9000f574b00cd0e6c
+  authority_audit: reports/stage2/s2_03t_action_authority_summary.json
+
+actor_action:
+  dimension: 2
+  order: [left_palm_normal_correction, right_palm_normal_correction]
+  normalized_range: [-1.0, 1.0]
+  positive_direction: object_positive_x_reduces_rear_surface_gap
+  correction_scale_m: 0.005
+  correction_rate_limit_m_per_control_step: 0.0001
+  correction_rate_limit_mps: 0.005
+  contacted_hand_additional_inward_cap_m: 0.001
+  tangential_action_enabled: false
+  vertical_action_enabled: false
+  orientation_action_enabled: false
+
+nominal_approach:
+  deterministic: true
+  independent_per_hand: true
+  speed_limit_mps: 0.01
+  acceleration_limit_mps2: 0.02
+  jerk_limit_mps3: 0.10
+  maximum_displacement_m: 0.09
+  rationale: 0.060_m_formal_gap_plus_observed_tracking_shortfall_and_approximately_0.005_m_margin
+  single_hand_contact_behavior: freeze_contacted_hand_nominal_continue_other_hand
+  bilateral_contact_behavior: freeze_both_nominal_advances
+  target_anchor: reset_time_frozen_box_pose
+  follows_moved_box: false
+
+inverse_kinematics:
+  controller: IsaacLab_DifferentialIKController
+  command_type: pose
+  relative_mode: true
+  method: dls
+  damping_lambda: 0.01
+  palm_orientation: fixed_s2_02_certified_orientation
+  joint_limit_margin_rad: 0.10
+  joint_target_rate_limit_rad_per_control_step: 0.005
+  finite_required: true
+
+safety_stop:
+  latch_until_reset: true
+  thresholds_source: configs/stage2/s2_03_attach_only.yaml
+  unchanged_thresholds:
+    per_palm_force_peak_n: 9.81
+    per_palm_impulse_ns: 0.981
+    combined_impulse_ns: 1.962
+    contact_force_rate_nps: 490.5
+    maximum_box_linear_speed_mps: 0.005
+    maximum_box_angular_speed_radps: 0.008726646259971648
+    maximum_box_translation_m: 0.005
+    maximum_box_yaw_change_rad: 0.008726646259971648
+    maximum_root_tilt_deg: 6.2075676918029785
+    minimum_joint_margin_rad: 0.10
+    maximum_torque_ratio: 1.001
+
+frozen_boundaries:
+  lower_body_trainable: false
+  pushing_enabled: false
+  planner_enabled: false
+  falcon_enabled: false
+  old_checkpoint_resume_enabled: false
+  active_controller_manifest_update_allowed: false
+
+development_only_decisions:
+  - correction_scale_m
+  - correction_rate_limit_m_per_control_step
+  - contacted_hand_additional_inward_cap_m
+  - maximum_displacement_m
+  - dls_damping_lambda
+  - joint_target_rate_limit_rad_per_control_step

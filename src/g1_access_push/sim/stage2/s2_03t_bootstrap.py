@@ -5,9 +5,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-import torch
-
 import isaaclab.utils.math as math_utils
+import torch
 
 from g1_access_push.sim.stage2.s2_03t_actions import ARM_JOINT_NAMES, ArmResidualAction
 from g1_access_push.sim.stage2.s2_03t_env import REFERENCE_SCHEMA_VERSION, S203TContactEnv
@@ -18,7 +17,6 @@ from g1_access_push.sim.stage2.s2_03t_mdp import (
     runtime_state,
 )
 from g1_access_push.stage2.s2_02_contract import object_local_targets
-
 
 WARMUP_STEPS = 100
 STAND_SETTLE_STEPS = 100
@@ -69,15 +67,14 @@ def _target_pose_in_pelvis(
     )
 
 
-def derive_precontact_reference(
+def _derive_precontact_reference_active(
     env: S203TContactEnv,
     record_callback: Callable[[str, int, dict[str, torch.Tensor]], None] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Replay 100+100+150+50 exact S2-03 control steps and capture state."""
+    """Replay while the public wrapper owns exception-safe bootstrap flags."""
 
     if env.num_envs != 1:
         raise ValueError("authoritative precontact extraction requires exactly one environment")
-    env._s2_03t_bootstrap_mode = True
     env.reset(seed=42)
     robot = env.scene["robot"]
     box = env.scene["box"]
@@ -85,7 +82,7 @@ def derive_precontact_reference(
     arm: ArmResidualAction = env.action_manager.get_term("arm_residual")
     lower = env.action_manager.get_term("frozen_lower_body")
     arm.set_bootstrap_mode(True)
-    actions = torch.zeros((1, 14), device=env.device)
+    actions = torch.zeros((1, 2), device=env.device)
 
     box_state = box.data.default_root_state.clone()
     box_state[:, :3] = torch.stack(
@@ -100,7 +97,9 @@ def derive_precontact_reference(
     box_state[:, 7:] = 0.0
     box.write_root_state_to_sim(box_state)
 
-    def step_with_desired(desired_pos: torch.Tensor, desired_quat: torch.Tensor, phase: str, step: int) -> None:
+    def step_with_desired(
+        desired_pos: torch.Tensor, desired_quat: torch.Tensor, phase: str, step: int
+    ) -> None:
         current_pos = palms.data.target_pos_source
         current_quat = palms.data.target_quat_source
         pos_error, orientation_error = math_utils.compute_pose_error(
@@ -113,9 +112,7 @@ def derive_precontact_reference(
         commands = torch.cat(
             (
                 _clamp_norm(pos_error.reshape(1, 2, 3), MAXIMUM_POSITION_CORRECTION_M),
-                _clamp_norm(
-                    orientation_error.reshape(1, 2, 3), MAXIMUM_ORIENTATION_CORRECTION_RAD
-                ),
+                _clamp_norm(orientation_error.reshape(1, 2, 3), MAXIMUM_ORIENTATION_CORRECTION_RAD),
             ),
             dim=-1,
         )
@@ -146,12 +143,16 @@ def derive_precontact_reference(
     for step in range(STAND_SETTLE_STEPS):
         step_with_desired(baseline_positions, baseline_quaternions, "STAND_SETTLE", step)
     for step in range(MOVE_TO_PRECONTACT_STEPS):
-        target_positions, target_quaternions = _target_pose_in_pelvis(env, box_fixed_pos, box_fixed_quat)
+        target_positions, target_quaternions = _target_pose_in_pelvis(
+            env, box_fixed_pos, box_fixed_quat
+        )
         fraction = float(step + 1) / MOVE_TO_PRECONTACT_STEPS
         desired_positions = baseline_positions + fraction * (target_positions - baseline_positions)
         step_with_desired(desired_positions, target_quaternions, "MOVE", step)
     for step in range(PRECONTACT_HOLD_STEPS):
-        target_positions, target_quaternions = _target_pose_in_pelvis(env, box_fixed_pos, box_fixed_quat)
+        target_positions, target_quaternions = _target_pose_in_pelvis(
+            env, box_fixed_pos, box_fixed_quat
+        )
         step_with_desired(target_positions, target_quaternions, "HOLD", step)
 
     metric = runtime_state(env).ensure()
@@ -196,12 +197,7 @@ def derive_precontact_reference(
         "arm_actual_joint_position": robot.data.joint_pos[0, arm.joint_ids].detach().cpu().tolist(),
         "arm_ik_target": reference["arm_ik_target"].tolist(),
         "maximum_actual_to_ik_target_error_rad": float(
-            torch.max(
-                torch.abs(
-                    robot.data.joint_pos[0, arm.joint_ids]
-                    - arm.bootstrap_targets[0]
-                )
-            )
+            torch.max(torch.abs(robot.data.joint_pos[0, arm.joint_ids] - arm.bootstrap_targets[0]))
         ),
         "surface_gap_m": metric["gaps"][0].detach().cpu().tolist(),
         "palm_force_n": metric["forces"][0].detach().cpu().tolist(),
@@ -213,6 +209,21 @@ def derive_precontact_reference(
         "contact_free": True,
         "source": reference["source"],
     }
-    arm.set_bootstrap_mode(False)
-    env._s2_03t_bootstrap_mode = False
     return reference, audit
+
+
+def derive_precontact_reference(
+    env: S203TContactEnv,
+    record_callback: Callable[[str, int, dict[str, torch.Tensor]], None] | None = None,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Exception-safe bootstrap wrapper; no scientific histories may leak through."""
+
+    env._s2_03t_bootstrap_mode = True
+    try:
+        return _derive_precontact_reference_active(env, record_callback=record_callback)
+    finally:
+        try:
+            arm = env.action_manager.get_term("arm_residual")
+            arm.set_bootstrap_mode(False)
+        finally:
+            env._s2_03t_bootstrap_mode = False

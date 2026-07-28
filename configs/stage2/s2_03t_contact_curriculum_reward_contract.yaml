@@ -1,0 +1,81 @@
+schema_version: 1
+stage: S2-03T
+contract: CONTACT_CURRICULUM_REWARD_REDESIGN
+status: IMPLEMENTED_FOR_NEW_TRAINING
+development_scope: SIMULATION_DEVELOPMENT_ONLY
+control_dt_s: 0.02
+reward_manager_semantics: raw_term_times_weight_times_control_dt
+
+modes:
+  - APPROACH
+  - CONTACT_ACQUIRE
+  - VERIFY_HOLD
+
+force_band:
+  reliable_contact_minimum_n: 1.0
+  soft_force_maximum_n: 3.0
+  hard_force_threshold_n: 9.81
+  safe_band_shape: flat_one_between_minimum_and_soft_maximum
+  above_soft_penalty: squared_normalized_excess
+  larger_force_monotonic_reward: false
+
+gap_progress:
+  formula: previous_gap_sum_minus_current_gap_sum
+  reset_initialization: lazy_first_post_reset_sample_yields_zero
+  deadband_m: 0.00001
+  clip_abs_m_per_control_step: 0.001
+  enabled_modes: [APPROACH]
+  disabled_modes: [CONTACT_ACQUIRE, VERIFY_HOLD]
+
+terms:
+  - {name: gap_progress, weight: 250.0, raw_unit: m, mode: APPROACH, maximum_actual_step_contribution: 0.005}
+  - {name: approach_symmetry, weight: 50.0, raw_unit: m, mode: APPROACH, maximum_actual_step_contribution: 0.001}
+  - {name: left_contact_onset, weight: 1.0, raw_unit: event, mode: CONTACT_ACQUIRE, maximum_actual_step_contribution: 0.02}
+  - {name: right_contact_onset, weight: 1.0, raw_unit: event, mode: CONTACT_ACQUIRE, maximum_actual_step_contribution: 0.02}
+  - {name: bilateral_contact_onset, weight: 3.0, raw_unit: event, mode: CONTACT_ACQUIRE, maximum_actual_step_contribution: 0.06}
+  - {name: verify_progress, weight: 4.0, raw_unit: verified_fraction, mode: CONTACT_ACQUIRE, maximum_actual_step_contribution: 0.004}
+  - {name: safe_force_band, weight: 1.0, raw_unit: dimensionless, mode: CONTACT_ACQUIRE, maximum_actual_step_contribution: 0.02}
+  - {name: single_contact_step, weight: -0.5, raw_unit: bool, mode: CONTACT_ACQUIRE, maximum_actual_step_contribution: -0.01}
+  - {name: contact_retention, weight: 1.0, raw_unit: bool, mode: VERIFY_HOLD, maximum_actual_step_contribution: 0.02}
+  - {name: attached_hold_step, weight: 4.0, raw_unit: bool, mode: VERIFY_HOLD, maximum_actual_step_contribution: 0.08}
+  - {name: force_balance, weight: 1.0, raw_unit: dimensionless, mode: VERIFY_HOLD, maximum_actual_step_contribution: 0.02}
+  - {name: success_terminal, weight: 100.0, raw_unit: event, mode: VERIFY_HOLD, maximum_actual_step_contribution: 2.0}
+  - {name: time_cost, weight: -0.01, raw_unit: control_step, mode: ALL, maximum_actual_step_contribution: -0.0002}
+  - {name: hand_orientation_tracking, weight: -0.05, raw_unit: rad, mode: ALL, maximum_actual_step_contribution: GATE_BOUNDED}
+  - {name: unsafe_force, weight: -4.0, raw_unit: squared_normalized_excess, mode: CONTACT_ACQUIRE_OR_VERIFY_HOLD, maximum_actual_step_contribution: -0.16}
+  - {name: force_impulse_rate, weight: -2.0, raw_unit: dimensionless, mode: CONTACT_ACQUIRE_OR_VERIFY_HOLD, maximum_actual_step_contribution: GATE_BOUNDED}
+  - {name: force_imbalance, weight: -0.5, raw_unit: N, mode: VERIFY_HOLD, maximum_actual_step_contribution: GATE_BOUNDED}
+  - {name: box_translation, weight: -40.0, raw_unit: m, mode: ALL, maximum_actual_step_contribution: GATE_BOUNDED}
+  - {name: box_yaw_change, weight: -40.0, raw_unit: rad, mode: ALL, maximum_actual_step_contribution: GATE_BOUNDED}
+  - {name: root_risk, weight: -1.0, raw_unit: degree_above_5, mode: ALL, maximum_actual_step_contribution: GATE_BOUNDED}
+  - {name: joint_limit_margin, weight: -5.0, raw_unit: rad, mode: ALL, maximum_actual_step_contribution: GATE_BOUNDED}
+  - {name: torque_ratio, weight: -2.0, raw_unit: ratio, mode: ALL, maximum_actual_step_contribution: GATE_BOUNDED}
+  - {name: action_l2, weight: -0.002, raw_unit: normalized_action_squared, mode: ALL, maximum_actual_step_contribution: -0.00008}
+  - {name: action_rate, weight: -0.01, raw_unit: normalized_action_delta_squared, mode: ALL, maximum_actual_step_contribution: -0.0016}
+  - {name: hard_force_terminal, weight: -100.0, raw_unit: event, mode: ALL, maximum_actual_step_contribution: -2.0}
+  - {name: pushing_terminal, weight: -100.0, raw_unit: event, mode: ALL, maximum_actual_step_contribution: -2.0}
+  - {name: contact_loss_terminal, weight: -25.0, raw_unit: event, mode: VERIFY_HOLD, maximum_actual_step_contribution: -0.5}
+  - {name: forbidden_collision_terminal, weight: -100.0, raw_unit: event, mode: ALL, maximum_actual_step_contribution: -2.0}
+  - {name: contact_timeout_terminal, weight: -25.0, raw_unit: event, mode: ALL, maximum_actual_step_contribution: -0.5}
+
+required_static_return_relations:
+  - safe_hold_return_gt_hover_25_mm_return
+  - safe_hold_return_gt_single_contact_timeout_return
+  - hard_impact_return_lt_safe_hold_return
+  - pushing_return_lt_safe_hold_return
+  - hover_25_mm_1000_step_return_lte_zero
+
+frozen_scientific_gates:
+  source: configs/stage2/s2_03_attach_only.yaml
+  thresholds_changed: false
+  pushing_is_immediate_failure: true
+  contact_loss_contract_changed: false
+  verify_steps: 20
+  hold_steps: 100
+  maximum_episode_steps: 1000
+
+development_only_decisions:
+  - reward_weights
+  - progress_deadband_and_clip
+  - soft_force_maximum_n
+  - root_risk_deadband_deg
