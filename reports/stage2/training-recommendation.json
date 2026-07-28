@@ -1,0 +1,41 @@
+{
+  "branch": "stage2/s2-03t-contact-training",
+  "contact_training_justified": true,
+  "decision": "JUSTIFIED_NOT_STARTED",
+  "evidence": {
+    "formal_result_path": "reports/stage2/s2_03_formal_result.json",
+    "formal_run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03_formal_20260728_071611",
+    "geometry_feasible": true,
+    "implementation_error": false,
+    "left_contact_achieved": false,
+    "maximum_commanded_normal_displacement_m": 0.07013199999999996,
+    "maximum_left_position_error_m": 0.03459995985031128,
+    "maximum_right_position_error_m": 0.0348731093108654,
+    "minimum_left_actual_surface_gap_m": 0.022305786609649658,
+    "minimum_right_actual_surface_gap_m": 0.024465501308441162,
+    "precontact_status": "PASS",
+    "primary_reason": "BILATERAL_CONTACT_TIMEOUT",
+    "reset_count": 0,
+    "right_contact_achieved": false,
+    "robot_stability": "PASS",
+    "s2_03_status": "FAIL",
+    "valid_physical_result": true
+  },
+  "justification": "The frozen normal approach exhausted its 0.07 m horizon with both palms still 22-25 mm from the box and 35 mm tracking error, while runtime audits, precontact geometry, robot stability, collision evidence, and evaluator completion all passed.",
+  "prohibitions": {
+    "active_manifest_update": true,
+    "box_pushing": true,
+    "end_to_end_task_training": true,
+    "falcon_migration": true,
+    "model_1999": true,
+    "old_pilot_actor": true,
+    "planner": true,
+    "resume": true,
+    "third_party_modification": true
+  },
+  "required_contract": "configs/stage2/s2_03t_contact_training_contract.yaml",
+  "schema_version": 1,
+  "source_fail_commit": "e018fe2a3bb284bb51da6a7e245c6772c6e0a87e",
+  "stage": "S2-03T",
+  "training_started": false
+}

@@ -1,0 +1,143 @@
+schema_version: 1
+stage: S2-03T
+task: ATTACH_ONLY_CONTACT_ESTABLISHMENT_RESIDUAL_TRAINING
+status: FROZEN_DRAFT_NOT_STARTED
+development_scope: SIMULATION_DEVELOPMENT_ONLY
+source_fail_commit: e018fe2a3bb284bb51da6a7e245c6772c6e0a87e
+source_formal_result: reports/stage2/s2_03_formal_result.json
+source_attach_config: configs/stage2/s2_03_attach_only.yaml
+
+scope:
+  objective: Establish and hold bilateral palm contact from the passed S2-02 precontact pose.
+  box_displacement_subgoal_m: [0.0, 0.0, 0.0]
+  base_motion_command: [0.0, 0.0, 0.0]
+  pushing_enabled: false
+  planner_enabled: false
+  whole_task_training_enabled: false
+  tangential_contact_target_motion_enabled: false
+  palm_orientation_target_motion_enabled: false
+
+initialization:
+  clean_actor_initialization: true
+  actor_initialization_seed: 42
+  resume_enabled: false
+  old_pilot_actor_allowed: false
+  model_1999_allowed: false
+  active_controller_manifest_update_allowed: false
+  lower_body_controller_trainable: false
+  lower_body_controller_source: CERTIFIED_RECURRENT_STUDENT
+  lower_body_controller_sha256: a0151975a757a33f0f5ed236d5616e2a98643abe2b36e50ac9ad01b6dd1f6d7e
+  forbidden_checkpoint_sha256: c3e147f90400598fdd97f61022acf599305254a2ccc3fdba1d3ace512ce133a0
+  lower_body_command: [0.0, 0.0, 0.0, 0.7]
+
+observation_contract:
+  policy_observation_dim: 77
+  representation: RAW_SI_WITH_COMPONENT_CLIPPING
+  components:
+    - {name: base_ang_vel_body, dimension: 3, clip_abs: 5.0, unit: rad_per_s}
+    - {name: projected_gravity_body, dimension: 3, clip_abs: 1.0, unit: dimensionless}
+    - {name: arm_joint_position_error_to_ik_reference, dimension: 14, clip_abs: 1.0, unit: rad}
+    - {name: arm_joint_velocity, dimension: 14, clip_abs: 10.0, unit: rad_per_s}
+    - {name: left_palm_position_error_in_box, dimension: 3, clip_abs: 0.10, unit: m}
+    - {name: right_palm_position_error_in_box, dimension: 3, clip_abs: 0.10, unit: m}
+    - {name: left_palm_orientation_error_axis_angle_in_box, dimension: 3, clip_abs: 0.5, unit: rad}
+    - {name: right_palm_orientation_error_axis_angle_in_box, dimension: 3, clip_abs: 0.5, unit: rad}
+    - {name: palm_actual_surface_gap, dimension: 2, clip_min: -0.02, clip_max: 0.10, unit: m}
+    - {name: palm_box_force_norm, dimension: 2, clip_min: 0.0, clip_max: 9.81, unit: N}
+    - {name: palm_contact_flags, dimension: 2, clip_min: 0.0, clip_max: 1.0, unit: bool}
+    - {name: box_translation_from_attach_start, dimension: 3, clip_abs: 0.005, unit: m}
+    - {name: box_yaw_change_from_attach_start, dimension: 1, clip_abs: 0.008726646259971648, unit: rad}
+    - {name: box_linear_velocity, dimension: 3, clip_abs: 0.005, unit: m_per_s}
+    - {name: box_angular_velocity, dimension: 3, clip_abs: 0.008726646259971648, unit: rad_per_s}
+    - {name: approach_progress_fraction, dimension: 1, clip_min: 0.0, clip_max: 1.0, unit: dimensionless}
+    - {name: previous_arm_action, dimension: 14, clip_abs: 1.0, unit: normalized}
+  finite_required: true
+
+action_contract:
+  policy_action_dim: 14
+  arm_action_dim: 14
+  lower_body_action_dim: 0
+  type: ARM_JOINT_POSITION_RESIDUAL_AROUND_FROZEN_IK_REFERENCE
+  normalized_range: [-1.0, 1.0]
+  residual_scale_rad: 0.05
+  maximum_residual_change_per_control_step_rad: 0.005
+  ordered_joint_names:
+    - left_shoulder_pitch_joint
+    - right_shoulder_pitch_joint
+    - left_shoulder_roll_joint
+    - right_shoulder_roll_joint
+    - left_shoulder_yaw_joint
+    - right_shoulder_yaw_joint
+    - left_elbow_joint
+    - right_elbow_joint
+    - left_wrist_roll_joint
+    - right_wrist_roll_joint
+    - left_wrist_pitch_joint
+    - right_wrist_pitch_joint
+    - left_wrist_yaw_joint
+    - right_wrist_yaw_joint
+  joint_limit_margin_rad: 0.10
+  lower_body_command_source: fixed_internal
+
+reward_contract:
+  optimization_weights_are_scientific_gates: false
+  box_progress_reward_enabled: false
+  base_progress_reward_enabled: false
+  terms:
+    - {name: bilateral_contact_verify_step, weight: 2.0, formula: both_contact_flags}
+    - {name: attached_hold_step, weight: 4.0, formula: both_contacts_and_all_frozen_gates}
+    - {name: success_terminal, weight: 100.0, formula: frozen_attach_success}
+    - {name: symmetric_gap_closure, weight: 1.0, formula: exp_minus_50_times_sum_abs_surface_gap}
+    - {name: hand_position_tracking, weight: -2.0, formula: sum_palm_position_error_m}
+    - {name: hand_orientation_tracking, weight: -0.1, formula: sum_palm_orientation_error_rad}
+    - {name: force_imbalance, weight: -0.5, formula: abs_left_force_minus_right_force_n}
+    - {name: box_translation, weight: -40.0, formula: box_translation_m}
+    - {name: box_yaw_change, weight: -40.0, formula: abs_box_yaw_change_rad}
+    - {name: force_impulse_rate, weight: -2.0, formula: normalized_peak_plus_impulse_plus_rate}
+    - {name: root_tilt, weight: -0.1, formula: root_tilt_deg}
+    - {name: joint_limit_margin, weight: -5.0, formula: positive_part_0p10_minus_margin_rad}
+    - {name: torque_ratio, weight: -2.0, formula: positive_part_torque_ratio_minus_1}
+    - {name: action_l2, weight: -0.001, formula: squared_action_norm}
+    - {name: action_rate, weight: -0.01, formula: squared_action_delta_norm}
+    - {name: forbidden_collision_terminal, weight: -100.0, formula: any_non_palm_box_collision}
+    - {name: contact_timeout_terminal, weight: -25.0, formula: bilateral_contact_timeout}
+
+termination_contract:
+  control_frequency_hz: 50
+  maximum_episode_steps: 1000
+  auto_reset_within_evaluation_episode: false
+  success:
+    bilateral_contact_threshold_n: [1.0, 1.0]
+    bilateral_verification_steps: 20
+    attached_hold_steps: 100
+    all_frozen_safety_gates_required: true
+  failure:
+    nonfinite: immediate
+    forbidden_non_palm_box_collision: immediate
+    bilateral_contact_timeout: 1000
+    contact_loss_grace_steps: 5
+    single_hand_maximum_steps: 25
+    per_palm_force_peak_threshold_n: 9.81
+    per_palm_impulse_threshold_ns: 0.981
+    excessive_combined_impulse_threshold_ns: 1.962
+    contact_force_rate_threshold_nps: 490.5
+    maximum_box_linear_speed_mps: 0.005
+    maximum_box_angular_speed_radps: 0.008726646259971648
+    maximum_box_translation_m: 0.005
+    maximum_box_yaw_change_rad: 0.008726646259971648
+    maximum_base_xy_excursion_m: 0.05
+    minimum_root_height_m: 0.5
+    maximum_root_height_m: 1.0
+    maximum_root_tilt_deg: 6.2075676918029785
+    minimum_arm_joint_limit_margin_rad: 0.10
+    maximum_arm_torque_ratio: 1.001
+    post_initial_reset_count_limit: 0
+
+promotion_boundary:
+  training_launch_authorized: false
+  formal_s2_03_thresholds_may_change: false
+  formal_evaluator_may_change: false
+  requires_fresh_implementation_review: true
+  requires_contract_smoke_and_short_pilot_gate: true
+  requires_new_formal_preflight: true
+  training_started: false
