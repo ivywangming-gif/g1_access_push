@@ -7,9 +7,11 @@ import hashlib
 import json
 from pathlib import Path
 
+import pytest
 import torch
 import yaml
 
+from g1_access_push.stage2.s2_03t_tensor_contract import filtered_contact_activity
 from g1_access_push.stage2.s2_03t_contract import ACTION_JOINT_NAMES, REWARD_SPECS
 
 
@@ -22,6 +24,7 @@ AGENT = ROOT / "src/g1_access_push/sim/stage2/s2_03t_agent_cfg.py"
 BOOTSTRAP = ROOT / "src/g1_access_push/sim/stage2/s2_03t_bootstrap.py"
 TRAIN = ROOT / "scripts/stage2_isaac/train_s2_03t.py"
 CAPACITY = ROOT / "scripts/stage2_isaac/run_s2_03t_capacity_smoke.py"
+TENSOR_CONTRACT = ROOT / "src/g1_access_push/stage2/s2_03t_tensor_contract.py"
 EVALUATE = ROOT / "scripts/stage2_isaac/evaluate_s2_03t_checkpoint.py"
 EVAL_WRAPPER = ROOT / "scripts/stage2_isaac/run_s2_03t_evaluation_once.sh"
 CHECKPOINT = Path(
@@ -92,8 +95,11 @@ def test_manager_based_task_has_exact_dimensions_and_no_training_camera() -> Non
     assert "episode_length_s: float = 20.0" in source
     assert "self.decimation = 4" in source and "self.sim.dt = 0.005" in source
     assert "self.scene.num_envs" not in source
-    assert 'prim_path="{ENV_REGEX_NS}/Robot/.*"' in source
     assert "filter_prim_paths_expr=list(BOX_FILTER_EXPRESSIONS)" in source
+    assert 'FORBIDDEN_SENSOR_PRIM_PATH = "{ENV_REGEX_NS}/Box"' in source
+    assert 'FORBIDDEN_FILTER_EXPRESSIONS = ("{ENV_REGEX_NS}/Robot/.*",)' in source
+    assert "prim_path=FORBIDDEN_SENSOR_PRIM_PATH" in source
+    assert "filter_prim_paths_expr=list(FORBIDDEN_FILTER_EXPRESSIONS)" in source
 
 
 def test_reward_names_and_weights_match_frozen_yaml() -> None:
@@ -223,14 +229,43 @@ def test_launchers_derive_effective_rc_from_authoritative_json() -> None:
         assert "STATUS_RC=${PIPESTATUS[0]}" in wrapper
 
 
+def test_forbidden_contact_activity_reduces_all_backend_filters_and_fails_closed() -> None:
+    matrix = torch.zeros((2, 1, 3, 3))
+    assert filtered_contact_activity(matrix, 2).tolist() == [False, False]
+    matrix[1, 0, 2, 0] = 2.0e-6
+    assert filtered_contact_activity(matrix, 2).tolist() == [False, True]
+    with pytest.raises(RuntimeError, match="MISSING"):
+        filtered_contact_activity(None, 2)
+    with pytest.raises(RuntimeError, match="SHAPE"):
+        filtered_contact_activity(torch.zeros((2, 2, 1, 3)), 2)
+    with pytest.raises(RuntimeError, match="SHAPE"):
+        filtered_contact_activity(torch.zeros((2, 1, 0, 3)), 2)
+    nonfinite = torch.zeros((2, 1, 1, 3))
+    nonfinite[0, 0, 0, 0] = torch.nan
+    with pytest.raises(RuntimeError, match="NONFINITE"):
+        filtered_contact_activity(nonfinite, 2)
+    nonfinite[0, 0, 0, 0] = torch.inf
+    with pytest.raises(RuntimeError, match="NONFINITE"):
+        filtered_contact_activity(nonfinite, 2)
+
+
 def test_runtime_metric_values_and_failure_masks_have_disjoint_namespaces() -> None:
     source = MDP.read_text(encoding="utf-8")
+    tensor_source = TENSOR_CONTRACT.read_text(encoding="utf-8")
     assert "failure_arm_joint_margin" in source
     assert "failure_forbidden_non_palm_box_collision" in source
     assert "COUNTER_TERMINATION_METRIC_NAMES = {\"contact_loss\", \"single_hand_timeout\"}" in source
     assert "name if name in COUNTER_TERMINATION_METRIC_NAMES" in source
     assert "key = metric_name if metric_name in COUNTER_TERMINATION_METRIC_NAMES" in source
     assert "\"termination_reasons\": reasons" in source
+    assert "torch.linalg.vector_norm(force_matrix, dim=-1).flatten(start_dim=1)" in tensor_source
+    assert "matrix[..., 0, :]" not in source
+    assert "carb.Float3(0.6, 0.3, 0.6)" in source
+    assert 'f"{robot_prefix}/left_hand/left_hand_palm_link"' in source
+    assert 'f"{robot_prefix}/right_hand/right_hand_palm_link"' in source
+    assert "FORBIDDEN_CONTACT_FORCE_MATRIX_MISSING" in tensor_source
+    assert "FORBIDDEN_CONTACT_FORCE_MATRIX_SHAPE" in tensor_source
+    assert "FORBIDDEN_CONTACT_FORCE_MATRIX_NONFINITE" in tensor_source
 
 
 def test_original_54_path_hash_snapshot_remains_unchanged() -> None:

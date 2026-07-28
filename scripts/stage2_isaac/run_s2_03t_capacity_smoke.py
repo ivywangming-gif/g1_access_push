@@ -98,6 +98,13 @@ try:
         zero_action = torch.zeros((args.num_envs, 14), device=env.device)
         next_observation, reward, done, _ = wrapped.step(zero_action)
     storage = runner.alg.storage
+    left_sensor = env.scene["left_palm_box_contact"]
+    right_sensor = env.scene["right_palm_box_contact"]
+    forbidden_sensor = env.scene["robot_box_contact"]
+    left_matrix = left_sensor.data.force_matrix_w
+    right_matrix = right_sensor.data.force_matrix_w
+    forbidden_matrix = forbidden_sensor.data.force_matrix_w
+    forbidden_filter_count = int(forbidden_sensor.contact_physx_view.filter_count)
     checks = {
         "formal_candidate": args.num_envs in (256, 128, 64),
         "environment_count": env.num_envs == args.num_envs,
@@ -117,6 +124,19 @@ try:
         "clean_actor": True,
         "resume_false": agent_cfg.resume is False,
         "checkpoint_not_loaded": agent_cfg.load_checkpoint is None and agent_cfg.load_run is None,
+        "left_palm_force_matrix_shape": left_matrix is not None
+        and list(left_matrix.shape) == [args.num_envs, 1, 1, 3],
+        "right_palm_force_matrix_shape": right_matrix is not None
+        and list(right_matrix.shape) == [args.num_envs, 1, 1, 3],
+        "forbidden_sensor_single_body": int(forbidden_sensor.num_bodies) == 1,
+        "forbidden_sensor_body_name": list(forbidden_sensor.body_names) == ["Box"],
+        "forbidden_filter_count_positive": forbidden_filter_count >= 1,
+        "forbidden_force_matrix_shape": forbidden_matrix is not None
+        and list(forbidden_matrix.shape) == [args.num_envs, 1, forbidden_filter_count, 3],
+        "contact_force_matrices_finite": all(
+            matrix is not None and bool(torch.isfinite(matrix).all())
+            for matrix in (left_matrix, right_matrix, forbidden_matrix)
+        ),
         "certified_lower_checkpoint": (
             env.action_manager.get_term("frozen_lower_body").checkpoint_sha256
             == CERTIFIED_STUDENT_SHA256
@@ -143,6 +163,12 @@ try:
         "checks": checks,
         "failed_checks": failed,
         "memory": memory,
+        "contact_sensor_audit": {
+            "left_force_matrix_shape": list(left_matrix.shape) if left_matrix is not None else None,
+            "right_force_matrix_shape": list(right_matrix.shape) if right_matrix is not None else None,
+            "forbidden_force_matrix_shape": list(forbidden_matrix.shape) if forbidden_matrix is not None else None,
+            "forbidden_filter_count": forbidden_filter_count,
+        },
         "reference_path": str(reference_path),
         "reference_sha256": args.reference_sha256,
         "training_started": False,

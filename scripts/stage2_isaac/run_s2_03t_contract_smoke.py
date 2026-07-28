@@ -75,6 +75,7 @@ try:
     state = runtime_state(env)
     sensor_left = env.scene["left_palm_box_contact"]
     sensor_right = env.scene["right_palm_box_contact"]
+    sensor_forbidden = env.scene["robot_box_contact"]
     action_names = list(env.action_manager.active_terms)
     action_dims = list(env.action_manager.action_term_dim)
     termination_names = set(env.termination_manager.active_terms)
@@ -95,6 +96,10 @@ try:
         "separate_sensor_instances": sensor_left is not sensor_right,
         "left_filter_count_one": int(sensor_left.contact_physx_view.filter_count) == 1,
         "right_filter_count_one": int(sensor_right.contact_physx_view.filter_count) == 1,
+        "forbidden_sensor_single_body": int(sensor_forbidden.num_bodies) == 1,
+        "forbidden_sensor_body_name": list(sensor_forbidden.body_names) == ["Box"],
+        "forbidden_filter_count_positive": int(sensor_forbidden.contact_physx_view.filter_count) >= 1,
+        "forbidden_force_matrix_available": sensor_forbidden.data.force_matrix_w is not None,
         "termination_fields_complete": termination_names == expected_termination_names,
         "reference_installed": env.precontact_reference is not None,
         "arm_previous_action_zero": bool(torch.count_nonzero(arm.raw_actions) == 0),
@@ -125,8 +130,14 @@ try:
             }
         )
         print(f"PHASE=CONTRACT_SMOKE step={step + 1}/{args.steps}", flush=True)
+    forbidden_matrix = sensor_forbidden.data.force_matrix_w
+    forbidden_filter_count = int(sensor_forbidden.contact_physx_view.filter_count)
     checks.update(
         {
+            "forbidden_force_matrix_shape": forbidden_matrix is not None
+            and list(forbidden_matrix.shape) == [1, 1, forbidden_filter_count, 3],
+            "forbidden_force_matrix_finite": forbidden_matrix is not None
+            and bool(torch.isfinite(forbidden_matrix).all()),
             "zero_step_reward_finite": all(torch.isfinite(torch.tensor(record["reward"])) for record in step_records),
             "zero_step_observation_finite": all(record["observation_finite"] for record in step_records),
             "zero_action_exact_reference": bool(torch.equal(arm.processed_actions, arm.reference)),

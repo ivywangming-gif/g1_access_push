@@ -37,6 +37,9 @@ from g1_access_push.sim.stage2.s2_03t_actions import (
 )
 
 
+FORBIDDEN_SENSOR_PRIM_PATH = "{ENV_REGEX_NS}/Box"
+FORBIDDEN_FILTER_EXPRESSIONS = ("{ENV_REGEX_NS}/Robot/.*",)
+
 CERTIFIED_STUDENT = Path(
     "/root/autodl-tmp/robotics/third_party/WBC-AGILE/agile/data/policy/"
     "velocity_height_g1/unitree_g1_velocity_height_recurrent_student.pt"
@@ -82,8 +85,8 @@ class S203TSceneCfg(Stage1SceneCfg):
         track_air_time=True,
     )
     robot_box_contact = ContactSensorCfg(
-        prim_path="{ENV_REGEX_NS}/Robot/.*",
-        filter_prim_paths_expr=list(BOX_FILTER_EXPRESSIONS),
+        prim_path=FORBIDDEN_SENSOR_PRIM_PATH,
+        filter_prim_paths_expr=list(FORBIDDEN_FILTER_EXPRESSIONS),
         history_length=2,
         track_air_time=False,
     )

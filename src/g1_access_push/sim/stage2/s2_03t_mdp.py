@@ -13,6 +13,7 @@ from isaaclab.envs import ManagerBasedRLEnv
 from isaaclab.envs.mdp import time_out as isaac_time_out
 
 from g1_access_push.sim.stage2.s2_03t_actions import ARM_JOINT_NAMES, ArmResidualAction
+from g1_access_push.stage2.s2_03t_tensor_contract import filtered_contact_activity
 
 
 CONTACT_FORCE_THRESHOLD_N = 1.0
@@ -309,9 +310,7 @@ class S203TRuntimeState:
 
         mask = torch.zeros(self.num_envs, dtype=torch.bool, device=self.device)
         matrix = self.robot_box_sensor.data.force_matrix_w
-        if matrix is None:
-            return mask
-        active = torch.linalg.vector_norm(matrix[..., 0, :], dim=-1).max(dim=-1).values > 1.0e-6
+        active = filtered_contact_activity(matrix, self.num_envs)
         active_ids = active.nonzero(as_tuple=False).squeeze(-1).tolist()
         if not active_ids:
             return mask
