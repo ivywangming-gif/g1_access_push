@@ -1,0 +1,201 @@
+{
+  "config_sha256": "fa53584719fc9730e1d87a451f8f69132c7396d07336eef1546a1ec5423d77bd",
+  "contract_digest_sha256": "6ed3835a3b11d34762d2e06d7b50d2bb317a3d26a75becaa302ddfb3b5565d21",
+  "parameter_provenance": {
+    "checks": {
+      "box_stillness": true,
+      "contact_threshold": true,
+      "control_dt": true,
+      "control_frequency": true,
+      "force_safety": true,
+      "motion_limits": true,
+      "precontact_gap": true,
+      "s2_01_pass": true,
+      "s2_02_pass": true,
+      "timing": true
+    },
+    "derived_parameters": {
+      "approach_acceleration_limit_mps2": 0.02,
+      "approach_jerk_limit_mps3": 0.1,
+      "approach_speed_mps": 0.01,
+      "attached_hold_steps": 100,
+      "bilateral_verification_steps": 20,
+      "contact_force_rate_threshold_nps": 490.5000000000001,
+      "contact_force_threshold_n": 1.0,
+      "contact_impulse_window_steps": 5,
+      "contact_loss_grace_steps": 5,
+      "control_dt_s": 0.02,
+      "control_frequency_hz": 50.0,
+      "excessive_combined_impulse_threshold_ns": 1.9620000000000006,
+      "maximum_box_angular_speed_radps": 0.008726646259971648,
+      "maximum_box_linear_speed_mps": 0.005,
+      "maximum_box_translation_m": 0.005,
+      "maximum_box_yaw_change_rad": 0.008726646259971648,
+      "no_contact_noise_upper_bound_n": 0.0,
+      "per_palm_force_peak_threshold_n": 9.810000000000002,
+      "per_palm_impulse_threshold_ns": 0.9810000000000003,
+      "precontact_gap_m": 0.06,
+      "single_hand_maximum_steps": 25,
+      "static_friction_capacity_n": 24.525000000000002
+    },
+    "rules": {
+      "approach": "0.01 m/s at 50 Hz; acceleration=2*speed; jerk=5*acceleration",
+      "box_stillness": "unchanged S2-01/S2-02 frozen stillness gates",
+      "contact_threshold": "max(1 N, max(S2-01 noise, S2-02 noise) + 1 N)",
+      "force_peak": "each palm <= 0.4 * mu_static * mass * g; bilateral total <= 0.8 friction capacity",
+      "impulse": "per-palm peak * 0.10 s; combined is twice per-palm"
+    },
+    "schema_version": 1,
+    "source_sha256": {
+      "/root/autodl-tmp/robotics/projects/g1_access_push/configs/stage2/s2_01_box_stand_sanity.yaml": "1f75cea857fb17717d853da5a2bc9a035ab4095df5e135771eb36798a56f7c2b",
+      "/root/autodl-tmp/robotics/projects/g1_access_push/reports/stage2/s2_01_runtime_audit_summary.json": "d7c37d01b90fd95551d1a2f788e9040abecc021fe738ce7a34229d6c13fc4ff9",
+      "/root/autodl-tmp/robotics/projects/g1_access_push/reports/stage2/s2_02_formal_result.json": "1bb26931bdde58c2bc67affbdf86f2d8a5f1efd68381addc69337b7252fae4e2"
+    },
+    "stage": "S2-03",
+    "status": "PASS"
+  },
+  "qualification_state": "READY_FOR_PREFLIGHT_AND_FORMAL",
+  "resolved": {
+    "acceptance": {
+      "maximum_arm_torque_ratio": 1.001,
+      "maximum_base_xy_excursion_m": 0.05,
+      "maximum_box_angular_speed_radps": 0.008726646259971648,
+      "maximum_box_linear_speed_mps": 0.005,
+      "maximum_box_translation_m": 0.005,
+      "maximum_box_yaw_change_rad": 0.008726646259971648,
+      "maximum_hand_orientation_error_deg": 8.0,
+      "maximum_hand_position_error_m": 0.06,
+      "maximum_root_height_m": 1.0,
+      "maximum_root_tilt_deg": 6.2075676918029785,
+      "minimum_arm_joint_limit_margin_rad": 0.1,
+      "minimum_root_height_m": 0.5,
+      "post_initial_reset_count_limit": 0
+    },
+    "certification": {
+      "controller_checkpoint_sha256": "a0151975a757a33f0f5ed236d5616e2a98643abe2b36e50ac9ad01b6dd1f6d7e",
+      "forbidden_checkpoint_sha256": "c3e147f90400598fdd97f61022acf599305254a2ccc3fdba1d3ace512ce133a0",
+      "s2_01_runtime_audit_path": "reports/stage2/s2_01_runtime_audit_summary.json",
+      "s2_02_formal_result_path": "reports/stage2/s2_02_formal_result.json",
+      "s2_02_pass_commit": "2f44b43d2678c4a882104be97fd6d7dff4bd24b8"
+    },
+    "contact_gate": {
+      "contact_force_rate_threshold_nps": 490.5,
+      "excessive_combined_impulse_threshold_ns": 1.962,
+      "left_contact_force_threshold_n": 1.0,
+      "per_palm_force_peak_threshold_n": 9.81,
+      "per_palm_impulse_threshold_ns": 0.981,
+      "right_contact_force_threshold_n": 1.0
+    },
+    "controller": {
+      "control_dt_s": 0.02,
+      "control_frequency_hz": 50,
+      "lower_body_command": [
+        0.0,
+        0.0,
+        0.0,
+        0.7
+      ],
+      "maximum_orientation_correction_rad": 0.03,
+      "maximum_position_correction_m": 0.005,
+      "palm_local_normal_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "source": "S1_07_DIFFERENTIAL_IK_PLUS_CERTIFIED_RECURRENT_LOWER_BODY",
+      "waist_command": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "development_scope": "SIMULATION_DEVELOPMENT_ONLY",
+    "formal": {
+      "auto_reset": false,
+      "episode_count": 1,
+      "terminal_states": [
+        "PASS",
+        "FAIL"
+      ]
+    },
+    "motion": {
+      "approach_acceleration_limit_mps2": 0.02,
+      "approach_jerk_limit_mps3": 0.1,
+      "approach_speed_mps": 0.01,
+      "attached_hold_steps": 100,
+      "bilateral_verification_steps": 20,
+      "contact_impulse_window_steps": 5,
+      "contact_loss_grace_steps": 5,
+      "failure_unload_steps": 25,
+      "maximum_approach_distance_m": 0.07,
+      "maximum_approach_steps": 400,
+      "move_to_precontact_steps": 150,
+      "precontact_hold_steps": 50,
+      "single_hand_maximum_steps": 25,
+      "stand_settle_steps": 100
+    },
+    "object": {
+      "baseline_id": "S2_LIGHT_BOX_DEVELOPMENT_BASELINE_V1",
+      "center_of_mass_local_xyz_m": [
+        0.0,
+        0.0,
+        -0.4
+      ],
+      "diagonal_inertia_kg_m2": [
+        0.12083333333333333,
+        0.43333333333333335,
+        0.5208333333333334
+      ],
+      "dynamic_friction": 0.5,
+      "mass_kg": 5.0,
+      "rear_face_xO_m": -0.6,
+      "restitution": 0.0,
+      "size_xyz_m": [
+        1.2,
+        0.6,
+        1.2
+      ],
+      "spawn_center_z_m": 0.602,
+      "static_friction": 0.5
+    },
+    "precontact": {
+      "base_to_box_center_distance_m": 1.06,
+      "candidate_index": 9,
+      "contact_height_m": 0.62,
+      "desired_palm_quaternion_in_object_wxyz": [
+        0.7071067811865476,
+        0.0,
+        0.7071067811865476,
+        0.0
+      ],
+      "palm_collision_support_offset_m": 0.44023889869451527,
+      "precontact_gap_m": 0.06,
+      "source_stage": "S2-02",
+      "tangential_separation_m": 0.3
+    },
+    "prohibitions": {
+      "base_motion_command": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "box_displacement_subgoal": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "forbidden_pilot_checkpoint": false,
+      "orientation_change_during_approach": false,
+      "planner": false,
+      "pushing": false,
+      "tangential_approach_motion": false,
+      "training": false
+    },
+    "schema_version": 1,
+    "stage": "S2-03",
+    "task": "BILATERAL_ATTACH_ONLY"
+  },
+  "runnable": true,
+  "schema_version": 1,
+  "stage": "S2-03"
+}

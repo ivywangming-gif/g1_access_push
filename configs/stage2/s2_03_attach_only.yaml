@@ -1,0 +1,97 @@
+stage: S2-03
+task: BILATERAL_ATTACH_ONLY
+schema_version: 1
+development_scope: SIMULATION_DEVELOPMENT_ONLY
+
+certification:
+  s2_01_runtime_audit_path: reports/stage2/s2_01_runtime_audit_summary.json
+  s2_02_pass_commit: 2f44b43d2678c4a882104be97fd6d7dff4bd24b8
+  s2_02_formal_result_path: reports/stage2/s2_02_formal_result.json
+  controller_checkpoint_sha256: a0151975a757a33f0f5ed236d5616e2a98643abe2b36e50ac9ad01b6dd1f6d7e
+  forbidden_checkpoint_sha256: c3e147f90400598fdd97f61022acf599305254a2ccc3fdba1d3ace512ce133a0
+
+object:
+  baseline_id: S2_LIGHT_BOX_DEVELOPMENT_BASELINE_V1
+  size_xyz_m: [1.2, 0.6, 1.2]
+  rear_face_xO_m: -0.6
+  spawn_center_z_m: 0.602
+  mass_kg: 5.0
+  center_of_mass_local_xyz_m: [0.0, 0.0, -0.4]
+  diagonal_inertia_kg_m2: [0.12083333333333333, 0.43333333333333335, 0.5208333333333334]
+  static_friction: 0.5
+  dynamic_friction: 0.5
+  restitution: 0.0
+
+precontact:
+  source_stage: S2-02
+  candidate_index: 9
+  contact_height_m: 0.62
+  tangential_separation_m: 0.30
+  base_to_box_center_distance_m: 1.06
+  precontact_gap_m: 0.06
+  desired_palm_quaternion_in_object_wxyz: [0.7071067811865476, 0.0, 0.7071067811865476, 0.0]
+  palm_collision_support_offset_m: 0.44023889869451527
+
+controller:
+  source: S1_07_DIFFERENTIAL_IK_PLUS_CERTIFIED_RECURRENT_LOWER_BODY
+  lower_body_command: [0.0, 0.0, 0.0, 0.7]
+  waist_command: [0.0, 0.0, 0.0]
+  palm_local_normal_axis: [0.0, 0.0, 1.0]
+  maximum_position_correction_m: 0.005
+  maximum_orientation_correction_rad: 0.03
+  control_frequency_hz: 50
+  control_dt_s: 0.02
+
+motion:
+  stand_settle_steps: 100
+  move_to_precontact_steps: 150
+  precontact_hold_steps: 50
+  approach_speed_mps: 0.01
+  approach_acceleration_limit_mps2: 0.02
+  approach_jerk_limit_mps3: 0.10
+  maximum_approach_distance_m: 0.07
+  maximum_approach_steps: 400
+  bilateral_verification_steps: 20
+  attached_hold_steps: 100
+  contact_loss_grace_steps: 5
+  single_hand_maximum_steps: 25
+  failure_unload_steps: 25
+  contact_impulse_window_steps: 5
+
+contact_gate:
+  left_contact_force_threshold_n: 1.0
+  right_contact_force_threshold_n: 1.0
+  per_palm_force_peak_threshold_n: 9.81
+  per_palm_impulse_threshold_ns: 0.981
+  excessive_combined_impulse_threshold_ns: 1.962
+  contact_force_rate_threshold_nps: 490.5
+
+acceptance:
+  maximum_box_linear_speed_mps: 0.005
+  maximum_box_angular_speed_radps: 0.008726646259971648
+  maximum_box_translation_m: 0.005
+  maximum_box_yaw_change_rad: 0.008726646259971648
+  maximum_base_xy_excursion_m: 0.05
+  minimum_root_height_m: 0.5
+  maximum_root_height_m: 1.0
+  maximum_root_tilt_deg: 6.2075676918029785
+  minimum_arm_joint_limit_margin_rad: 0.10
+  maximum_arm_torque_ratio: 1.001
+  maximum_hand_position_error_m: 0.06
+  maximum_hand_orientation_error_deg: 8.0
+  post_initial_reset_count_limit: 0
+
+formal:
+  episode_count: 1
+  auto_reset: false
+  terminal_states: [PASS, FAIL]
+
+prohibitions:
+  pushing: false
+  box_displacement_subgoal: [0.0, 0.0, 0.0]
+  base_motion_command: [0.0, 0.0, 0.0]
+  planner: false
+  training: false
+  forbidden_pilot_checkpoint: false
+  tangential_approach_motion: false
+  orientation_change_during_approach: false

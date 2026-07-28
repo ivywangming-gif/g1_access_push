@@ -1,0 +1,53 @@
+{
+  "checks": {
+    "box_stillness": true,
+    "contact_threshold": true,
+    "control_dt": true,
+    "control_frequency": true,
+    "force_safety": true,
+    "motion_limits": true,
+    "precontact_gap": true,
+    "s2_01_pass": true,
+    "s2_02_pass": true,
+    "timing": true
+  },
+  "derived_parameters": {
+    "approach_acceleration_limit_mps2": 0.02,
+    "approach_jerk_limit_mps3": 0.1,
+    "approach_speed_mps": 0.01,
+    "attached_hold_steps": 100,
+    "bilateral_verification_steps": 20,
+    "contact_force_rate_threshold_nps": 490.5000000000001,
+    "contact_force_threshold_n": 1.0,
+    "contact_impulse_window_steps": 5,
+    "contact_loss_grace_steps": 5,
+    "control_dt_s": 0.02,
+    "control_frequency_hz": 50.0,
+    "excessive_combined_impulse_threshold_ns": 1.9620000000000006,
+    "maximum_box_angular_speed_radps": 0.008726646259971648,
+    "maximum_box_linear_speed_mps": 0.005,
+    "maximum_box_translation_m": 0.005,
+    "maximum_box_yaw_change_rad": 0.008726646259971648,
+    "no_contact_noise_upper_bound_n": 0.0,
+    "per_palm_force_peak_threshold_n": 9.810000000000002,
+    "per_palm_impulse_threshold_ns": 0.9810000000000003,
+    "precontact_gap_m": 0.06,
+    "single_hand_maximum_steps": 25,
+    "static_friction_capacity_n": 24.525000000000002
+  },
+  "rules": {
+    "approach": "0.01 m/s at 50 Hz; acceleration=2*speed; jerk=5*acceleration",
+    "box_stillness": "unchanged S2-01/S2-02 frozen stillness gates",
+    "contact_threshold": "max(1 N, max(S2-01 noise, S2-02 noise) + 1 N)",
+    "force_peak": "each palm <= 0.4 * mu_static * mass * g; bilateral total <= 0.8 friction capacity",
+    "impulse": "per-palm peak * 0.10 s; combined is twice per-palm"
+  },
+  "schema_version": 1,
+  "source_sha256": {
+    "/root/autodl-tmp/robotics/projects/g1_access_push/configs/stage2/s2_01_box_stand_sanity.yaml": "1f75cea857fb17717d853da5a2bc9a035ab4095df5e135771eb36798a56f7c2b",
+    "/root/autodl-tmp/robotics/projects/g1_access_push/reports/stage2/s2_01_runtime_audit_summary.json": "d7c37d01b90fd95551d1a2f788e9040abecc021fe738ce7a34229d6c13fc4ff9",
+    "/root/autodl-tmp/robotics/projects/g1_access_push/reports/stage2/s2_02_formal_result.json": "1bb26931bdde58c2bc67affbdf86f2d8a5f1efd68381addc69337b7252fae4e2"
+  },
+  "stage": "S2-03",
+  "status": "PASS"
+}
