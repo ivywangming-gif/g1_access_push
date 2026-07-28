@@ -43,6 +43,12 @@ PPO_REFERENCE = Path(
 )
 PPO_REFERENCE_SHA256 = "4c28e04a2030b62bb0322f708806e0d9d3f42b31d129961b7d6ca66e486e6a05"
 WORKFLOW_DIRECTIVE_SHA256 = "d7e8d53d37c22d85fc2a49acfdba6f05732560fa5b7f7393e67a8e840af361e5"
+FORMAL_CAPACITY_SMOKE_RUN = Path(
+    "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/"
+    "s2_03t_formal_capacity256_contactfix_20260728_112151"
+)
+FORMAL_CAPACITY_SMOKE_RESULT_SHA256 = "3f448dc52bb2caf14a36f78142f6e14bbcd93e85957b7dd04bb70f031b6ce063"
+FORMAL_SELECTED_NUM_ENVS = 256
 
 
 def sha256_file(path: Path) -> str:
@@ -105,6 +111,13 @@ def ppo_provenance() -> dict[str, Any]:
             "formal_num_env_candidates": _source(
                 [256, 128, 64], workflow_source, WORKFLOW_DIRECTIVE_SHA256, True,
                 "One pre-training capacity smoke may downshift only on OOM.",
+            ),
+            "formal_selected_num_envs": _source(
+                FORMAL_SELECTED_NUM_ENVS,
+                str(FORMAL_CAPACITY_SMOKE_RUN / "capacity_smoke_result.json"),
+                FORMAL_CAPACITY_SMOKE_RESULT_SHA256,
+                True,
+                "The preferred 256-environment candidate passed the repaired runtime capacity smoke.",
             ),
             "formal_max_iterations": _source(
                 1000, workflow_source, WORKFLOW_DIRECTIVE_SHA256, True, "Frozen formal execution budget."
@@ -316,6 +329,13 @@ def build_artifacts() -> dict[str, dict[str, Any]]:
         },
         "formal": {
             "num_env_candidates_oom_only": [256, 128, 64],
+            "selected_num_envs": FORMAL_SELECTED_NUM_ENVS,
+            "capacity_smoke": {
+                "run_root": str(FORMAL_CAPACITY_SMOKE_RUN),
+                "result_sha256": FORMAL_CAPACITY_SMOKE_RESULT_SHA256,
+                "status": "PASS",
+                "primary_reason": "FORMAL_CAPACITY_AVAILABLE",
+            },
             "maximum_iterations": 1000,
             "save_interval": 100,
             "screening_development_seeds": [42, 43, 44],

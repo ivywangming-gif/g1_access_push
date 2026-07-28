@@ -322,3 +322,8 @@ def test_generated_artifacts_are_current_and_encode_four_conflicts() -> None:
     assert resolved["pilot"]["development_evaluation_seeds"] == [42, 43, 44, 45]
     assert resolved["formal"]["screening_development_seeds"] == [42, 43, 44]
     assert resolved["formal"]["qualification_seed"] == 42
+    assert resolved["formal"]["selected_num_envs"] == 256
+    assert resolved["formal"]["capacity_smoke"]["status"] == "PASS"
+    assert resolved["formal"]["capacity_smoke"]["result_sha256"] == (
+        "3f448dc52bb2caf14a36f78142f6e14bbcd93e85957b7dd04bb70f031b6ce063"
+    )

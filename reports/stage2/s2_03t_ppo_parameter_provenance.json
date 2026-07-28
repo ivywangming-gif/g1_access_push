@@ -96,6 +96,13 @@
       "source_sha256": "d7e8d53d37c22d85fc2a49acfdba6f05732560fa5b7f7393e67a8e840af361e5",
       "value": 100
     },
+    "formal_selected_num_envs": {
+      "project_new": true,
+      "rationale": "The preferred 256-environment candidate passed the repaired runtime capacity smoke.",
+      "source_file": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_capacity256_contactfix_20260728_112151/capacity_smoke_result.json",
+      "source_sha256": "3f448dc52bb2caf14a36f78142f6e14bbcd93e85957b7dd04bb70f031b6ce063",
+      "value": 256
+    },
     "gamma": {
       "project_new": false,
       "rationale": "Inherited from the closest installed AGILE G1 manipulation PPO configuration.",

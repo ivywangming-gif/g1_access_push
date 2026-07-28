@@ -36,6 +36,12 @@
   },
   "contract_conflicts_path": "reports/stage2/s2_03t_contract_conflicts.json",
   "formal": {
+    "capacity_smoke": {
+      "primary_reason": "FORMAL_CAPACITY_AVAILABLE",
+      "result_sha256": "3f448dc52bb2caf14a36f78142f6e14bbcd93e85957b7dd04bb70f031b6ce063",
+      "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_capacity256_contactfix_20260728_112151",
+      "status": "PASS"
+    },
     "clean_actor": true,
     "maximum_iterations": 1000,
     "num_env_candidates_oom_only": [
@@ -51,7 +57,8 @@
       42,
       43,
       44
-    ]
+    ],
+    "selected_num_envs": 256
   },
   "initialization": {
     "clean_actor": true,

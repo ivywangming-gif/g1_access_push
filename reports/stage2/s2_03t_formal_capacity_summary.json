@@ -1,0 +1,47 @@
+{
+  "attempts": [
+    {
+      "authoritative_status": "PASS",
+      "evidence_disposition": "INVALID",
+      "num_envs": 256,
+      "primary_reason": "UNSUPPORTED_BATCHED_MULTI_BODY_FILTER_SENSOR_NOT_AUDITED",
+      "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_capacity256_20260728_101220"
+    },
+    {
+      "authoritative_status": "PASS",
+      "evidence_disposition": "PASS",
+      "num_envs": 256,
+      "primary_reason": "FORMAL_CAPACITY_AVAILABLE",
+      "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_formal_capacity256_contactfix_20260728_112151"
+    }
+  ],
+  "code_commit": "8a2a74c1f82c9e3d648f1d881433b82e40b64054",
+  "contact_sensor_audit": {
+    "configured_forbidden_filter_count": 46,
+    "forbidden_filter_count": 46,
+    "forbidden_force_matrix_shape": [256, 1, 46, 3],
+    "left_force_matrix_shape": [256, 1, 1, 3],
+    "right_force_matrix_shape": [256, 1, 1, 3]
+  },
+  "failed_checks": [],
+  "launcher_rc": 0,
+  "memory": {
+    "free_bytes_after_step": 30482694144,
+    "maximum_allocated_bytes": 38736384,
+    "maximum_reserved_bytes": 48234496,
+    "total_bytes": 33668988928
+  },
+  "mode": "FORMAL_CAPACITY_SELECTION",
+  "pilot_checkpoint_used": false,
+  "primary_reason": "PREFERRED_256_ENV_CAPACITY_PASSED",
+  "process_rc": 0,
+  "reference_sha256": "1e537e075af7f888fb95a63501d3976d0d7740eff51c6bd9000f574b00cd0e6c",
+  "result_sha256": "3f448dc52bb2caf14a36f78142f6e14bbcd93e85957b7dd04bb70f031b6ce063",
+  "resume": false,
+  "schema_version": 1,
+  "selected_num_envs": 256,
+  "stage": "S2-03T",
+  "status": "PASS",
+  "training_contract_sha256": "221f27d2a22d3e07f9bd9a05680d61d57f3b2af59a2cf0ed4f5bd8af424e6316",
+  "training_started": false
+}
