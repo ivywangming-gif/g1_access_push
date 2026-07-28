@@ -1,14 +1,59 @@
 {
-  "attempt_count": 4,
+  "attempt_count": 7,
   "attempts": [
-    {"attempt": 1, "status": "INVALID", "primary_reason": "IMPLEMENTATION_EXCEPTION", "diagnosed_infrastructure_reason": "RUNTIME_METRIC_VALUE_MASK_NAMESPACE_COLLISION", "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_085727"},
-    {"attempt": 2, "status": "INVALID", "primary_reason": "IMPLEMENTATION_EXCEPTION", "diagnosed_infrastructure_reason": "ARM_REFERENCE_BATCH_SHAPE_MISMATCH", "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_091025"},
-    {"attempt": 3, "status": "INVALID", "primary_reason": "IMPLEMENTATION_EXCEPTION", "diagnosed_infrastructure_reason": "COUNTED_TERMINATION_ROUTE_MISMATCH", "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_091329"},
-    {"attempt": 4, "status": "PASS", "primary_reason": "ALL_RUNTIME_CONTRACT_CHECKS_PASSED", "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_091813"}
+    {
+      "attempt": 1,
+      "status": "INVALID",
+      "primary_reason": "IMPLEMENTATION_EXCEPTION",
+      "diagnosed_infrastructure_reason": "RUNTIME_METRIC_VALUE_MASK_NAMESPACE_COLLISION",
+      "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_085727"
+    },
+    {
+      "attempt": 2,
+      "status": "INVALID",
+      "primary_reason": "IMPLEMENTATION_EXCEPTION",
+      "diagnosed_infrastructure_reason": "ARM_REFERENCE_BATCH_SHAPE_MISMATCH",
+      "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_091025"
+    },
+    {
+      "attempt": 3,
+      "status": "INVALID",
+      "primary_reason": "IMPLEMENTATION_EXCEPTION",
+      "diagnosed_infrastructure_reason": "COUNTED_TERMINATION_ROUTE_MISMATCH",
+      "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_091329"
+    },
+    {
+      "attempt": 4,
+      "status": "INVALID",
+      "primary_reason": "ALL_RUNTIME_CONTRACT_CHECKS_PASSED",
+      "diagnosed_infrastructure_reason": "UNSUPPORTED_BATCHED_MULTI_BODY_FILTER_SENSOR_NOT_AUDITED",
+      "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_091813"
+    },
+    {
+      "attempt": 5,
+      "status": "INVALID",
+      "primary_reason": "ALL_RUNTIME_CONTRACT_CHECKS_PASSED",
+      "diagnosed_infrastructure_reason": "ROBOT_FILTER_WILDCARD_COUNT_MISMATCH",
+      "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_103259"
+    },
+    {
+      "attempt": 6,
+      "status": "INVALID",
+      "primary_reason": "RUNTIME_CONTRACT_CHECK_FAILED",
+      "diagnosed_infrastructure_reason": "ENV_NAMESPACE_REGEX_MISCLASSIFIED_AS_BODY_WILDCARD",
+      "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_104328"
+    },
+    {
+      "attempt": 7,
+      "status": "PASS",
+      "primary_reason": "ALL_RUNTIME_CONTRACT_CHECKS_PASSED",
+      "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_104740"
+    }
   ],
-  "code_commit": "f4ecfb5121625ed6c726b081771325deb15eefbb",
+  "code_commit": "f0f94d61a21030edaab0a6df3ffba15559aae057",
   "training_contract_sha256": "221f27d2a22d3e07f9bd9a05680d61d57f3b2af59a2cf0ed4f5bd8af424e6316",
-  "authoritative_result_sha256": "13dad891893e4663434d73fcc2c2f8e5395f9387e68d8c6ee48d0acaa93c43ce",
+  "authoritative_result_sha256": "85df094aa80807f9cedcb6eed9012e473efdab7a614544ae175abc8deeaca533",
+  "console_filter_pattern_errors": 0,
   "action_shape": [
     1,
     14
@@ -34,6 +79,15 @@
     "arm_previous_action_zero": true,
     "certified_checkpoint_sha": true,
     "contact_counters_zero": true,
+    "forbidden_configured_filter_count_46": true,
+    "forbidden_filter_count_matches_config": true,
+    "forbidden_filter_suffixes_match_authoritative": true,
+    "forbidden_filters_exact_no_body_wildcard": true,
+    "forbidden_force_matrix_available": true,
+    "forbidden_force_matrix_finite": true,
+    "forbidden_force_matrix_shape": true,
+    "forbidden_sensor_body_name": true,
+    "forbidden_sensor_single_body": true,
     "impulse_history_zero": true,
     "joint_order": true,
     "left_filter_count_one": true,
@@ -61,6 +115,16 @@
     "zero_step_observation_finite": true,
     "zero_step_reward_finite": true
   },
+  "contact_sensor_audit": {
+    "backend_filter_count": 46,
+    "configured_filter_count": 46,
+    "forbidden_force_matrix_shape": [
+      1,
+      1,
+      46,
+      3
+    ]
+  },
   "failed_checks": [],
   "mode": "CONTRACT_SMOKE",
   "observation_shape": [
@@ -68,7 +132,7 @@
     77
   ],
   "primary_reason": "ALL_RUNTIME_CONTRACT_CHECKS_PASSED",
-  "reference_path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_091813/precontact_reference.pt",
+  "reference_path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_104740/precontact_reference.pt",
   "reference_sha256": "1e537e075af7f888fb95a63501d3976d0d7740eff51c6bd9000f574b00cd0e6c",
   "schema_version": 1,
   "scientific_result_created": false,
