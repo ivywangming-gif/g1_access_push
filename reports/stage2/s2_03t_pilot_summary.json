@@ -1,0 +1,51 @@
+{
+  "all_evaluation_safety_valid": true,
+  "all_training_values_finite": true,
+  "baseline_aggregate_mean_minimum_surface_gap_m": 0.05758030712604523,
+  "baseline_episode_count": 4,
+  "bilateral_contact_episode_count": 0,
+  "checkpoint": {
+    "actor_input_dim": 77,
+    "actor_output_dim": 14,
+    "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_pilot25_20260728_095241/model_24.pt",
+    "sha256": "199d509551f111b854888013ad3bfc900a31f09d1508c65722fcb7fd93e9c67d",
+    "size_bytes": 1503313
+  },
+  "clean_actor": true,
+  "code_commit": "286b4c4978704c55352ca83fe2e5ebe31f034219",
+  "development_evaluations": [
+    {
+      "bilateral_contact": false,
+      "finite": true,
+      "forbidden_collision": false,
+      "left_minimum_surface_gap_m": 0.052113115787506104,
+      "mean_minimum_surface_gap_m": 0.04014921188354492,
+      "primary_reason": "BILATERAL_CONTACT_TIMEOUT",
+      "reset_count": 0,
+      "right_minimum_surface_gap_m": 0.02818530797958374,
+      "root_height_minimum_m": 0.7246726751327515,
+      "root_tilt_maximum_deg": 4.274618148803711,
+      "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_pilot25_eval_seed42_20260728_095511",
+      "seed": 42,
+      "status": "FAIL",
+      "time_out": true,
+      "torque_ratio_maximum": 1.0
+    }
+  ],
+  "evaluations_completed": 1,
+  "gap_improvement_m": 0.017431095242500305,
+  "gap_improvement_threshold_m": 0.005,
+  "iterations": 25,
+  "mode": "PILOT_GATE",
+  "model_1999_used": false,
+  "num_envs": 64,
+  "pilot_checkpoint_allowed_for_formal": false,
+  "primary_reason": "MEAN_MINIMUM_SURFACE_GAP_IMPROVED_BY_AT_LEAST_5MM",
+  "resume": false,
+  "schema_version": 1,
+  "scientific_result_created": false,
+  "stage": "S2-03T",
+  "status": "PASS",
+  "training_contract_sha256": "221f27d2a22d3e07f9bd9a05680d61d57f3b2af59a2cf0ed4f5bd8af424e6316",
+  "training_run": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_pilot25_20260728_095241"
+}
