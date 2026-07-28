@@ -151,6 +151,9 @@ def test_precontact_reference_captures_full_exact_state_and_restores_on_subset_r
     assert "arm.restore_reference(env_ids" in environment
     assert "lower.restore_reference(env_ids" in environment
     assert "runtime_state(self).reset(env_ids)" in environment
+    assert "def installed_reference_tensor_diffs" in environment
+    assert "lower.hidden_state[0, env_id]" in environment
+    assert "previous_lower_policy_action" in environment
 
 
 def test_agent_and_training_entry_are_clean_no_resume_current_api() -> None:
@@ -181,6 +184,13 @@ def test_actor_evaluation_stops_on_first_done_and_calls_unchanged_evaluator() ->
     assert "post_initial_reset_count\": 0" in evaluator
     assert "scripts/stage2/evaluate_s2_03_attach_only.py" in wrapper
     assert "--enable_cameras" in wrapper
+    assert "precontact_reference_replay_comparison.json" in evaluator
+    assert "installed_reference_audit.json" in evaluator
+    assert "INSTALLED_PRECONTACT_REFERENCE_MISMATCH" in evaluator
+    assert "if not installed_valid:" in evaluator
+    assert "initial_observation_finite" in evaluator
+    assert "contact_counters_zero" in evaluator
+    assert "if replay_max_diff > 1.0e-5" not in evaluator
 
 
 def test_launchers_derive_effective_rc_from_authoritative_json() -> None:

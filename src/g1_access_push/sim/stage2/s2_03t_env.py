@@ -36,6 +36,37 @@ class S203TContactEnv(ManagerBasedRLEnv):
     def precontact_reference(self) -> dict[str, Any] | None:
         return self._s2_03t_reference
 
+    def installed_reference_tensor_diffs(self, env_id: int = 0) -> dict[str, float]:
+        """Compare the simulator state after reset with the installed frozen reference."""
+
+        if self._s2_03t_reference is None:
+            raise RuntimeError("PRECONTACT_REFERENCE_NOT_INSTALLED")
+        if not 0 <= env_id < self.num_envs:
+            raise IndexError(f"environment index out of range: {env_id}")
+        reference = self._s2_03t_reference
+        robot = self.scene["robot"]
+        box = self.scene["box"]
+        arm: ArmResidualAction = self.action_manager.get_term("arm_residual")
+        lower: FrozenRecurrentLowerBodyAction = self.action_manager.get_term("frozen_lower_body")
+        robot_root = robot.data.root_state_w[env_id].detach().clone()
+        robot_root[:3] -= self.scene.env_origins[env_id]
+        box_root = box.data.root_state_w[env_id].detach().clone()
+        box_root[:3] -= self.scene.env_origins[env_id]
+        actual = {
+            "robot_root_state_relative": robot_root,
+            "robot_joint_position": robot.data.joint_pos[env_id],
+            "robot_joint_velocity": robot.data.joint_vel[env_id],
+            "box_root_state_relative": box_root,
+            "arm_ik_target": arm.reference[env_id],
+            "lower_hidden_state": lower.hidden_state[0, env_id],
+            "lower_cell_state": lower.cell_state[0, env_id],
+            "previous_lower_policy_action": lower.previous_policy_actions[env_id],
+        }
+        return {
+            name: float(torch.max(torch.abs(value.detach().cpu() - reference[name])))
+            for name, value in actual.items()
+        }
+
     def install_precontact_reference(self, source: Path | dict[str, Any]) -> None:
         if isinstance(source, Path):
             reference = torch.load(source, map_location="cpu", weights_only=True)

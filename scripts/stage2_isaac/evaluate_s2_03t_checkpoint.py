@@ -197,11 +197,75 @@ try:
     ):
         tensor_diffs[name] = float(torch.max(torch.abs(replay_reference[name] - stored_reference[name])))
     replay_max_diff = max(tensor_diffs.values())
-    if replay_max_diff > 1.0e-5:
-        raise RuntimeError(f"PRECONTACT_REFERENCE_REPLAY_MISMATCH:{replay_max_diff}")
+    write_json(
+        RUN / "precontact_reference_replay_comparison.json",
+        {
+            "schema_version": 1,
+            "status": "DIAGNOSTIC_ONLY",
+            "camera_enabled_bootstrap": True,
+            "tensor_max_abs_diff": tensor_diffs,
+            "maximum_abs_diff": replay_max_diff,
+            "scientific_gate": False,
+        },
+    )
+    if not math.isfinite(replay_max_diff):
+        raise RuntimeError("PRECONTACT_REFERENCE_REPLAY_NONFINITE")
     env.install_precontact_reference(stored_reference)
     env._s2_03t_terminal_snapshots.clear()
-    env.reset(seed=args.development_seed)
+    initial_observation, _ = env.reset(seed=args.development_seed)
+    installed_tensor_diffs = env.installed_reference_tensor_diffs(0)
+    installed_max_diff = max(installed_tensor_diffs.values())
+    arm = env.action_manager.get_term("arm_residual")
+    lower = env.action_manager.get_term("frozen_lower_body")
+    installed_state = runtime_state(env)
+    installed_metric = installed_state.ensure()
+    installed_checks = {
+        "reference_tensors_finite": all(math.isfinite(value) for value in installed_tensor_diffs.values()),
+        "reference_tensors_within_tolerance": installed_max_diff <= 1.0e-5,
+        "arm_processed_equals_reference": bool(torch.equal(arm.processed_actions, arm.reference)),
+        "arm_raw_history_zero": bool(torch.count_nonzero(arm.raw_actions) == 0),
+        "arm_previous_history_zero": bool(torch.count_nonzero(arm.previous_raw_actions) == 0),
+        "arm_delta_history_zero": bool(torch.count_nonzero(arm.action_delta) == 0),
+        "arm_residual_zero": bool(torch.count_nonzero(arm.applied_residual) == 0),
+        "lower_public_action_empty": bool(lower.raw_actions.numel() == 0),
+        "lower_policy_matches_previous": bool(torch.equal(lower.policy_actions, lower.previous_policy_actions)),
+        "lower_processed_target_finite": bool(torch.isfinite(lower.processed_actions).all()),
+        "impulse_history_zero": bool(torch.count_nonzero(installed_state.impulse) == 0),
+        "force_history_zero": bool(torch.count_nonzero(installed_state.previous_force) == 0),
+        "contact_counters_zero": bool(
+            torch.count_nonzero(installed_state.verify_count) == 0
+            and torch.count_nonzero(installed_state.hold_count) == 0
+            and torch.count_nonzero(installed_state.single_hand_count) == 0
+            and torch.count_nonzero(installed_state.loss_streak) == 0
+        ),
+        "episode_length_zero": bool(torch.count_nonzero(env.episode_length_buf) == 0),
+        "terminal_snapshots_clear": not bool(env._s2_03t_terminal_snapshots),
+        "contacts_clear": not bool(installed_metric["contacts"].any()),
+        "box_reference_zero": bool(torch.count_nonzero(installed_metric["box_translation"]) == 0),
+        "base_reference_zero": bool(torch.count_nonzero(installed_metric["base_excursion"]) == 0),
+        "initial_observation_shape": list(initial_observation["policy"].shape) == [1, 77],
+        "initial_observation_finite": bool(torch.isfinite(initial_observation["policy"]).all()),
+    }
+    installed_valid = (
+        math.isfinite(installed_max_diff)
+        and installed_max_diff <= 1.0e-5
+        and all(installed_checks.values())
+    )
+    write_json(
+        RUN / "installed_reference_audit.json",
+        {
+            "schema_version": 1,
+            "status": "PASS" if installed_valid else "INVALID",
+            "reference_path": str(reference_path),
+            "reference_sha256": args.reference_sha256,
+            "tensor_max_abs_diff": installed_tensor_diffs,
+            "maximum_abs_diff": installed_max_diff,
+            "threshold": 1.0e-5,
+            "checks": installed_checks,
+        },
+    )
+    if not installed_valid:
+        raise RuntimeError(f"INSTALLED_PRECONTACT_REFERENCE_MISMATCH:{installed_max_diff}")
     transitions.append({"frame": len(records) - 1, "state": "APPROACH_NORMAL", "reason": None})
     wrapped = RslRlVecEnvWrapper(env, clip_actions=1.0)
     agent_cfg = S203TPPORunnerCfg()
@@ -318,6 +382,9 @@ try:
             "reference_path": str(reference_path),
             "reference_sha256": args.reference_sha256,
             "reference_replay_max_abs_diff": replay_max_diff,
+            "reference_replay_gate": "DIAGNOSTIC_ONLY_CAMERA_ENABLED_BOOTSTRAP",
+            "installed_reference_max_abs_diff": installed_max_diff,
+            "installed_reference_tensor_diffs": installed_tensor_diffs,
             "reference_tensor_diffs": tensor_diffs,
             "precontact_replay_audit": replay_audit,
             "terminal_snapshot": terminal_snapshot,
