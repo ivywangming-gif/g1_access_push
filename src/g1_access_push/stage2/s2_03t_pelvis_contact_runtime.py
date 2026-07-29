@@ -422,7 +422,7 @@ class BodyClearanceModel:
                     if not np.isfinite(transform).all():
                         raise ValueError("NONFINITE_COLLIDER_TRANSFORM")
                     homogeneous = np.concatenate((local, np.ones((len(local), 1), dtype=float)), axis=1)
-                    transformed = (homogeneous @ transform.T)[:, :3]
+                    transformed = (homogeneous @ transform)[:, :3]
                     if not np.isfinite(transformed).all():
                         raise ValueError("NONFINITE_COLLIDER_BOUND")
                     choices = [("INSTANCE_MESH_VERTICES_RAW", local), ("INSTANCE_MESH_VERTICES_TRANSFORMED", transformed)]
