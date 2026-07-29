@@ -90,7 +90,7 @@ def owning_body_name(prim: Any, body_names: set[str]) -> str | None:
 def body_path_map(stage: Any) -> dict[str, str]:
     root = stage.GetPrimAtPath("/World/envs/env_0/Robot")
     result: dict[str, str] = {}
-    for prim in Usd.PrimRange(root):
+    for prim in Usd.PrimRange(root, Usd.TraverseInstanceProxies()):
         if prim.HasAPI(UsdPhysics.RigidBodyAPI):
             result.setdefault(str(prim.GetName()), str(prim.GetPath()))
     return result
@@ -104,7 +104,7 @@ def collider_audit(stage: Any, robot: Any, body_paths: dict[str, str]) -> dict[s
     root = stage.GetPrimAtPath("/World/envs/env_0/Robot")
     body_names = set(str(v) for v in robot.body_names)
     entries: list[dict[str, Any]] = []
-    for prim in Usd.PrimRange(root):
+    for prim in Usd.PrimRange(root, Usd.TraverseInstanceProxies()):
         path = str(prim.GetPath())
         is_collision = prim.HasAPI(UsdPhysics.CollisionAPI) or prim.HasAPI(PhysxSchema.PhysxCollisionAPI) or "/collisions/" in path.lower()
         if not is_collision:
@@ -201,7 +201,7 @@ class ContactPairAuditor:
                                    "filter_path": body_path, "colliders": list(paths)})
         world = stage.GetPrimAtPath("/World")
         ground_paths: list[str] = []
-        for prim in Usd.PrimRange(world):
+        for prim in Usd.PrimRange(world, Usd.TraverseInstanceProxies()):
             path = str(prim.GetPath())
             if path.startswith("/World/envs/env_0/Robot"):
                 continue
