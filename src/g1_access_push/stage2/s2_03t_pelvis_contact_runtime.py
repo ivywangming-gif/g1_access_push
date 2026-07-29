@@ -12,6 +12,7 @@ import json
 import math
 import os
 import subprocess
+import shutil
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -449,8 +450,12 @@ class BodyClearanceModel:
 class VideoWriter:
     def __init__(self, path: Path, width: int, height: int, fps: int = 25) -> None:
         self.path, self.frames = path, 0
+        ffmpeg = shutil.which("ffmpeg")
+        if ffmpeg is None:
+            import imageio_ffmpeg
+            ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
         self.proc = subprocess.Popen(
-            ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s:v",
+            [ffmpeg, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s:v",
              f"{width}x{height}", "-r", str(fps), "-i", "-", "-an", "-c:v", "libx264", "-preset",
              "veryfast", "-crf", "20", "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(path)],
             stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
