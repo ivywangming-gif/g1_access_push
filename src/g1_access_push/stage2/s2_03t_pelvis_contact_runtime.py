@@ -105,7 +105,9 @@ def collider_audit(stage: Any, robot: Any, body_paths: dict[str, str]) -> dict[s
     body_names = set(str(v) for v in robot.body_names)
     entries: list[dict[str, Any]] = []
     for prim in Usd.PrimRange(root):
-        if not prim.HasAPI(UsdPhysics.CollisionAPI):
+        path = str(prim.GetPath())
+        is_collision = prim.HasAPI(UsdPhysics.CollisionAPI) or prim.HasAPI(PhysxSchema.PhysxCollisionAPI) or "/collisions/" in path.lower()
+        if not is_collision:
             continue
         owner = owning_body_name(prim, body_names)
         if owner is None:
