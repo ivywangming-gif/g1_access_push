@@ -118,7 +118,7 @@ def run(ns: dict[str, Any]) -> int:
     ns["static_state"].__globals__["PAIR"] = pair
     write_json(run_root / "contact_pair_sensor_audit.json", pair.coverage)
     clearance = ns["BodyClearanceModel"](stage, robot, colliders)
-    write_json(run_root / "runtime_clearance_model.json", {"radii_m": clearance.radii, "sources": clearance.sources, "diagnostics": clearance.diagnostics, "method": "CONSERVATIVE_WORLD_COLLIDER_VERTEX_BOUNDING_SPHERES"})
+    write_json(run_root / "runtime_clearance_model.json", {"radii_m": clearance.radii, "sources": clearance.sources, "diagnostics": clearance.diagnostics, "method": "CONSERVATIVE_OWNER_FRAME_COLLIDER_BOUNDING_SPHERES"})
     write_json(
         run_root / "resolved_config.json",
         {

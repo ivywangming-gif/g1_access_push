@@ -401,6 +401,7 @@ class BodyClearanceModel:
     """Conservative world collider-bound sphere clearance for dense replay."""
 
     def __init__(self, stage: Any, robot: Any, colliders: dict[str, Any]) -> None:
+        self.stage = stage
         self.robot, self.radii, self.sources, self.diagnostics = robot, {}, {}, {}
         cache = UsdGeom.BBoxCache(Usd.TimeCode.Default(), [UsdGeom.Tokens.default_], useExtentsHint=False)
         body_names = set(str(v) for v in robot.body_names)
@@ -409,39 +410,43 @@ class BodyClearanceModel:
             if owner not in body_names:
                 continue
             try:
+                owner_prim = stage.GetPrimAtPath(item.get("owning_body_path", ""))
+                owner_world = UsdGeom.Xformable(owner_prim).ComputeLocalToWorldTransform(Usd.TimeCode.Default())
+                owner_matrix = np.asarray([[float(owner_world[i][j]) for j in range(4)] for i in range(4)], dtype=float)
+                if not np.isfinite(owner_matrix).all():
+                    raise ValueError("NONFINITE_OWNER_TRANSFORM")
+                owner_inverse = np.linalg.inv(owner_matrix)
                 prim = stage.GetPrimAtPath(item["collider_prim"])
                 mesh = UsdGeom.Mesh(prim) if prim and prim.GetTypeName() == "Mesh" else None
                 points_attr = mesh.GetPointsAttr() if mesh is not None else None
                 points = points_attr.Get() if points_attr is not None and points_attr.IsValid() else None
-                body_id = list(robot.body_names).index(owner)
-                center = robot.data.body_pos_w[0, body_id].detach().cpu().numpy()
                 if points is not None and len(points):
                     local = np.asarray([[float(point[0]), float(point[1]), float(point[2])] for point in points], dtype=float)
-                    matrix = UsdGeom.Xformable(prim).ComputeLocalToWorldTransform(Usd.TimeCode.Default())
-                    transform = np.asarray([[float(matrix[i][j]) for j in range(4)] for i in range(4)], dtype=float)
-                    if not np.isfinite(transform).all():
-                        raise ValueError("NONFINITE_COLLIDER_TRANSFORM")
+                    mesh_world = UsdGeom.Xformable(prim).ComputeLocalToWorldTransform(Usd.TimeCode.Default())
+                    mesh_matrix = np.asarray([[float(mesh_world[i][j]) for j in range(4)] for i in range(4)], dtype=float)
+                    relative = mesh_matrix @ owner_inverse
+                    if not np.isfinite(relative).all():
+                        raise ValueError("NONFINITE_COLLIDER_RELATIVE_TRANSFORM")
                     homogeneous = np.concatenate((local, np.ones((len(local), 1), dtype=float)), axis=1)
-                    transformed = (homogeneous @ transform)[:, :3]
-                    if not np.isfinite(transformed).all():
-                        raise ValueError("NONFINITE_COLLIDER_BOUND")
-                    choices = [("INSTANCE_MESH_VERTICES_RAW", local), ("INSTANCE_MESH_VERTICES_TRANSFORMED", transformed)]
-                    source, samples = min(choices, key=lambda pair: float(np.linalg.norm(pair[1].mean(axis=0) - center)))
+                    samples = (homogeneous @ relative)[:, :3]
+                    source = "INSTANCE_MESH_VERTICES_OWNER_FRAME"
                 else:
                     box = cache.ComputeWorldBound(prim).ComputeAlignedRange()
                     lo, hi = box.GetMin(), box.GetMax()
-                    samples = np.asarray([[x, y, z] for x in (float(lo[0]), float(hi[0]))
-                                          for y in (float(lo[1]), float(hi[1]))
-                                          for z in (float(lo[2]), float(hi[2]))], dtype=float)
-                    source = "USD_BBOX"
+                    world_corners = np.asarray([[x, y, z] for x in (float(lo[0]), float(hi[0]))
+                                                for y in (float(lo[1]), float(hi[1]))
+                                                for z in (float(lo[2]), float(hi[2]))], dtype=float)
+                    homogeneous = np.concatenate((world_corners, np.ones((len(world_corners), 1), dtype=float)), axis=1)
+                    samples = (homogeneous @ owner_inverse)[:, :3]
+                    source = "USD_BBOX_OWNER_FRAME"
                 if not np.isfinite(samples).all():
                     raise ValueError("NONFINITE_COLLIDER_BOUND")
-                radius = float(np.linalg.norm(samples - center.reshape(1, 3), axis=1).max())
+                radius = float(np.linalg.norm(samples, axis=1).max())
                 if math.isfinite(radius) and 0.0 < radius < 2.0:
                     self.radii[owner] = max(self.radii.get(owner, 0.0), radius)
                     self.sources[owner] = source
                     self.diagnostics.setdefault(owner, {"source": source, "radius_m": radius,
-                                                        "centroid_distance_m": float(np.linalg.norm(samples.mean(axis=0) - center))})
+                                                        "owner_frame": "USD_COLLIDER_TO_OWNER_RIGID_BODY"})
             except Exception:
                 continue
         self.pelvis_id = list(robot.body_names).index("pelvis")
@@ -468,7 +473,7 @@ class BodyClearanceModel:
             return {"clearance_m": None, "pair": "UNKNOWN", "method": "COLLIDER_BOUND_SPHERE_UNAVAILABLE"}
         clearance, name = min(values)
         return {"clearance_m": clearance, "pair": f"pelvis::{name}",
-                "method": "CONSERVATIVE_WORLD_COLLIDER_BOUNDING_SPHERES"}
+                "method": "CONSERVATIVE_OWNER_FRAME_COLLIDER_BOUNDING_SPHERES"}
 
 
 class VideoWriter:
