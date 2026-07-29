@@ -1,0 +1,204 @@
+schema_version: 1
+stage: S2-03T_PELVIS_CONTACT_PAIR_AND_LEFT_ARM_PATH_RECOVERY
+status: WAYPOINT_SEARCH_PENDING
+development_scope: SIMULATION_DEVELOPMENT_ONLY
+
+# This file freezes the endpoint and safety contract for the isolated path
+# recovery campaign.  The runtime writes the selected waypoint values and
+# changes `status` to STATIC_COLLISION_VALIDATED_NOT_YET_DYNAMICALLY_CERTIFIED
+# only after the dense static audit has passed.  It must never alter the
+# endpoint or any formal S2-03 safety threshold.
+previous_authoritative_result:
+  status: FAIL
+  primary_reason: SAFETY_GATE_TRIGGERED
+  run_root: /root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_safe_chest_joint_reference_20260729_033538
+  result_commit: 23f2e48e21040e5c16c4c32ead740c68e4ff3410
+
+reference:
+  source: S2_02_OBSERVED_STABLE_ARM_Q
+  path: /root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_contract_smoke_20260728_104740/precontact_reference.pt
+  sha256: 1e537e075af7f888fb95a63501d3976d0d7740eff51c6bd9000f574b00cd0e6c
+  target_frame: ROOT
+  quaternion_order: wxyz
+  endpoint_must_remain_unchanged: true
+  arm_joint_order:
+    - left_shoulder_pitch_joint
+    - right_shoulder_pitch_joint
+    - left_shoulder_roll_joint
+    - right_shoulder_roll_joint
+    - left_shoulder_yaw_joint
+    - right_shoulder_yaw_joint
+    - left_elbow_joint
+    - right_elbow_joint
+    - left_wrist_roll_joint
+    - right_wrist_roll_joint
+    - left_wrist_pitch_joint
+    - right_wrist_pitch_joint
+    - left_wrist_yaw_joint
+    - right_wrist_yaw_joint
+  q_chest_arm_reference_rad:
+    - 0.42407718300819397
+    - 0.3559030294418335
+    - -0.061720527708530426
+    - 0.05856018513441086
+    - -0.007883468642830849
+    - -0.17393609881401062
+    - 0.7199919819831848
+    - 0.8523964881896973
+    - 0.14376944303512573
+    - -0.3120492398738861
+    - 0.5213500261306763
+    - 0.4298710525035858
+    - -0.002913616131991148
+    - 0.1546958088874817
+
+controller:
+  mode: JOINT_SPACE_MINIMUM_JERK
+  control_dt_s: 0.02
+  settle_steps: 50
+  segment_steps: 250
+  hold_steps: 500
+  joint_rate_limit_rad_s: 2.0
+  lower_body_command: [0.0, 0.0, 0.0, 0.7]
+  lower_body_checkpoint_sha256: a0151975a757a33f0f5ed236d5616e2a98643abe2b36e50ac9ad01b6dd1f6d7e
+  actor_enabled: false
+  planner_enabled: false
+  differential_ik_for_formal_move: false
+  box_used: false
+  walking_enabled: false
+  contact_attach_enabled: false
+  auto_reset: false
+  num_envs: 1
+
+contact_pair_audit:
+  replay_initial_state: true
+  focus_frame_range: [220, 245]
+  left_only_frame_range: [235, 241]
+  bilateral_frame_range: [240, 246]
+  pelvis_body_name: pelvis
+  one_to_one_filtered_queries: true
+  track_contact_points: true
+  required_counterparts:
+    - ground
+    - left_hand_palm_link
+    - left_wrist_yaw_link
+    - left_wrist_pitch_link
+    - left_wrist_roll_link
+    - left_forearm
+    - left_elbow_link
+    - left_upper_arm
+    - left_shoulder
+    - right_hand_palm_link
+    - right_wrist_yaw_link
+    - right_wrist_pitch_link
+    - right_wrist_roll_link
+    - right_forearm
+    - right_elbow_link
+    - right_upper_arm
+    - right_shoulder
+    - torso
+  required_fields:
+    - exact_prim_path_a
+    - exact_prim_path_b
+    - first_contact_frame
+    - first_contact_time_s
+    - last_contact_frame
+    - last_contact_time_s
+    - force_vector_n
+    - force_norm_n
+    - contact_point_world_xyz_m
+    - contact_normal_world_xyz
+    - contact_duration_s
+    - relative_body_velocity_mps
+    - body_pose_a
+    - body_pose_b
+    - involved_joint_positions_rad
+    - root_pose
+    - present_in_default_stand
+    - present_at_final_static_target
+
+static_path_audit:
+  straight_path_samples: 501
+  segment_samples: 251
+  development_clearance_m: 0.005
+  development_clearance_source: "explicit path-recovery development gate; no prior numeric margin exists in the frozen source"
+  straight_path_must_be_checked: true
+  endpoint_collision_free_is_not_sufficient: true
+  check_self_collision_pairs: true
+  check_pelvis_clearance: true
+  check_arm_torso_collision: true
+  check_fk_and_joint_limits: true
+
+waypoint_search:
+  maximum_segments: 3
+  maximum_waypoints: 2
+  left_arm_first: true
+  maximum_candidates: 32
+  candidate_generation: BOUNDED_DETERMINISTIC_TEMPLATES
+  right_arm_mode: DEFAULT_OR_CERTIFIED_PASS_PATH
+  endpoint: q_chest_arm_reference_rad
+  search_variables:
+    - left_shoulder_pitch_joint
+    - left_shoulder_roll_joint
+    - left_shoulder_yaw_joint
+    - left_elbow_joint
+    - left_wrist_pitch_joint
+    - left_wrist_yaw_joint
+  bounded_candidate_offsets_rad:
+    left_shoulder_pitch_joint: [-0.10, 0.0, 0.10]
+    left_shoulder_roll_joint: [-0.15, 0.0, 0.15]
+    left_shoulder_yaw_joint: [-0.15, 0.0, 0.15]
+    left_elbow_joint: [-0.15, 0.0, 0.15]
+    left_wrist_pitch_joint: [-0.10, 0.0, 0.10]
+    left_wrist_yaw_joint: [-0.10, 0.0, 0.10]
+  selected:
+    status: NOT_SELECTED
+    q_clear_arm_rad: null
+    q_lift_arm_rad: null
+    minimum_pelvis_clearance_m: null
+    static_collision_free: null
+    selection_score: null
+
+dynamic_validation:
+  independent_minimum_jerk_per_segment: true
+  tests:
+    - left_only
+    - right_only_regression
+    - bilateral
+  left_path_gate: full_endpoint_hold_and_safety_pass
+  bilateral_path_gate: full_endpoint_hold_10s_and_safety_pass
+  hold_seconds: 10.0
+  no_reset_accumulation: true
+  no_teleport: true
+
+frozen_formal_safety_gates:
+  minimum_joint_margin_rad: 0.10
+  static_joint_margin_rad: 0.12
+  forbidden_contact_force_n: 1.0
+  maximum_torque_ratio: 1.001
+  maximum_root_tilt_deg: 6.2075676918029785
+  root_height_range_m: [0.50, 1.00]
+
+outputs:
+  pair_audit: reports/stage2/s2_03t_pelvis_contact_pair_audit.json
+  waypoint_config: configs/stage2/s2_03t_safe_chest_waypoint_path.yaml
+  videos:
+    - pelvis_collision_debug_front.mp4
+    - pelvis_collision_debug_side.mp4
+    - left_waypoint_front.mp4
+    - left_waypoint_side.mp4
+    - bilateral_waypoint_front.mp4
+    - bilateral_waypoint_side.mp4
+
+prohibitions:
+  falcon: false
+  ppo: false
+  reward_changes: false
+  box: false
+  walking: false
+  contact_attach: false
+  planner: false
+  global_pelvis_collision_disable: false
+  threshold_changes: false
+  third_party_changes: false
+  active_controller_manifest_update: false
