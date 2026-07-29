@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "stage": "S2-03T_CHEST_PREPOSE_ONLY",
+  "status": "FAIL",
+  "primary_reason": "SAFETY_GATE_TRIGGERED",
+  "implementation_commit": "c84bbdc270ab8cc533b330ba41e9ce2edf20a6c6",
+  "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_chest_prepose_20260729_022014",
+  "seed": 42,
+  "control_mode": "DIFFERENTIAL_IK",
+  "target_source": "src/g1_access_push/stage2/s2_02_contract.py::object_local_targets",
+  "reference_sha256": "1e537e075af7f888fb95a63501d3976d0d7740eff51c6bd9000f574b00cd0e6c",
+  "hand_visual_type": "Unitree G1 Dex3-1 hand (runtime USD hand/finger prim audit)",
+  "hardware_hand_match": "UNKNOWN",
+  "end_effectors": {
+    "left": {"body": "left_hand_palm_link", "body_id": 30},
+    "right": {"body": "right_hand_palm_link", "body_id": 31}
+  },
+  "wrist_bodies": {
+    "left": {"body": "left_wrist_yaw_link", "body_id": 28},
+    "right": {"body": "right_wrist_yaw_link", "body_id": 29}
+  },
+  "arm_joint_order": {
+    "left": [
+      "left_shoulder_pitch_joint",
+      "left_shoulder_roll_joint",
+      "left_shoulder_yaw_joint",
+      "left_elbow_joint",
+      "left_wrist_roll_joint",
+      "left_wrist_pitch_joint",
+      "left_wrist_yaw_joint"
+    ],
+    "right": [
+      "right_shoulder_pitch_joint",
+      "right_shoulder_roll_joint",
+      "right_shoulder_yaw_joint",
+      "right_elbow_joint",
+      "right_wrist_roll_joint",
+      "right_wrist_pitch_joint",
+      "right_wrist_yaw_joint"
+    ]
+  },
+  "formal": {
+    "observed_control_frames": 150,
+    "expected_control_frames": 750,
+    "hold_seconds": 0.0,
+    "tracking_metric_scope": "OBSERVED_PRE_TERMINAL",
+    "left_position_error_p95_m": 0.1079415388405323,
+    "right_position_error_p95_m": 0.1304863527417183,
+    "left_position_error_max_m": 0.10883094370365143,
+    "right_position_error_max_m": 0.13117115199565887,
+    "oscillation_detected": false,
+    "root_displacement_xy_max_m": 0.03126310184597969,
+    "root_displacement_xyz_max_m": 0.06787551939487457,
+    "recurrent_reset_verified": true,
+    "safety_trigger": "ACTUAL_JOINT_MARGIN",
+    "trigger_frame": 150,
+    "trigger_time_s": 3.0,
+    "trigger_minimum_joint_margin_rad": 0.09391164779663086,
+    "trigger_minimum_target_joint_margin_rad": 0.09482550621032715,
+    "trigger_root_height_m": 0.7165290713310242,
+    "trigger_root_roll_deg": -0.5448593316555868,
+    "trigger_root_pitch_deg": -3.2504489023802656,
+    "trigger_root_tilt_deg": 3.295750376454628,
+    "trigger_arm_torque_ratio_max": 0.25277602672576904,
+    "trigger_forbidden_collision": false
+  },
+  "videos": {
+    "front_path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_chest_prepose_20260729_022014/chest_prepose_front.mp4",
+    "front_size_bytes": 100356,
+    "front_sha256": "1c5d9b9a5fbfcce59cca0af9290e83e9341befa011bab95fa738612cd88c0a33",
+    "side_path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_chest_prepose_20260729_022014/chest_prepose_side.mp4",
+    "side_size_bytes": 110852,
+    "side_sha256": "757c786227b87bde8906b6539e453fd946becddcd3a9fac3c54d64f2517207eb"
+  },
+  "scientific_contract": {
+    "box_used": false,
+    "contact_test_started": false,
+    "base_walking_started": false,
+    "ppo_started": false,
+    "checkpoint_training_started": false,
+    "falcon_started": false,
+    "planner_started": false,
+    "s2_04_started": false
+  },
+  "first_attempt": {
+    "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_chest_prepose_20260729_021142",
+    "status": "INVALID",
+    "reason": "RESULT_SERIALIZATION_NONFINITE_METRIC"
+  }
+}
