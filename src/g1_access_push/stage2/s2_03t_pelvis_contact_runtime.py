@@ -68,7 +68,7 @@ def tolist(value: Any) -> Any:
     return value
 
 
-def percentile(values: Iterable[float], q: float) -> float | None:
+def percentile(values: Iterable[float], q: float = 95.0) -> float | None:
     vals = list(values)
     return float(np.percentile(np.asarray(vals, dtype=float), q)) if vals else None
 
