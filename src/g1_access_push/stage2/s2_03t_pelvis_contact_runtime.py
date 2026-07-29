@@ -401,7 +401,7 @@ class BodyClearanceModel:
     """Conservative world collider-bound sphere clearance for dense replay."""
 
     def __init__(self, stage: Any, robot: Any, colliders: dict[str, Any]) -> None:
-        self.robot, self.radii, self.sources = robot, {}, {}
+        self.robot, self.radii, self.sources, self.diagnostics = robot, {}, {}, {}
         cache = UsdGeom.BBoxCache(Usd.TimeCode.Default(), [UsdGeom.Tokens.default_], useExtentsHint=False)
         body_names = set(str(v) for v in robot.body_names)
         for item in colliders["entries"]:
@@ -413,6 +413,8 @@ class BodyClearanceModel:
                 mesh = UsdGeom.Mesh(prim) if prim and prim.GetTypeName() == "Mesh" else None
                 points_attr = mesh.GetPointsAttr() if mesh is not None else None
                 points = points_attr.Get() if points_attr is not None and points_attr.IsValid() else None
+                body_id = list(robot.body_names).index(owner)
+                center = robot.data.body_pos_w[0, body_id].detach().cpu().numpy()
                 if points is not None and len(points):
                     local = np.asarray([[float(point[0]), float(point[1]), float(point[2])] for point in points], dtype=float)
                     matrix = UsdGeom.Xformable(prim).ComputeLocalToWorldTransform(Usd.TimeCode.Default())
@@ -420,8 +422,11 @@ class BodyClearanceModel:
                     if not np.isfinite(transform).all():
                         raise ValueError("NONFINITE_COLLIDER_TRANSFORM")
                     homogeneous = np.concatenate((local, np.ones((len(local), 1), dtype=float)), axis=1)
-                    samples = (homogeneous @ transform.T)[:, :3]
-                    source = "INSTANCE_MESH_VERTICES"
+                    transformed = (homogeneous @ transform.T)[:, :3]
+                    if not np.isfinite(transformed).all():
+                        raise ValueError("NONFINITE_COLLIDER_BOUND")
+                    choices = [("INSTANCE_MESH_VERTICES_RAW", local), ("INSTANCE_MESH_VERTICES_TRANSFORMED", transformed)]
+                    source, samples = min(choices, key=lambda pair: float(np.linalg.norm(pair[1].mean(axis=0) - center)))
                 else:
                     box = cache.ComputeWorldBound(prim).ComputeAlignedRange()
                     lo, hi = box.GetMin(), box.GetMax()
@@ -431,12 +436,12 @@ class BodyClearanceModel:
                     source = "USD_BBOX"
                 if not np.isfinite(samples).all():
                     raise ValueError("NONFINITE_COLLIDER_BOUND")
-                body_id = list(robot.body_names).index(owner)
-                center = robot.data.body_pos_w[0, body_id].detach().cpu().numpy()
                 radius = float(np.linalg.norm(samples - center.reshape(1, 3), axis=1).max())
                 if math.isfinite(radius) and 0.0 < radius < 2.0:
                     self.radii[owner] = max(self.radii.get(owner, 0.0), radius)
                     self.sources[owner] = source
+                    self.diagnostics.setdefault(owner, {"source": source, "radius_m": radius,
+                                                        "centroid_distance_m": float(np.linalg.norm(samples.mean(axis=0) - center))})
             except Exception:
                 continue
         self.pelvis_id = list(robot.body_names).index("pelvis")
