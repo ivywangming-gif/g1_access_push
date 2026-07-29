@@ -7,7 +7,7 @@ import math
 from pathlib import Path
 from typing import Any
 
-from g1_access_push.stage2.s2_03t_pelvis_contact_runtime import write_json
+from g1_access_push.stage2.s2_03t_pelvis_contact_runtime import tolist, write_json
 
 import torch
 
