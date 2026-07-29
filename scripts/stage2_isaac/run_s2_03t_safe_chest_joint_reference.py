@@ -1421,3 +1421,5 @@ finally:
         simulation_app.close()
     except Exception:
         pass
+
+raise SystemExit(rc)
