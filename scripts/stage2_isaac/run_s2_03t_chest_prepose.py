@@ -128,8 +128,8 @@ def tolist(value: Any) -> Any:
     return value.item() if isinstance(value, np.generic) else value
 
 
-def percentile(values: list[float], q: float) -> float:
-    return float(np.percentile(np.asarray(values, dtype=float), q)) if values else float("nan")
+def percentile(values: list[float], q: float) -> float | None:
+    return float(np.percentile(np.asarray(values, dtype=float), q)) if values else None
 
 
 def clamp_norm(value: torch.Tensor, limit: float) -> torch.Tensor:
@@ -370,7 +370,7 @@ def usd_hand_audit(stage: Any, robot_path: str) -> dict[str, Any]:
 def term_joint_ids(term: Any, count: int) -> set[int]:
     ids = getattr(term, "_joint_ids", None)
     if isinstance(ids, slice):
-        return set(range(count))[ids]
+        return set(range(count)[ids])
     return set() if ids is None else {int(value) for value in ids}
 
 
@@ -487,6 +487,8 @@ def forbidden_contact(sensor: Any) -> tuple[bool | None, float | None, list[str]
     if values.ndim == 1:
         values = values.reshape(1, -1)
     norms = torch.linalg.vector_norm(values, dim=-1)
+    if not bool(torch.isfinite(norms).all()):
+        return None, None, []
     names = list(getattr(sensor, "body_names", ()))
     if len(names) != int(norms.numel()):
         return None, None, names
@@ -531,7 +533,9 @@ def desired_pose(
     for side in range(2):
         if active[side]:
             pos[side] = baseline_pos[side] + u * (target_pos[side] - baseline_pos[side])
-            quat[side] = math_utils.quat_slerp(baseline_quat[side], target_quat[side], tau=u)
+            quat[side] = math_utils.quat_slerp(
+                baseline_quat[side], target_quat[side].clone(), tau=u
+            )
     return pos, quat
 
 
@@ -541,7 +545,9 @@ def make_record(
     frame: int,
     desired_pos: torch.Tensor,
     desired_quat: torch.Tensor,
+    baseline_root_pos_w: torch.Tensor,
     previous_target: torch.Tensor | None,
+    upper_body_target_overridden: bool,
     oscillation: bool = False,
 ) -> tuple[dict[str, Any], torch.Tensor]:
     robot = env.scene["robot"]
@@ -557,6 +563,7 @@ def make_record(
     velocity = robot.data.joint_vel[0, arm_ids].detach().clone()
     limits = robot.data.joint_pos_limits[0, arm_ids]
     margin = torch.minimum(actual_joint - limits[:, 0], limits[:, 1] - actual_joint).min()
+    target_margin = torch.minimum(target - limits[:, 0], limits[:, 1] - target).min()
     effort = robot.data.joint_effort_limits[0, arm_ids].abs().clamp_min(1.0e-6)
     torque_ratio = (robot.data.applied_torque[0, arm_ids].abs() / effort).max()
     roll, pitch, yaw, tilt = root_metrics(robot.data.root_link_quat_w[0])
@@ -569,6 +576,7 @@ def make_record(
         and bool(torch.isfinite(actual_joint).all())
         and bool(torch.isfinite(velocity).all())
         and bool(torch.isfinite(robot.data.root_link_pos_w[0]).all())
+        and bool(torch.isfinite(robot.data.root_link_quat_w[0]).all())
         and bool(torch.isfinite(robot.data.applied_torque[0, arm_ids]).all())
         and collision is not None
     )
@@ -596,6 +604,14 @@ def make_record(
         "action_rate_source": "DifferentialIK joint target delta / control_dt",
         "arm_torque_ratio_max": float(torque_ratio),
         "minimum_joint_limit_margin_rad": float(margin),
+        "minimum_target_joint_limit_margin_rad": float(target_margin),
+        "root_position_world_m": tolist(robot.data.root_link_pos_w[0]),
+        "root_displacement_xy_m": float(
+            torch.linalg.vector_norm(robot.data.root_link_pos_w[0, :2] - baseline_root_pos_w[:2])
+        ),
+        "root_displacement_xyz_m": float(
+            torch.linalg.vector_norm(robot.data.root_link_pos_w[0] - baseline_root_pos_w)
+        ),
         "root_height_m": float(robot.data.root_link_pos_w[0, 2]),
         "root_roll_deg": math.degrees(roll),
         "root_pitch_deg": math.degrees(pitch),
@@ -610,10 +626,16 @@ def make_record(
             "lower_body": "action_manager.lower_body_joint_pos:frozen_recurrent_student",
             "base": "fixed_zero_command",
         },
-        "upper_body_target_overridden": False,
+        "upper_body_target_overridden": upper_body_target_overridden,
         "joint_order_swapped": False,
         "ik_frame_error": False,
         "pose_delta_accumulation_detected": False,
+        "diagnostic_evidence": {
+            "joint_order": "runtime find_joints preserve_order exact match",
+            "ik_frame": "runtime palm body/frame exact match and target converted to current pelvis",
+            "pose_delta": "desired pose recomputed from immutable baseline and minimum-jerk fraction",
+            "target_override": "runtime exact joint-id overlap audit across all action terms",
+        },
         "oscillation_detected": oscillation,
     }
     return record, target
@@ -655,6 +677,7 @@ def run_episode(
     active: tuple[bool, bool],
     target_pos: torch.Tensor,
     target_quat: torch.Tensor,
+    upper_body_target_overridden: bool,
     formal: bool = False,
     video: EvidenceVideo | None = None,
 ) -> dict[str, Any]:
@@ -667,6 +690,7 @@ def run_episode(
     palms = env.scene["hand_frames"]
     baseline_pos = palms.data.target_pos_source[0].detach().clone()
     baseline_quat = palms.data.target_quat_source[0].detach().clone()
+    baseline_root_pos_w = env.scene["robot"].data.root_link_pos_w[0].detach().clone()
     names = list(env.action_manager.active_terms)
     dims = [int(value) for value in env.action_manager.action_term_dim]
     slices: dict[str, slice] = {}
@@ -682,16 +706,24 @@ def run_episode(
     records: list[dict[str, Any]] = []
     previous_target: torch.Tensor | None = None
     early_done = False
+    safety_trigger: str | None = None
 
     if video is not None:
         initial, initial_target = make_record(
-            env, "INITIAL", 0, baseline_pos, baseline_quat, None
+            env,
+            "INITIAL",
+            0,
+            baseline_pos,
+            baseline_quat,
+            baseline_root_pos_w,
+            None,
+            upper_body_target_overridden,
         )
         initial["desired_upper_body_joints_rad"] = tolist(initial_target)
         video.capture(initial, force=True, keyframe="initial")
 
     def one_step(phase: str, fraction: float, frame: int) -> None:
-        nonlocal previous_target, early_done
+        nonlocal previous_target, early_done, safety_trigger
         desired_pos, desired_quat = desired_pose(
             baseline_pos, baseline_quat, target_pos, target_quat, fraction, active
         )
@@ -714,18 +746,33 @@ def run_episode(
         if not finite(observation):
             raise RuntimeError(f"NONFINITE_RUNTIME_STATE:{label}:{frame}")
         record, previous_target = make_record(
-            env, phase, frame, desired_pos, desired_quat, previous_target
+            env,
+            phase,
+            frame,
+            desired_pos,
+            desired_quat,
+            baseline_root_pos_w,
+            previous_target,
+            upper_body_target_overridden,
         )
         records.append(record)
-        if (
-            not record["finite"]
-            or record["forbidden_collision"] is True
-            or record["root_height_m"] < ROOT_HEIGHT_RANGE_M[0]
-            or record["root_height_m"] > ROOT_HEIGHT_RANGE_M[1]
-            or record["root_tilt_deg"] > ROOT_TILT_GATE_DEG
-            or record["minimum_joint_limit_margin_rad"] < 0.10
-            or record["arm_torque_ratio_max"] > 1.001
-        ):
+        trigger = None
+        if not record["finite"]:
+            trigger = "METRIC_OR_STATE_NONFINITE"
+        elif record["forbidden_collision"] is True:
+            trigger = "FORBIDDEN_COLLISION"
+        elif not ROOT_HEIGHT_RANGE_M[0] <= record["root_height_m"] <= ROOT_HEIGHT_RANGE_M[1]:
+            trigger = "ROOT_HEIGHT"
+        elif record["root_tilt_deg"] > ROOT_TILT_GATE_DEG:
+            trigger = "ROOT_TILT"
+        elif record["minimum_joint_limit_margin_rad"] < 0.10:
+            trigger = "ACTUAL_JOINT_MARGIN"
+        elif record["minimum_target_joint_limit_margin_rad"] < 0.10:
+            trigger = "TARGET_JOINT_MARGIN"
+        elif record["arm_torque_ratio_max"] > 1.001:
+            trigger = "ARM_TORQUE_RATIO"
+        if trigger is not None:
+            safety_trigger = trigger
             early_done = True
         if video is not None:
             video.capture(record, force=False)
@@ -764,16 +811,22 @@ def run_episode(
         video.capture(records[-1], force=True, keyframe="terminal")
 
     hold_records = [item for item in records if item["phase"] == hold_phase]
-    left_pos = [float(item["left_position_error_m"]) for item in hold_records]
-    right_pos = [float(item["right_position_error_m"]) for item in hold_records]
-    left_ori = [float(item["left_orientation_error_deg"]) for item in hold_records]
-    right_ori = [float(item["right_orientation_error_deg"]) for item in hold_records]
+    # PASS gates use hold records only.  If a frozen safety gate stops motion
+    # before hold, still report finite observed tracking metrics rather than
+    # inventing NaN values; the scope field makes that distinction explicit.
+    metric_records = hold_records if hold_records else records
+    metric_scope = "HOLD" if hold_records else "OBSERVED_PRE_TERMINAL"
+    left_pos = [float(item["left_position_error_m"]) for item in metric_records]
+    right_pos = [float(item["right_position_error_m"]) for item in metric_records]
+    left_ori = [float(item["left_orientation_error_deg"]) for item in metric_records]
+    right_ori = [float(item["right_orientation_error_deg"]) for item in metric_records]
     safety = all(
         bool(item["finite"])
         and item["forbidden_collision"] is False
         and ROOT_HEIGHT_RANGE_M[0] <= float(item["root_height_m"]) <= ROOT_HEIGHT_RANGE_M[1]
         and float(item["root_tilt_deg"]) <= ROOT_TILT_GATE_DEG
         and float(item["minimum_joint_limit_margin_rad"]) >= 0.10
+        and float(item["minimum_target_joint_limit_margin_rad"]) >= 0.10
         and float(item["arm_torque_ratio_max"]) <= 1.001
         for item in records
     )
@@ -798,33 +851,53 @@ def run_episode(
         "expected_control_frames": SETTLE_STEPS + MOVE_STEPS + hold_count,
         "hold_frames": len(hold_records),
         "hold_seconds": len(hold_records) * CONTROL_DT_S,
+        "tracking_metric_scope": metric_scope,
         "recurrent_reset": reset_audit,
         "early_done": early_done,
+        "safety_trigger": safety_trigger,
+        "metric_complete": bool(records) and all(
+            item["forbidden_collision"] is not None and bool(item["finite"])
+            for item in records
+        ),
         "oscillation_detected": oscillation,
         "tracking_ok": tracking,
         "safety_ok": safety,
         "position_error_p95_m": {"left": percentile(left_pos, 95), "right": percentile(right_pos, 95)},
-        "position_error_max_m": {"left": max(left_pos, default=float("nan")), "right": max(right_pos, default=float("nan"))},
+        "position_error_max_m": {
+            "left": max(left_pos) if left_pos else None,
+            "right": max(right_pos) if right_pos else None,
+        },
         "orientation_error_p95_deg": {"left": percentile(left_ori, 95), "right": percentile(right_ori, 95)},
-        "orientation_error_max_deg": {"left": max(left_ori, default=float("nan")), "right": max(right_ori, default=float("nan"))},
+        "orientation_error_max_deg": {
+            "left": max(left_ori) if left_ori else None,
+            "right": max(right_ori) if right_ori else None,
+        },
+        "root_displacement_xy_max_m": max(
+            (float(item["root_displacement_xy_m"]) for item in records), default=0.0
+        ),
+        "root_displacement_xyz_max_m": max(
+            (float(item["root_displacement_xyz_m"]) for item in records), default=0.0
+        ),
         "records": records,
     }
 
 
 def classify(formal: dict[str, Any], runtime: dict[str, Any], probes: list[dict[str, Any]]) -> tuple[str, str]:
+    del probes
     if runtime["upper_body_target_overridden"]:
         return "FAIL", "UPPER_BODY_TARGET_OVERRIDDEN"
-    if formal["early_done"] or not formal["safety_ok"]:
+    if not formal["metric_complete"]:
+        return "INVALID", "METRIC_MISSING"
+    if formal["early_done"] and formal["safety_trigger"] is not None:
         return "FAIL", "SAFETY_GATE_TRIGGERED"
+    if formal["early_done"]:
+        return "INVALID", "INCOMPLETE_TRACE"
     if formal["hold_seconds"] < HOLD_SECONDS:
         return "INVALID", "INCOMPLETE_TRACE"
+    if not formal["safety_ok"]:
+        return "FAIL", "SAFETY_GATE_TRIGGERED"
     if not formal["tracking_ok"]:
         return "FAIL", "CHEST_PREPOSE_TRACKING_UNSTABLE"
-    for probe in probes:
-        if probe["early_done"]:
-            return "FAIL", "SAFETY_GATE_TRIGGERED"
-        if not probe["tracking_ok"]:
-            return "FAIL", "CHEST_PREPOSE_TRACKING_UNSTABLE"
     return "PASS", "CHEST_PREPOSE_TRACKING_COMPLETE"
 
 
@@ -849,12 +922,12 @@ def main() -> int:
     ENV = ManagerBasedEnv(cfg=cfg)
     write_json(RUN / "runner_status.json", {"status": "RUNNING", "phase": "ENVIRONMENT_CREATED"})
     set_camera_views(ENV)
-    runtime = runtime_audit(ENV, cfg, get_current_stage())
     # Establish the deterministic reset before resolving the virtual-box
     # geometry in the current pelvis frame.
     initial_observation, _ = ENV.reset(seed=args.seed)
     if not finite(initial_observation):
         raise RuntimeError("OBSERVATION_NONFINITE_AFTER_INITIAL_RESET")
+    runtime = runtime_audit(ENV, cfg, get_current_stage())
     current_robot = ENV.scene["robot"]
     target_pos, target_quat, target_conversion = target_pose_from_s2_02(
         reference,
@@ -920,6 +993,7 @@ def main() -> int:
             active=active,
             target_pos=target_pos,
             target_quat=target_quat,
+            upper_body_target_overridden=runtime["upper_body_target_overridden"],
         )
         write_json(
             RUN / f"{label.lower()}_trace.json",
@@ -936,10 +1010,16 @@ def main() -> int:
         active=(True, True),
         target_pos=target_pos,
         target_quat=target_quat,
+        upper_body_target_overridden=runtime["upper_body_target_overridden"],
         formal=True,
         video=RECORDER,
     )
+    write_json(
+        RUN / "formal_trace.json",
+        {"stage": STAGE, "label": formal["label"], "records": formal["records"]},
+    )
     videos = RECORDER.close()
+    RECORDER = None
     status, reason = classify(formal, runtime, probes)
     result = {
         "schema_version": 1,

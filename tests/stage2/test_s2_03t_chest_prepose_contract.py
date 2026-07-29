@@ -82,6 +82,15 @@ def test_runner_uses_manager_based_env_two_tuple_step() -> None:
     assert "truncated" not in runner
 
 
+def test_early_safety_stop_remains_json_compliant_and_auditable() -> None:
+    runner = RUNNER.read_text(encoding="utf-8")
+    assert 'default=float("nan")' not in runner
+    assert '"left": max(left_pos) if left_pos else None' in runner
+    assert 'return "FAIL", "SAFETY_GATE_TRIGGERED"' in runner
+    assert 'return "INVALID", "METRIC_MISSING"' in runner
+    assert 'RUN / "formal_trace.json"' in runner
+
+
 def test_reference_sha_contract_is_not_retyped() -> None:
     contract = (
         ROOT / "src/g1_access_push/stage2/s2_03t_chest_prepose_contract.py"
