@@ -25,10 +25,25 @@ from isaaclab.sensors import ContactSensor, ContactSensorCfg
 CONTACT_EPS_N = 1.0e-6
 
 
+def _json_safe(value: Any) -> Any:
+    """Normalize tensors/NumPy values and unresolved non-finite diagnostics."""
+    if isinstance(value, torch.Tensor):
+        return _json_safe(value.detach().cpu().tolist())
+    if isinstance(value, np.generic):
+        return _json_safe(value.item())
+    if isinstance(value, float):
+        return value if math.isfinite(value) else "METRIC_MISSING"
+    if isinstance(value, dict):
+        return {str(key): _json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_safe(item) for item in value]
+    return value
+
+
 def write_json(path: Path, value: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.tmp.{os.getpid()}")
-    temporary.write_text(json.dumps(value, indent=2, sort_keys=True, allow_nan=False) + "\n", encoding="utf-8")
+    temporary.write_text(json.dumps(_json_safe(value), indent=2, sort_keys=True, allow_nan=False) + "\n", encoding="utf-8")
     os.replace(temporary, path)
 
 
