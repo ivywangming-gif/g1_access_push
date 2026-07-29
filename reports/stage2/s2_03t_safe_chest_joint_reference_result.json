@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "stage": "S2-03T_SAFE_CHEST_JOINT_REFERENCE_RECOVERY",
+  "run_root": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_safe_chest_joint_reference_20260729_033538",
+  "source_commit": "da42393",
+  "status": "FAIL",
+  "primary_reason": "SAFETY_GATE_TRIGGERED",
+  "old_target_can_pass_0p10_margin_gate": "NO",
+  "old_trace": {
+    "records": 150,
+    "trigger_frame": 150,
+    "trigger_time_s": 3.0,
+    "limiting_joint": "right_elbow_joint",
+    "limits_rad": [-1.0471998453140259, 2.0943996906280518],
+    "actual_q_rad": 2.000488042831421,
+    "requested_target_q_rad": 1.9995741844177246,
+    "actual_margin_rad": 0.09391164779663086,
+    "target_margin_rad": 0.09482550621032715,
+    "pre_formal_move_target_margin_rad": 0.6854630708694458,
+    "first_target_below_0p10_frame": 150,
+    "max_actual_delta_q_rad": 0.06104087829589844,
+    "max_target_delta_q_rad": 0.05306804180145264,
+    "clip_pre_post": "METRIC_MISSING",
+    "jacobian_singular_values": "METRIC_MISSING",
+    "jacobian_condition_number": "METRIC_MISSING",
+    "dls_lambda": 0.01
+  },
+  "target_frame_audit": {
+    "status": "PASS",
+    "target_frame": "ROOT",
+    "quaternion_order": "wxyz",
+    "max_position_abs_diff_m": 5.960464477539063e-08,
+    "max_rotation_matrix_abs_diff": 1.2665987014770508e-07,
+    "palm_collision_support_offset_m": 0.44023889869451527,
+    "object_local_targets_m": [
+      [-1.1002388986945153, 0.15, 0.020000000000000018],
+      [-1.1002388986945153, -0.15, 0.020000000000000018]
+    ]
+  },
+  "default_arms_stand_baseline": {
+    "status": "PASS",
+    "observed_frames": 550,
+    "hold_seconds": 10.0,
+    "max_root_tilt_deg": 3.9048217171779855,
+    "max_torque_ratio": 0.20618252456188202,
+    "recurrent_reset": "PASS"
+  },
+  "static_reference": {
+    "source": "S2-02 precontact_reference.pt::arm_ik_target",
+    "source_enum": "S2_02_OBSERVED_STABLE_ARM_Q",
+    "observed_s2_02_trace_median_q": "METRIC_MISSING",
+    "selected_candidate": "FULL_S2_02_ORIENTATION",
+    "status": "KINEMATICALLY_VALIDATED_NOT_YET_DYNAMICALLY_CERTIFIED",
+    "minimum_joint_margin_rad": 1.0930795669555664,
+    "limiting_joint": "left_wrist_pitch_joint",
+    "left_fk_position_residual_m": 0.0029715087730437517,
+    "right_fk_position_residual_m": 0.0018332693725824356,
+    "left_orientation_residual_deg": 0.6350836355499206,
+    "right_orientation_residual_deg": 0.6367194658561387,
+    "collision_free": "YES",
+    "ablation_candidates": {
+      "POSITION_ONLY": {"safe": false, "max_position_residual_m": 0.174655482172966},
+      "RELAXED_ORIENTATION": {"safe": true, "max_position_residual_m": 0.04394384101033211},
+      "FULL_S2_02_ORIENTATION": {"safe": true, "max_position_residual_m": 0.0029715087730437517}
+    }
+  },
+  "formal_joint_space_trajectory": {
+    "control_mode": "JOINT_SPACE_MINIMUM_JERK",
+    "differential_ik_used": "NO",
+    "expected_frames": 800,
+    "observed_frames": 243,
+    "hold_seconds": 0.0,
+    "first_forbidden_collision_frame": 243,
+    "first_forbidden_collision_time_s": 4.86,
+    "forbidden_contact_bodies": ["pelvis"],
+    "forbidden_contact_force_max_n": 1.0534766912460327,
+    "minimum_actual_joint_margin_at_trigger_rad": 1.1349399089813232,
+    "minimum_target_joint_margin_at_trigger_rad": 1.1356661319732666,
+    "root_height_at_trigger_m": 0.7208517789840698,
+    "root_tilt_at_trigger_deg": 3.6533793780849586,
+    "torque_ratio_at_trigger": 0.03712977468967438,
+    "oscillation_detected": "NO",
+    "command_clip_count": 0
+  },
+  "videos": {
+    "front": {
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_safe_chest_joint_reference_20260729_033538/safe_chest_joint_front.mp4",
+      "size_bytes": 1081696,
+      "sha256": "04081c0cb2e8bcebf86f4c02d0df6d6cdc157d1b67eb180ff6cc7865c2e36626",
+      "encoded_frames": 401,
+      "complete_10s_hold": "NO_SAFETY_STOP_BEFORE_HOLD"
+    },
+    "side": {
+      "path": "/root/autodl-tmp/robotics/runs/g1_access_push/stage2/s2_03t_safe_chest_joint_reference_20260729_033538/safe_chest_joint_side.mp4",
+      "size_bytes": 1104731,
+      "sha256": "798abc5c216158ee32c5639f01688f311727e3afc353c77bf0054d333da7d278",
+      "encoded_frames": 401,
+      "complete_10s_hold": "NO_SAFETY_STOP_BEFORE_HOLD"
+    }
+  },
+  "scientific_contract": {
+    "box_used": false,
+    "contact_test_started": false,
+    "base_walking_started": false,
+    "ppo_started": false,
+    "falcon_started": false,
+    "planner_started": false
+  },
+  "teardown": {
+    "result_written_before_teardown": true,
+    "kit_teardown": "SIGTERM_AFTER_RESULT_WRITTEN_DUE_TIMEOUT",
+    "second_parallel_isaac": false
+  },
+  "provenance_note": "S2-02 formal trace did not persist 14D arm q vectors; the selected q is the frozen precontact_reference.pt arm_ik_target. The required observed-q median is therefore METRIC_MISSING and is not claimed as a trace-derived median."
+}
