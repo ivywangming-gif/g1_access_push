@@ -78,6 +78,7 @@ from g1_access_push.stage2.s2_03t_pelvis_contact_path_recovery_contract import (
     segment_samples,
 )
 from g1_access_push.stage2.s2_03t_pelvis_contact_runtime import (  # noqa: E402
+    CONTACT_EPS_N,
     BodyClearanceModel,
     ContactPairAuditor,
     EvidenceVideo,
