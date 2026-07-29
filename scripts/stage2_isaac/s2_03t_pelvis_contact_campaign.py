@@ -112,9 +112,13 @@ def run(ns: dict[str, Any]) -> int:
         raise RuntimeError("COLLIDER_AUDIT_INCOMPLETE")
     pair = ns["ContactPairAuditor"](env, stage, runtime, colliders, ns["CONTROL_DT_S"])
     ns["PAIR"] = pair
+    # runpy keeps runner function globals separate from the campaign namespace
+    # in some Isaac entry paths; bind the auditor explicitly for every record.
+    ns["run_episode"].__globals__["PAIR"] = pair
+    ns["static_state"].__globals__["PAIR"] = pair
     write_json(run_root / "contact_pair_sensor_audit.json", pair.coverage)
     clearance = ns["BodyClearanceModel"](stage, robot, colliders)
-    write_json(run_root / "runtime_clearance_model.json", {"radii_m": clearance.radii, "method": "CONSERVATIVE_WORLD_COLLIDER_BOUNDING_SPHERES"})
+    write_json(run_root / "runtime_clearance_model.json", {"radii_m": clearance.radii, "sources": clearance.sources, "method": "CONSERVATIVE_WORLD_COLLIDER_VERTEX_BOUNDING_SPHERES"})
     write_json(
         run_root / "resolved_config.json",
         {
