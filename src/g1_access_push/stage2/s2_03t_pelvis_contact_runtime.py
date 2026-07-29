@@ -97,7 +97,7 @@ def body_path_map(stage: Any) -> dict[str, str]:
 
 
 def _matrix(value: Gf.Matrix4d) -> list[list[float]]:
-    return [[float(value[i][j]) for j in range(4)] for i in range(4)]
+    return [[(float(value[i][j]) if math.isfinite(float(value[i][j])) else "METRIC_MISSING") for j in range(4)] for i in range(4)]
 
 
 def collider_audit(stage: Any, robot: Any, body_paths: dict[str, str]) -> dict[str, Any]:
@@ -139,7 +139,7 @@ def collider_audit(stage: Any, robot: Any, body_paths: dict[str, str]) -> dict[s
                 "collider_approximation": str(approximation) if approximation is not None else "DEFAULT_OR_NOT_APPLICABLE",
                 "local_transform": _matrix(local),
                 "world_transform_at_audit": _matrix(world),
-                "scale_rotation_matrix_product": [[float(scale[i][j]) for j in range(3)] for i in range(3)],
+                "scale_rotation_matrix_product": ([[float(scale[i][j]) for j in range(3)] for i in range(3)] if all(math.isfinite(float(scale[i][j])) for i in range(3) for j in range(3)) else "METRIC_MISSING"),
                 "contact_offset_m": contact_offset,
                 "rest_offset_m": rest_offset,
                 "collision_enabled": enabled,
