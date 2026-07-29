@@ -657,9 +657,10 @@ def target_frame_audit(
 
 def palm_poses_in_root(env: Any, body_ids: list[int]) -> tuple[torch.Tensor, torch.Tensor]:
     robot = env.scene["robot"]
+    count = len(body_ids)
     return math_utils.subtract_frame_transforms(
-        robot.data.root_link_pos_w,
-        robot.data.root_link_quat_w,
+        robot.data.root_link_pos_w.unsqueeze(1).expand(-1, count, -1),
+        robot.data.root_link_quat_w.unsqueeze(1).expand(-1, count, -1),
         robot.data.body_pos_w[:, body_ids],
         robot.data.body_quat_w[:, body_ids],
     )
@@ -693,8 +694,10 @@ def static_candidate_audit(
     for label, candidate in candidates.items():
         env.reset(seed=42)
         set_arm_q(env, arm_ids, candidate.to(device=env.device))
-        actual_pos, actual_quat = palm_poses_in_root(env, body_ids)
-        pos_err = actual_pos[0] - target_pos
+        actual_pos_batch, actual_quat_batch = palm_poses_in_root(env, body_ids)
+        actual_pos = actual_pos_batch[0]
+        actual_quat = actual_quat_batch[0]
+        pos_err = actual_pos - target_pos
         ori_err = math_utils.compute_pose_error(actual_pos, actual_quat, target_pos, target_quat, rot_error_type="axis_angle")[1]
         margins = torch.minimum(candidate - limits[:, 0], limits[:, 1] - candidate)
         collision, force_max, bodies = forbidden_contact(env.scene["contact_forces"])
@@ -789,7 +792,9 @@ def make_record(
     target_margins = torch.minimum(actuator_target - limits[:, 0], limits[:, 1] - actuator_target)
     effort = robot.data.joint_effort_limits[0, arm_ids].abs().clamp_min(1.0e-6)
     torque_ratio = (robot.data.applied_torque[0, arm_ids].abs() / effort).max()
-    actual_pos, actual_quat = palm_poses_in_root(env, body_ids)
+    actual_pos_batch, actual_quat_batch = palm_poses_in_root(env, body_ids)
+    actual_pos = actual_pos_batch[0]
+    actual_quat = actual_quat_batch[0]
     pose_error = math_utils.compute_pose_error(
         actual_pos, actual_quat, target_pos, target_quat, rot_error_type="axis_angle"
     )
